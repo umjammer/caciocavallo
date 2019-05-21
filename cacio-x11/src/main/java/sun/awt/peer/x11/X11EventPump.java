@@ -48,7 +48,7 @@ class X11EventPump extends CacioEventPump<X11EventData> {
 
     X11EventPump() {
         eventData = new X11EventData();
-        windowMap = new HashMap<Long,X11PlatformWindow>();
+        windowMap = new HashMap<>();
     }
 
     @Override
@@ -77,7 +77,7 @@ class X11EventPump extends CacioEventPump<X11EventData> {
                 X11PlatformWindow w = windowMap.get(Long.valueOf(nativeEvent.getWindow()));
                 CacioComponent source = w.getCacioComponent();
                 Component c = source.getAWTComponent();
-                System.err.println("exposing: " + c);
+                System.err.println("X11EventPump::dispatchNativeEvent: exposing: " + c);
                 postPaintEvent(source, 0, 0, c.getWidth(), c.getHeight());
                 break;
             }
@@ -93,7 +93,7 @@ class X11EventPump extends CacioEventPump<X11EventData> {
                 CacioComponent source = w.getCacioComponent();
                 Component c = source.getAWTComponent();
                 /* TODO: Fix mods. */
-                System.err.println("BUTTON_PRESS");
+                System.err.println("X11EventPump::dispatchNativeEvent: BUTTON_PRESS");
                 postMouseEvent(source, MouseEvent.MOUSE_PRESSED, System.currentTimeMillis(), MouseEvent.BUTTON1_DOWN_MASK, nativeEvent.getX(), nativeEvent.getY(), 0, false);
                 break;
             }
@@ -102,12 +102,12 @@ class X11EventPump extends CacioEventPump<X11EventData> {
                 CacioComponent source = w.getCacioComponent();
                 Component c = source.getAWTComponent();
                 /* TODO: Fix mods. */
-                System.err.println("BUTTON_RELEASE");
+                System.err.println("X11EventPump::dispatchNativeEvent: BUTTON_RELEASE");
                 postMouseEvent(source, MouseEvent.MOUSE_RELEASED, System.currentTimeMillis(), 0, nativeEvent.getX(), nativeEvent.getY(), 0, false);
                 break;
             }
             default:
-                System.err.println("unhandled event type: " + nativeEvent.getType());
+                System.err.println("X11EventPump::dispatchNativeEvent: unhandled event type: " + nativeEvent.getType());
         }
     }
 

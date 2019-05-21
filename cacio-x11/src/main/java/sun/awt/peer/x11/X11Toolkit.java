@@ -50,6 +50,8 @@ import java.awt.peer.SystemTrayPeer;
 import java.awt.peer.TrayIconPeer;
 import java.util.Map;
 import java.util.Properties;
+
+import sun.awt.datatransfer.DataTransferer;
 import sun.awt.peer.cacio.CacioToolkit;
 import sun.awt.peer.cacio.managed.FullScreenWindowFactory;
 import sun.awt.peer.cacio.PlatformWindowFactory;
@@ -183,9 +185,13 @@ public class X11Toolkit extends CacioToolkit {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
+    @Override
     public InputMethodDescriptor getInputMethodAdapterDescriptor() throws AWTException {
-        // TODO: Implement.
-        return null;
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
+    @Override
+    public DataTransferer getDataTransferer() {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
 }

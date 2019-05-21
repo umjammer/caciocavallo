@@ -27,8 +27,7 @@ package sun.awt.peer.x11;
 
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
-import sun.awt.FontConfiguration;
-import sun.font.FcFontConfiguration;
+
 import sun.java2d.SunGraphicsEnvironment;
 import sun.java2d.SurfaceManagerFactory;
 
@@ -53,17 +52,6 @@ public class X11GraphicsEnvironment extends SunGraphicsEnvironment {
     @Override
     protected GraphicsDevice makeScreenDevice(int arg0) {
         return new X11GraphicsDevice();
-    }
-
-    @Override
-    protected FontConfiguration createFontConfiguration() {
-        return new FcFontConfiguration(this);
-    }
-
-    @Override
-    public FontConfiguration createFontConfiguration(boolean preferLocale,
-                                                     boolean preferProp) {
-        return new FcFontConfiguration(this, preferLocale, preferProp);
     }
 
     @Override

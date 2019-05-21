@@ -26,7 +26,6 @@
 package sun.awt.peer.x11;
 
 import java.awt.GraphicsConfiguration;
-import java.awt.Rectangle;
 import java.awt.Transparency;
 import sun.awt.SunToolkit;
 import sun.awt.image.SunVolatileImage;

@@ -59,4 +59,13 @@ public class X11PlatformWindowFactory implements PlatformWindowFactory {
         }
         return eventPump;
     }
+
+    @Override
+    public PlatformWindow createPlatformToplevelWindow(CacioComponent component,
+            PlatformWindow owner) {
+        Component awtC = component.getAWTComponent();
+        return new X11PlatformWindow(getEventPump(), component, (X11PlatformWindow) owner,
+                                     awtC.getX(), awtC.getY(), awtC.getWidth(),
+                                     awtC.getHeight());
+    }
 }

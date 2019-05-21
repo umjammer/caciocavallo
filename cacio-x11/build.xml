@@ -9,7 +9,7 @@
     <target name="compile" depends="compile-java,compile-native"
             description="Compiles Java classes and native libraries." />
 
-    <target name="compile-java" depends="cacio.shared.compile">
+    <target name="compile-java" depends="">
         <mkdir dir="${dir.build.x11.classes}" />
         <javac classpath="${dir.build.shared.classes}"
                bootclasspath="${openjdk}/classes"
@@ -27,10 +27,11 @@
                      outtype="shared">
             <fileset dir="${dir.src.x11.native}"></fileset>
             <includepath>
+                <pathelement path="${x11.include}" />
                 <pathelement path="${dir.build.x11.include}" />
                 <pathelement path="${openjdk}/include" />
                 <!-- TODO: Make this linux thingy a property. -->
-                <pathelement path="${openjdk}/include/linux" />
+                <pathelement path="${openjdk}/include/darwin" />
                 <pathelement path="${openjdk.src}/jdk/src/share/native/common" />
                 <pathelement path="${openjdk.src}/jdk/src/share/native/sun/java2d" />
             </includepath>
