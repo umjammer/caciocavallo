@@ -32,10 +32,7 @@ import java.io.*;
 import java.util.*;
 import java.util.List;
 import java.util.concurrent.*;
-import java.util.concurrent.atomic.*;
 import java.util.concurrent.locks.*;
-
-import javax.servlet.http.*;
 
 import net.java.openjdk.cacio.servlet.*;
 import net.java.openjdk.cacio.servlet.transport.*;
@@ -81,7 +78,7 @@ public class WebScreen implements PlatformScreen {
 
 	screenLock = new ReentrantLock();
 	screenCondition = screenLock.newCondition();
-	pendingUpdateList = new ArrayList<ScreenUpdate>();
+	pendingUpdateList = new ArrayList<>();
     }
 
     public Graphics2D getClippedGraphics(Color fg, Color bg, Font font, List<Rectangle> clipRects) {
@@ -268,7 +265,7 @@ public class WebScreen implements PlatformScreen {
 	    }
 
 	    if (pendingUpdateList.size() > 0) {
-		ArrayList<Integer> cmdList = new ArrayList<Integer>(pendingUpdateList.size() * 7);
+		ArrayList<Integer> cmdList = new ArrayList<>(pendingUpdateList.size() * 7);
 
 		// Refactor
 		TreeImagePacker packer = new TreeImagePacker();

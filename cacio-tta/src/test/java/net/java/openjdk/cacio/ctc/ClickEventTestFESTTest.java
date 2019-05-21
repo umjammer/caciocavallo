@@ -55,7 +55,7 @@ public class ClickEventTestFESTTest {
 
     @Before
     public void setUp() throws Exception {
-        events = new LinkedList<MouseEvent>();
+        events = new LinkedList<>();
         final JLabel label = new JLabel("label");
         label.addMouseListener(new MouseAdapter() {
             @Override

@@ -11,7 +11,7 @@ public class TestSessionManager extends WebSessionManager {
     
     private Logger logger = Logger.getLogger(this.getClass().getName());
     
-    HashMap<Integer, WebSessionState> idSessionMap = new HashMap<Integer, WebSessionState>();
+    HashMap<Integer, WebSessionState> idSessionMap = new HashMap<>();
 
     public synchronized WebSessionState register(HttpSession session) {
 	int subSessionID = idSessionMap.size();

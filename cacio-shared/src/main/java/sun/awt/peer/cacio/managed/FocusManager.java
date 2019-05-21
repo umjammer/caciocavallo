@@ -74,7 +74,7 @@ public class FocusManager {
 	return instance.getContextInstance();
     }
 
-    private Stack<ManagedWindow> focusedWindowStack = new Stack<ManagedWindow>();
+    private Stack<ManagedWindow> focusedWindowStack = new Stack<>();
 
     public FocusManager() {
     }

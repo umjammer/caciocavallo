@@ -39,7 +39,7 @@ public class WebMouseStateTracker {
 
     EventData lastMouseEvent = null;
     EventData lastClickedEvent = null;
-    HashMap<Integer, Boolean> pressedMap = new HashMap<Integer, Boolean>();
+    HashMap<Integer, Boolean> pressedMap = new HashMap<>();
 
     public WebMouseStateTracker(WebScreen screen) {
 	this.screen = screen;

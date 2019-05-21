@@ -81,7 +81,7 @@ public class TreeImagePacker {
      * @return List with the BlitScreenUpdates contained in updateList
      */
     protected List<BlitScreenUpdate> filterBlitScreenUpdates(List<ScreenUpdate> updateList) {
-	ArrayList<BlitScreenUpdate> bltUpdateList = new ArrayList<BlitScreenUpdate>(updateList.size());
+	ArrayList<BlitScreenUpdate> bltUpdateList = new ArrayList<>(updateList.size());
 	for (ScreenUpdate update : updateList) {
 	    if (update instanceof BlitScreenUpdate) {
 		bltUpdateList.add((BlitScreenUpdate) update);

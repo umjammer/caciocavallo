@@ -43,9 +43,6 @@ import java.awt.Insets;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.Toolkit;
-import java.awt.Transparency;
-import java.awt.Window;
-
 import java.awt.event.FocusEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
@@ -55,8 +52,6 @@ import java.awt.image.ColorModel;
 import java.awt.image.ImageObserver;
 import java.awt.image.ImageProducer;
 import java.awt.image.VolatileImage;
-import java.awt.image.WritableRaster;
-
 import java.awt.peer.ComponentPeer;
 import java.awt.peer.ContainerPeer;
 
@@ -70,7 +65,6 @@ import sun.awt.PaintEventDispatcher;
 
 import sun.awt.RepaintArea;
 import sun.awt.event.IgnorePaintEvent;
-import sun.awt.image.OffScreenImage;
 import sun.font.FontDesignMetrics;
 
 import sun.java2d.pipe.Region;
@@ -457,7 +451,7 @@ class CacioComponentPeer<AWTComponentType extends Component,
                   g.dispose();
               }
         } else {
-            PaintEvent event = PaintEventDispatcher.getPaintEventDispatcher().createPaintEvent((Component) awtComponent, 0,0, awtComponent.getWidth(), awtComponent.getHeight());
+            PaintEvent event = PaintEventDispatcher.getPaintEventDispatcher().createPaintEvent(awtComponent, 0,0, awtComponent.getWidth(), awtComponent.getHeight());
             awtComponent.getToolkit().getSystemEventQueue().postEvent(event);
         }
 

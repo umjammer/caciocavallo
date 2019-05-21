@@ -29,7 +29,6 @@ import java.lang.ref.*;
 import java.util.*;
 import java.util.logging.*;
 
-import javax.management.*;
 import javax.servlet.http.*;
 
 import net.java.openjdk.awt.peer.web.*;
@@ -71,7 +70,7 @@ public abstract class WebSessionManager {
 	instance = sessionMan;
     }
 
-    ThreadLocal<WeakReference<WebSessionState>> threadStateHolder = new ThreadLocal<WeakReference<WebSessionState>>();
+    ThreadLocal<WeakReference<WebSessionState>> threadStateHolder = new ThreadLocal<>();
 
     public static WebSessionManager getInstance() {
 	return instance;
@@ -142,7 +141,7 @@ public abstract class WebSessionManager {
      * @param state
      */
     public void registerSessionAtCurrentThread(WebSessionState state) {
-	threadStateHolder.set(new WeakReference<WebSessionState>(state));
+	threadStateHolder.set(new WeakReference<>(state));
     }
 
     /**

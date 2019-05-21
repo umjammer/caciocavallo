@@ -313,7 +313,7 @@ class EscherPlatformWindow implements PlatformToplevelWindow {
 //      xwindow.change_attributes(atts);
       
       // Determine the frame insets.
-      Atom atom = (Atom) Atom.intern(dev.getDisplay(), "_NET_FRAME_EXTENTS");
+      Atom atom = Atom.intern(dev.getDisplay(), "_NET_FRAME_EXTENTS");
       Window.Property p = xwindow.get_property(false, atom, Atom.CARDINAL, 0,
                                                Window.MAX_WM_LENGTH);
       if (p.format() != 0)

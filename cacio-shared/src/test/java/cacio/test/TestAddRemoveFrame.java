@@ -4,9 +4,6 @@
 
 package cacio.test;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 /**
  * Test behaviour when mixing heavyweight and lightweigth components.
  *

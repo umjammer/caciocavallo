@@ -136,7 +136,7 @@ class ManagedWindow
         LinkedList<Rectangle> clips;
         LinkedList<ManagedWindow> children = getChildren();
         if (children != null && children.size() > 0) {
-            clips = new LinkedList<Rectangle>();
+            clips = new LinkedList<>();
             for (ManagedWindow child : children) {
                 if (child.isVisible()) {
                     clips.add(child.getBounds());
@@ -182,7 +182,7 @@ class ManagedWindow
         Deque<ManagedWindow> siblings = parent.getChildren();
         if (siblings.getLast() != this) {
             if (clipRects == null) {
-                clipRects = new LinkedList<Rectangle>();
+                clipRects = new LinkedList<>();
             }
             Iterator<ManagedWindow> i = siblings.descendingIterator();
             Rectangle myBounds = getBounds();

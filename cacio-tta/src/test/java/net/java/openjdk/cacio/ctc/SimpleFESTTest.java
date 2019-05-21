@@ -39,7 +39,7 @@ public class SimpleFESTTest {
 
     private JFrame frame;
     private FrameFixture ff;
-    private Set menuClicks = new HashSet();
+    private Set<String> menuClicks = new HashSet<>();
 
     @Before
     public void setUp() {

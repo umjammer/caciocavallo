@@ -32,7 +32,6 @@ import org.fest.swing.edt.GuiTask;
 import org.fest.swing.fixture.FrameFixture;
 import org.fest.swing.fixture.JButtonFixture;
 import org.fest.swing.fixture.JTextComponentFixture;
-import org.fest.swing.junit.v4_5.runner.GUITestRunner;
 import org.fest.swing.timing.Pause;
 import org.junit.After;
 import org.junit.Before;

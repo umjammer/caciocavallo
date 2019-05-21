@@ -8,7 +8,7 @@ class KeyStrokeMappingFactory {
 
     private static KeyStrokeMappingFactory instance = new KeyStrokeMappingFactory();
 
-    private Map<String,KeyStrokeMapping> maps = new HashMap<String,KeyStrokeMapping>();
+    private Map<String,KeyStrokeMapping> maps = new HashMap<>();
 
     static KeyStrokeMappingFactory getInstance() {
         return instance;

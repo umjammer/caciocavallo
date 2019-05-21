@@ -10,7 +10,6 @@ import java.awt.Robot;
 import java.awt.SystemTray;
 import java.awt.TrayIcon;
 import java.awt.Window;
-import java.awt.datatransfer.Clipboard;
 import java.awt.dnd.DragGestureEvent;
 import java.awt.dnd.InvalidDnDOperationException;
 import java.awt.dnd.peer.DragSourceContextPeer;

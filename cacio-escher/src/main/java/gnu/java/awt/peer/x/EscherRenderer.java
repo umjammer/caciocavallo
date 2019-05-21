@@ -171,11 +171,11 @@ public class EscherRenderer
 
   public void draw(SunGraphics2D sg2d, Shape s)
   {
-    if (sg2d.strokeState == sg2d.STROKE_THIN)
+    if (sg2d.strokeState == SunGraphics2D.STROKE_THIN)
       {
         // Delegate to drawPolygon() if possible...
         if (s instanceof Polygon &&
-            sg2d.transformState < sg2d.TRANSFORM_TRANSLATESCALE)
+            sg2d.transformState < SunGraphics2D.TRANSFORM_TRANSLATESCALE)
           {
             Polygon p = (Polygon) s;
             drawPolygon(sg2d, p.xpoints, p.ypoints, p.npoints);
@@ -186,7 +186,7 @@ public class EscherRenderer
         // high-quality thin paths.
         doPath(sg2d, s, false);
       }
-    else if (sg2d.strokeState < sg2d.STROKE_CUSTOM)
+    else if (sg2d.strokeState < SunGraphics2D.STROKE_CUSTOM)
       {
         // REMIND: X11 can handle uniform scaled wide lines
         // and dashed lines itself if we set the appropriate

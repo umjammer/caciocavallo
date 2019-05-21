@@ -29,8 +29,6 @@ import java.awt.KeyboardFocusManager;
 import java.lang.reflect.*;
 import java.util.*;
 
-import javax.swing.*;
-
 import net.java.openjdk.awt.peer.web.*;
 import sun.awt.*;
 

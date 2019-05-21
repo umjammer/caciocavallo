@@ -1,8 +1,6 @@
 package cacio.test;
 
 import java.awt.*;
-import javax.swing.*;
-import javax.swing.plaf.basic.*;
 public class TestList {
 
   public static void main(String[] args) {

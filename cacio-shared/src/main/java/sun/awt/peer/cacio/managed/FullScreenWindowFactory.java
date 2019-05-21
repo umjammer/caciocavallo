@@ -27,7 +27,6 @@ package sun.awt.peer.cacio.managed;
 
 import java.awt.Dimension;
 import java.awt.GraphicsConfiguration;
-import java.awt.GraphicsDevice;
 import java.security.AccessController;
 import java.util.Collections;
 import java.util.HashMap;

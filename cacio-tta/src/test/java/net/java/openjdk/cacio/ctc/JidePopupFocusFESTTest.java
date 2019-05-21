@@ -5,7 +5,6 @@
 package net.java.openjdk.cacio.ctc;
 
 import com.jidesoft.hints.AbstractIntelliHints;
-import net.java.openjdk.cacio.ctc.junit.CacioFESTRunner;
 import org.fest.swing.annotation.GUITest;
 import org.fest.swing.edt.GuiActionRunner;
 import org.fest.swing.edt.GuiTask;

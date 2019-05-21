@@ -1,6 +1,5 @@
 package net.java.openjdk.cacio.ctc.test;
 
-import java.awt.EventQueue;
 import java.awt.Rectangle;
 import java.awt.Robot;
 import java.awt.Toolkit;

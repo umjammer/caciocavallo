@@ -79,7 +79,7 @@ public class WebSurfaceData extends SurfaceData {
 	destination = dest;
 
 	int w = b.width, h = b.height;
-	surfaceUpdateList = new ArrayList<ScreenUpdate>();
+	surfaceUpdateList = new ArrayList<>();
 	damageTracker = new GridDamageTracker(w, h);
 	imgBuffer = new BufferedImage(w, h, BufferedImage.TYPE_INT_RGB);
 	bufferGraphics = (Graphics2D) imgBuffer.getGraphics();
@@ -228,7 +228,7 @@ public class WebSurfaceData extends SurfaceData {
 	    mergeMultipleScreenUpdates();
 
 	    List<ScreenUpdate> pendingUpdateList = surfaceUpdateList;
-	    surfaceUpdateList = new ArrayList<ScreenUpdate>();
+	    surfaceUpdateList = new ArrayList<>();
 	    return pendingUpdateList;
 	}
 

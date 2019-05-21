@@ -28,7 +28,6 @@ package net.java.openjdk.awt.peer.web;
 
 import java.awt.*;
 import java.awt.image.*;
-import java.util.*;
 import java.util.List;
 
 /**

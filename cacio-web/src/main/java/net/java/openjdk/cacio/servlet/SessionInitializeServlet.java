@@ -99,7 +99,7 @@ public class SessionInitializeServlet extends HttpServlet {
      * @return the parameters contained in a list
      */
     protected String[] generateParameterArray(HttpServletRequest request) {
-	ArrayList<String> paramList = new ArrayList<String>();
+	ArrayList<String> paramList = new ArrayList<>();
 
 	String paramValue = null;
 	while ((paramValue = request.getParameter("param" + paramList.size())) != null) {

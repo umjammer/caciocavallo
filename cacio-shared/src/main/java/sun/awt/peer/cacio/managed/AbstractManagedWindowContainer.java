@@ -56,7 +56,7 @@ abstract class AbstractManagedWindowContainer
      * uses the specified parent container.
      */
     protected AbstractManagedWindowContainer() {
-        children = new LinkedList<ManagedWindow>();
+        children = new LinkedList<>();
     }
 
     /**
@@ -210,7 +210,7 @@ abstract class AbstractManagedWindowContainer
 
     private void repaintSelf(int x, int y, int w, int h) {
         Rectangle r = new Rectangle(x, y, w, h);
-        LinkedList<Rectangle> rects = new LinkedList<Rectangle>();
+        LinkedList<Rectangle> rects = new LinkedList<>();
         for (ManagedWindow c : children) {
             if (c.isVisible()) {
                 Rectangle b = c.getBounds();

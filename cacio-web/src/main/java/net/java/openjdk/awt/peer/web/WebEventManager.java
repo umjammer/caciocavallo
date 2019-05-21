@@ -8,7 +8,7 @@ public class WebEventManager {
     WebKeyboardStateTracker keyboardTracker;
     WebSessionState state;
 
-    HashMap<Integer, String[]> eventIDMap = new HashMap<Integer, String[]>();
+    HashMap<Integer, String[]> eventIDMap = new HashMap<>();
     int highestDispatchedEventID = 0;
 
     public WebEventManager(WebSessionState state) {
@@ -29,7 +29,7 @@ public class WebEventManager {
 	    } else {
 		eventIDMap.put(eventID, params);
 
-		ArrayList<Integer> sortedEventIDList = new ArrayList<Integer>(eventIDMap.keySet());
+		ArrayList<Integer> sortedEventIDList = new ArrayList<>(eventIDMap.keySet());
 		Collections.sort(sortedEventIDList);
 		int minID = sortedEventIDList.get(0);
 		int maxId = sortedEventIDList.get(sortedEventIDList.size() - 1);
@@ -49,7 +49,7 @@ public class WebEventManager {
     }
 
     protected void dispatchEvent(String[] params) {
-	LinkedList<String> eventDataList = new LinkedList<String>();
+	LinkedList<String> eventDataList = new LinkedList<>();
 	eventDataList.addAll(Arrays.asList(params));
 
 	while (eventDataList.size() > 0) {

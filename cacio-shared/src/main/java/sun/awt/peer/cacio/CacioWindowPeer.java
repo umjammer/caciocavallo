@@ -148,7 +148,7 @@ class CacioWindowPeer extends CacioContainerPeer<Window, JRootPane>
     JRootPane initSwingComponent() {
         // We always need a rootPane, even for undecorated windows, otherwise
         // we cannot have menu support...
-        Window window = (Window) getAWTComponent();
+        Window window = getAWTComponent();
         JRootPane jrootpane = new JRootPane();
         jrootpane.setDoubleBuffered(false);
         return jrootpane;
@@ -217,7 +217,7 @@ class CacioWindowPeer extends CacioContainerPeer<Window, JRootPane>
     @Override
     public void handlePeerEvent(AWTEvent ev) {
         
-        Window w = (Window) getAWTComponent();
+        Window w = getAWTComponent();
         switch (ev.getID()) {
 
         case FocusEvent.FOCUS_GAINED:

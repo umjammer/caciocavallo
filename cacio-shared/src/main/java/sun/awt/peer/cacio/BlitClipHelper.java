@@ -26,7 +26,6 @@
 package sun.awt.peer.cacio;
 
 import java.awt.Composite;
-import java.awt.Rectangle;
 import sun.java2d.SurfaceData;
 import sun.java2d.pipe.Region;
 import sun.java2d.pipe.SpanIterator;

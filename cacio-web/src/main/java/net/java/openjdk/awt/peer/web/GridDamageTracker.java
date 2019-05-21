@@ -55,7 +55,7 @@ public class GridDamageTracker {
      *            - Height of the tracked WebSurfaceData in pixels
      */
     public GridDamageTracker(int width, int height) {
-	rectList = new ArrayList<WebRect>();
+	rectList = new ArrayList<>();
 
 	int cellsX = (int) Math.ceil(((double) width) / GRID_SIZE);
 	int cellsY = (int) Math.ceil(((double) height) / GRID_SIZE);
@@ -108,7 +108,7 @@ public class GridDamageTracker {
     public List<ScreenUpdate> groupDamagedAreas(BufferedImage imgBuffer) {
 	WebRect unionRect = getUnionRectangle();
 	if (unionRect != null) {
-	    ArrayList<ScreenUpdate> screenUpdateList = new ArrayList<ScreenUpdate>();
+	    ArrayList<ScreenUpdate> screenUpdateList = new ArrayList<>();
 
 	    List<WebRect> regionList = createDamagedRegionList(5);
 	    if (unionRect != null && unionRect.getWidth() > 0 && unionRect.getHeight() > 0) {
@@ -160,7 +160,7 @@ public class GridDamageTracker {
      */
     private List<WebRect> createDamagedRegionList(int mergeLimit) {
 	WebRect[][] unions = new WebRect[grid.length][grid[0].length];
-	List<WebRect> rectList = new ArrayList<WebRect>();
+	List<WebRect> rectList = new ArrayList<>();
 
 	// Calculate damaged region for each Cell
 	for (int y = 0; y < grid.length; y++) {

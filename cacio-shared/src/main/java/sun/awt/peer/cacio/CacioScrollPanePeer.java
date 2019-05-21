@@ -28,13 +28,11 @@ package sun.awt.peer.cacio;
 import java.awt.Adjustable;
 import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.Graphics;
 import java.awt.ScrollPane;
 import java.awt.peer.ComponentPeer;
 import java.awt.peer.ScrollPanePeer;
 import javax.swing.JPanel;
 import javax.swing.JScrollBar;
-import javax.swing.JScrollPane;
 import sun.awt.AWTAccessor;
 
 class CacioScrollPanePeer extends CacioContainerPeer<ScrollPane, JPanel>

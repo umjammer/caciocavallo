@@ -15,7 +15,7 @@ abstract class AbstractKeyStrokeMapping implements KeyStrokeMapping {
     static final int NO_MASK = 0;
 
     Map<AWTKeyStroke,Character> getDefaultMap() {
-        Map<AWTKeyStroke,Character> map = new HashMap<AWTKeyStroke,Character>();
+        Map<AWTKeyStroke,Character> map = new HashMap<>();
         map.put(keyStroke(VK_BACK_SPACE, NO_MASK), '\b');
         map.put(keyStroke(VK_DELETE, NO_MASK), '\u007f');
         map.put(keyStroke(VK_ENTER, NO_MASK), '\n');

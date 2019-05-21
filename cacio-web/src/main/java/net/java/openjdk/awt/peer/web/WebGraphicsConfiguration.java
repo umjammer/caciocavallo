@@ -58,7 +58,7 @@ public class WebGraphicsConfiguration extends GraphicsConfiguration {
 	 * the session is valid, we have a reference to the WebScreen.
 	 */
 	WebScreen screen = new WebScreen(this);
-	screenRef = new WeakReference<WebScreen>(screen);
+	screenRef = new WeakReference<>(screen);
 	WebSessionManager.getInstance().getCurrentState().setScreen(screen);
     }
 
@@ -66,7 +66,7 @@ public class WebGraphicsConfiguration extends GraphicsConfiguration {
 	GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
 	GraphicsDevice gd = ge.getDefaultScreenDevice();
 	GraphicsConfiguration gc = gd.getDefaultConfiguration();
-	return (WebGraphicsConfiguration) gc;
+	return gc;
     }
 
     @Override

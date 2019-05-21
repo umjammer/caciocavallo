@@ -15,7 +15,7 @@ public class WebSessionManagerImpl extends WebSessionManager {
 	HashMap<Integer, WebSessionState> subSessionMap = (HashMap<Integer, WebSessionState>) session.getAttribute(SESSION_KEY);
 
 	if (subSessionMap == null) {
-	    subSessionMap = new HashMap<Integer, WebSessionState>();
+	    subSessionMap = new HashMap<>();
 	    session.setAttribute(SESSION_KEY, subSessionMap);
 	}
 
@@ -40,7 +40,7 @@ public class WebSessionManagerImpl extends WebSessionManager {
     public synchronized void disposeSession(HttpSession session) {
 	HashMap<Integer, WebSessionState> subSessionMap = (HashMap<Integer, WebSessionState>) session.getAttribute(SESSION_KEY);
 	if (subSessionMap != null) {
-	    List<Integer> subSessionKeyList = new ArrayList<Integer>(subSessionMap.keySet());
+	    List<Integer> subSessionKeyList = new ArrayList<>(subSessionMap.keySet());
 	    
 	    for (Integer subSessionId : subSessionKeyList) {
 		WebSessionState state = subSessionMap.get(subSessionId);

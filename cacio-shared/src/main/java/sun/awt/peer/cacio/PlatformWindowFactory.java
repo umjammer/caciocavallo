@@ -25,8 +25,6 @@
 
 package sun.awt.peer.cacio;
 
-import java.awt.GraphicsDevice;
-
 /**
  * Creates {@link PlatformWindow} instances for use by the component peers.
  */

@@ -1,8 +1,6 @@
 package cacio.test;
 
 import java.awt.*;
-import javax.swing.*;
-import javax.swing.text.*;
 public class TestTextArea {
   public static void main(String[] args) {
       /*

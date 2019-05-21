@@ -39,7 +39,7 @@ import java.util.*;
 public class DynamicByteBuffer {
     final int bufferSize;
 
-    ArrayList<byte[]> bufferList = new ArrayList<byte[]>();
+    ArrayList<byte[]> bufferList = new ArrayList<>();
 
     int curBufferPos = 0;
     byte[] curBuffer;

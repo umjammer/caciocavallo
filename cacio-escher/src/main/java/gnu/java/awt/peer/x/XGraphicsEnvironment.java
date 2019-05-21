@@ -96,7 +96,7 @@ public class XGraphicsEnvironment
         FileInputStream configIn = new FileInputStream(config);
         props.load(configIn);
         int dev = 1;
-        ArrayList<XGraphicsDevice> deviceList = new ArrayList<XGraphicsDevice>();
+        ArrayList<XGraphicsDevice> deviceList = new ArrayList<>();
         while (true)
           {
             String propName = "display." + dev;
@@ -120,7 +120,7 @@ public class XGraphicsEnvironment
                 break;
               }
           }
-        devices = (XGraphicsDevice[]) deviceList.toArray
+        devices = deviceList.toArray
                                       (new XGraphicsDevice[deviceList.size()]);
       }
     catch (FileNotFoundException ex)

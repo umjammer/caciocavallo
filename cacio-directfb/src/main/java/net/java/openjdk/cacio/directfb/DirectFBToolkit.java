@@ -29,7 +29,6 @@ import java.awt.AWTException;
 import java.awt.Desktop;
 import java.awt.Frame;
 import java.awt.GraphicsDevice;
-import java.awt.GraphicsEnvironment;
 import java.awt.HeadlessException;
 import java.awt.PrintJob;
 import java.awt.Robot;

@@ -17,7 +17,7 @@ public class CTCEventSource implements CacioEventSource {
         return instance;
     }
 
-    private BlockingQueue<EventData> queue = new LinkedBlockingQueue<EventData>();
+    private BlockingQueue<EventData> queue = new LinkedBlockingQueue<>();
 
     private CTCEventSource() {
         // Singleton.
