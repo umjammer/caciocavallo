@@ -1,2 +1,4 @@
 .hgignore
 netbeans
+.hgtags
+.hg_off

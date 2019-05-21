@@ -72,22 +72,27 @@ That's all for now, time to move on to...
 Build
 -----
 
-To build project Caciocavallo you need first a recent build of OpenJDK
-or IcedTea. Caciocavallo requires the use of Sun internal classes, so
-chances are that it will not even compile. But as we don't expect many
-changes in the AWT and Java2D code we rely on, you should be able to just
-build and run Cacio without pain.
+Building Cacio requires OpenJDK7 or later, it will not work with any
+previous release or alternative JDKs.
 
-You can clone the latest code from the OpenJDK website. As of this writing,
-one patch is still required. This is being discussed here:
+Caciocavallo utilizes Maven for the main modules. In the toplevel Cacio
+directory simply type:
 
-https://bugs.openjdk.java.net/show_bug.cgi?id=100052
+mvn clean install
 
-This patch is needed in order to run the native library code for the
-Caciocavallo backends.
+This should compile Caciocavallo.
 
-For Caciocavallo, the ant build included should work on Eclipse or
-NetBeans and on the command line as well.
+In order to build Cacio-web, you need an installation of Maven 2 (it will
+not work with Maven3 ... yet). Go into the cacio-web subdirectory
+and type:
+
+mvn2 clean install
+
+This should compile both the Java classes and native portions of Cacio-web.
+
+The other, and as of now not supported, modules under the src/ directory utilize
+Ant for building. Following is the old description of the Ant build process used
+for those modules:
 
 There is a build.properties file that needs tweaking with some paths, but this
 file is tracked by Mercurial, so changing it will call for endless merge or
@@ -126,6 +131,65 @@ Something like:
 CLASSPATH=/home/neugens/work_space/tools/cpptasks.jar ant compile
 
 should do the trick.
+
+
+
+Caciocavallo-Web
+----
+
+Caciocavallo-Web is a caciocavallo implementation for displaying AWT/Swing
+applications in a html5 capable browser, while the application is runing
+on a server. Events are sent from the browser to the server, 
+whereas the visual output is sent to the browser.
+
+Dependencies:
+
+* JsKeyLib: Caciocavallo-Web requires a LGPL2 licensed javascript library for decoding
+keyboard events, which because of licensing constraints can't be contained
+in the caciocavallo-repository.
+The library can be downloaded from: 
+http://sourceforge.net/p/jskeylib/home/Home/
+
+* Jetty-7 http://download.eclipse.org/jetty/
+If you intend to use the WebSocket backend, please use the latest 
+version of Jetty-8. Caciocavallo-Web has been tested successfully with 
+jetty-8.0.1 (jetty-8.0 has a bug in session-handling which causes memory leaks).
+
+* JUnit4 for running the unit tests.
+
+* KeyPoint png encoder (optional)
+For transports using the png format, keypoint's png encoder provides better
+performance and allows to adjust the compressionLevel.
+To enable the keypoint png encoder, simply download the library-file 
+http://93.83.133.214/cacioweb/keypoint_png.jar
+and add it to your classpath. (source file named keypoint_png_src.tar.gz)
+
+
+Building:
+
+Unzip jetty, and adjust the following paths in user.properties:
+web.jetty_lib_dir=/home/ce/Development/libs/jetty
+web.servlet-api=/home/ce/Development/libs/jetty/servlet-api-2.5.jar
+web.jskeylib=/home/ce/jskeylib-code
+lib.junit=/home/ce/Development/libs/junit-4.8.2.jar
+
+Use the following ant-task to build the server runtime: cacio.web.srv-runtime
+
+To start the application, simply add the application you would like to run
+to the classpath, add the native part to the java_library_path and start the server runtime:
+java -cp cacio-web-runtime.jar:SwingSet2.jar:(keypoint_png.jar) 
+-Djava.library.path=build/web/lib/ net.java.openjdk.cacio.server.CacioServer
+
+and open the ApplicationStarter-Servlet using your Browser:
+http://localhost:8080/SessionInitializer?cls=SwingSet2
+
+It is also possible to specify a compression format, when starting 
+an Application: http://localhost:8080/SessionInitializer?cls=SwingSet2&format=png
+
+When using png-compression, the compression-level can be adjusted additionally:
+http://localhost:8080/SessionInitializer?cls=SwingSet2&format=png&clevel=2
+where cLevel can be an integer between 0 (no) and 9 (highest) compression.
+
 
 Test
 ----
