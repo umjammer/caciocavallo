@@ -150,7 +150,7 @@ class EscherBlitLoops
         ZPixmap pm;
         try {
             pm = new ZPixmap(gc.display, w, h,
-                                     gc.display.getDefaultVisual());
+                                     gc.display.default_pixmap_format); // TODO
         } catch (EscherUnsupportedScreenBitDepthException e) {
             AWTError awtErr = new AWTError("Cannot create a ZPixmpas");
             awtErr.initCause(e);
@@ -161,7 +161,7 @@ class EscherBlitLoops
             for (int x = sx; x < sx + w; x++)
               {
                 int rgb = bufImg.getRGB(x, y);
-                pm.putPixel(x - sx, y - sy, rgb);
+                pm.set(x - sx, y - sy, (rgb >>> 16) & 0xff, (rgb >>> 8) & 0xff, rgb & 0xff);
               }
           }
         d.put_image(gc, pm, dx, dy);
@@ -182,7 +182,10 @@ class EscherBlitLoops
             
             for (int xx = 0; xx < w; xx++) {
                 
-                RGB rgb = zpixmap.getRGB(xx, yy);
+                int r = zpixmap.get_red(xx, yy);
+                int g = zpixmap.get_blue(xx, yy);
+                int b = zpixmap.get_blue(xx, yy);
+                RGB rgb = new RGB(r, g, b);
 
                 int red = rgb.red;
                 int green = rgb.green;
@@ -221,7 +224,7 @@ class EscherBlitLoops
                     blue = rgbPix & 0xff;
                 }
 
-                zpixmap.putRGB(xx, yy, red, green, blue);
+                zpixmap.set(xx, yy, red, green, blue);
             }
         }
       

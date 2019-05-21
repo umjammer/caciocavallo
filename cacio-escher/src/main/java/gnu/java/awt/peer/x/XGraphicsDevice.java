@@ -117,7 +117,7 @@ public class XGraphicsDevice
       {
         if (displayName.hostname.equals(""))
             displayName.hostname = "localhost";
-        
+
         try
           {
             if (EscherToolkit.DEBUG)
@@ -141,7 +141,7 @@ public class XGraphicsDevice
           {
             /* do noting here */
           }
-        
+
         try
           {
             // The following happens when we are configured to use plain sockets,
@@ -158,7 +158,7 @@ public class XGraphicsDevice
             awtErr.initCause(ex);
             throw awtErr;
           }
-        
+
         eventSource = new XEventSource(display);
       }
     return display;
@@ -180,18 +180,18 @@ public class XGraphicsDevice
       {
         // TODO: Is this 100% ok?
         String sockPath = "/tmp/.X11-unix/X" + displayName.display_no;
-        Class localSocketAddressClass =
+        Class<?> localSocketAddressClass =
           Class.forName("gnu.java.net.local.LocalSocketAddress");
-        Constructor localSocketAddressConstr =
-          localSocketAddressClass.getConstructor(new Class[]{ String.class });
+        Constructor<?> localSocketAddressConstr =
+          localSocketAddressClass.getConstructor(String.class);
         Object addr =
-          localSocketAddressConstr.newInstance(new Object[]{ sockPath });
-        Class localSocketClass =
+          localSocketAddressConstr.newInstance(sockPath);
+        Class<?> localSocketClass =
           Class.forName("gnu.java.net.local.LocalSocket");
-        Constructor localSocketConstructor =
-          localSocketClass.getConstructor(new Class[]{localSocketAddressClass});
+        Constructor<?> localSocketConstructor =
+          localSocketClass.getConstructor(localSocketAddressClass);
         Object localSocket =
-          localSocketConstructor.newInstance(new Object[]{ addr });
+          localSocketConstructor.newInstance(addr);
         socket = (Socket) localSocket;
       }
     catch (Exception ex)

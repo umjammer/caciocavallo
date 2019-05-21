@@ -54,6 +54,7 @@ import java.awt.peer.TrayIconPeer;
 import java.util.Map;
 import java.util.Properties;
 
+import sun.awt.datatransfer.DataTransferer;
 import sun.awt.peer.cacio.CacioEventSource;
 import sun.awt.peer.cacio.CacioToolkit;
 import sun.awt.peer.cacio.PlatformWindowFactory;
@@ -221,6 +222,13 @@ public class EscherToolkit extends CacioToolkit {
 
     public CacioEventSource getEventSource() {
         // TODO: Implement me.
+        return null;
+    }
+
+    /* @see sun.awt.ComponentFactory#getDataTransferer() */
+    @Override
+    public DataTransferer getDataTransferer() {
+        // TODO Auto-generated method stub
         return null;
     }
 }

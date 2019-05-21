@@ -131,7 +131,7 @@ class EscherPlatformWindow implements PlatformToplevelWindow {
 
         Insets parentInsets;
         if (parent == null) {
-            parentWindow = dev.getDisplay().getRootWindow();
+            parentWindow = dev.getDisplay().default_root; // TODO
             parentInsets = new Insets(0, 0, 0, 0);
         } else {
             parentWindow = ((EscherPlatformWindow) parent).xwindow;
@@ -247,7 +247,8 @@ class EscherPlatformWindow implements PlatformToplevelWindow {
     }
 
     @Override
-    public Graphics2D getGraphics() {
+    public Graphics2D getGraphics(Color foreground, Color background,
+            Font font) {
         Component awtComponent = cacioComponent.getAWTComponent();
         Color fg = foreground;
         if (fg == null)
@@ -304,7 +305,7 @@ class EscherPlatformWindow implements PlatformToplevelWindow {
       eq.postEvent(new PaintEvent(awtComponent, PaintEvent.PAINT,
                                   new Rectangle(0, 0, awtComponent.getWidth(),
                                                 awtComponent.getHeight())));
-      Graphics g = getGraphics();
+      Graphics g = getGraphics(foreground, background, font);
       g.clearRect(0, 0, awtComponent.getWidth(), awtComponent.getHeight());
       g.dispose();
 //      // Reset input selection.
@@ -432,20 +433,16 @@ class EscherPlatformWindow implements PlatformToplevelWindow {
         return null;
     }
 
+    /* @see sun.awt.peer.cacio.PlatformWindow#requestFocus() */
     @Override
-    public void setBackground(Color c) {
+    public void requestFocus() {
         // TODO Auto-generated method stub
         
     }
 
+    /* @see sun.awt.peer.cacio.PlatformToplevelWindow#setBlocked(boolean) */
     @Override
-    public void setFont(Font f) {
-        // TODO Auto-generated method stub
-        
-    }
-
-    @Override
-    public void setForeground(Color c) {
+    public void setBlocked(boolean blocked) {
         // TODO Auto-generated method stub
         
     }

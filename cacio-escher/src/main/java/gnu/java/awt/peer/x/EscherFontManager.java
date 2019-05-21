@@ -42,7 +42,6 @@ import java.awt.FontFormatException;
 import java.io.File;
 
 import sun.awt.FontConfiguration;
-import sun.font.FontManager;
 import sun.font.PhysicalFont;
 import sun.font.SunFontManager;
 
@@ -91,7 +90,8 @@ public class EscherFontManager
               defaultPhysicalFont = (PhysicalFont)
               createFont2D(fontFile,
                       Font.TRUETYPE_FONT,
-                      false);
+                      false,
+                      null); // TODO
           } catch (FontFormatException ex) {
               throw new Error("Probable fatal error:No fonts found.");
           }

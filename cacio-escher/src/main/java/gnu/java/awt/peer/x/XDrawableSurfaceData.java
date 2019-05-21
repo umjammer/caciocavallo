@@ -318,7 +318,7 @@ class XDrawableSurfaceData
   {
     int pixel = ColorMapper.getInstace().
             convertToNativePixel(sg2d.pixel,
-                                 xDrawable.display.getDefaultVisual());
+                                 xDrawable.display.default_pixmap_format); // TODO
       
     xgc.set_foreground(pixel);
     Region c = sg2d.clipRegion;

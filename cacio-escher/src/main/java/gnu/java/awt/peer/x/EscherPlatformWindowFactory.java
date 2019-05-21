@@ -26,8 +26,8 @@
 package gnu.java.awt.peer.x;
 
 import sun.awt.peer.cacio.CacioComponent;
-import sun.awt.peer.cacio.CacioEventSource;
 import sun.awt.peer.cacio.CacioEventPump;
+import sun.awt.peer.cacio.PlatformToplevelWindow;
 import sun.awt.peer.cacio.PlatformWindow;
 import sun.awt.peer.cacio.PlatformWindowFactory;
 
@@ -40,15 +40,20 @@ class EscherPlatformWindowFactory implements PlatformWindowFactory {
     }
 
     @Override
-    public PlatformWindow createPlatformToplevelWindow(CacioComponent component) {
+    public PlatformToplevelWindow createPlatformToplevelWindow(CacioComponent component) {
         return new EscherPlatformWindow(component, null);
     }
 
     @Override
-    public CacioEventPump createEventPump() {
+    public PlatformWindow createPlatformToplevelWindow(CacioComponent component,
+            PlatformWindow owner) {
+        return new EscherPlatformWindow(component, null);
+    }
+
+    @Override
+    public CacioEventPump<?> createEventPump() {
         return null; // TODO: FIX this!
         // XGraphicsDevice dev = EscherToolkit.getDefaultDevice();
         // return dev.getEventSource();
     }
-
 }
