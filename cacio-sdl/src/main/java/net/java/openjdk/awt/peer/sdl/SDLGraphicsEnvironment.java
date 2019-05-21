@@ -24,23 +24,44 @@
  */
 package net.java.openjdk.awt.peer.sdl;
 
-import sun.awt.image.SunVolatileImage;
-import sun.awt.image.VolatileSurfaceManager;
+import java.awt.GraphicsDevice;
+
+import sun.java2d.SunGraphicsEnvironment;
 import sun.java2d.SurfaceManagerFactory;
 
 /**
- * @author Mario Torre <neugens.limasoftware@gmail.com>
+ * Graphics Environment implementation based on libSDL.
+ *
+ * @author Mario Torre <neugens.liamsoftware@gmail.com>
  */
-class SDLSurfaceManagerFactory extends SurfaceManagerFactory {
+public class SDLGraphicsEnvironment extends SunGraphicsEnvironment {
 
-    public SDLSurfaceManagerFactory() {
+    static {
+        System.loadLibrary("cacio-sdl");
+        boolean initialised = nativeInit();
+        if (!initialised) {
+            throw new ExceptionInInitializerError("Cannot initiliase libSDL!");
+        }
+        SurfaceManagerFactory.setInstance(new SDLSurfaceManagerFactory());
     }
 
     @Override
-    public VolatileSurfaceManager createVolatileManager(SunVolatileImage image,
-                                                        Object context) {
+    protected int getNumScreens() {
 
-        return new SDLVolativeSurfaceManager(image, context);
+        return 1;
     }
 
+    @Override
+    protected GraphicsDevice makeScreenDevice(int screennum) {
+
+        return new SDLGraphicsDevice();
+    }
+
+    @Override
+    public boolean isDisplayLocal() {
+
+        return true;
+    }
+
+    private static final native boolean nativeInit();
 }

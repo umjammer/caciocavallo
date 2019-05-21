@@ -9,7 +9,7 @@
     <target name="compile" depends="compile-java,compile-native"
             description="Compiles Java classes and native libraries." />
 
-    <target name="compile-java" depends="cacio.shared.compile">
+    <target name="compile-java" depends="">
         <mkdir dir="${dir.build.sdl.classes}" />
         <javac classpath="${dir.build.shared.classes}"
                bootclasspath="${openjdk}/classes"
@@ -27,6 +27,7 @@
             <includepath>
                 <pathelement path="${dir.build.sdl.include}" />
                 <pathelement path="${openjdk}/include" />
+                <pathelement path="${openjdk}/include/darwin" />
                 <!-- TODO: Make this linux thingy a property. -->
                 <pathelement path="${openjdk}/include/linux" />
                 <pathelement path="${openjdk.src}/jdk/src/share/native/common" />

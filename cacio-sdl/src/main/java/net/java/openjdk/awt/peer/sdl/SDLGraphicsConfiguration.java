@@ -53,7 +53,7 @@ class SDLGraphicsConfiguration extends GraphicsConfiguration {
         GraphicsEnvironment.getLocalGraphicsEnvironment();
         GraphicsDevice gd = ge.getDefaultScreenDevice();
         GraphicsConfiguration gc = gd.getDefaultConfiguration();
-        return (SDLGraphicsConfiguration) gc;
+        return gc;
     }
 
     @Override

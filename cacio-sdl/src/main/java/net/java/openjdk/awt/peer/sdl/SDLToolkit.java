@@ -50,12 +50,13 @@ import java.awt.peer.SystemTrayPeer;
 import java.awt.peer.TrayIconPeer;
 import java.util.Map;
 import java.util.Properties;
-
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import sun.awt.datatransfer.DataTransferer;
 import sun.awt.peer.cacio.CacioToolkit;
-import sun.awt.peer.cacio.managed.FullScreenWindowFactory;
 import sun.awt.peer.cacio.PlatformWindowFactory;
+import sun.awt.peer.cacio.managed.FullScreenWindowFactory;
 
 /**
  * SDL based backend for CacioCavallo.
@@ -125,7 +126,7 @@ public class SDLToolkit extends CacioToolkit {
 
     @Override
     protected int getScreenWidth() {
-        
+
         GraphicsConfiguration config =
                 SDLGraphicsConfiguration.getDefaultConfiguration();
         return config.getBounds().width;
@@ -133,7 +134,7 @@ public class SDLToolkit extends CacioToolkit {
 
     @Override
     protected int getScreenHeight() {
-        
+
         GraphicsConfiguration config =
                 SDLGraphicsConfiguration.getDefaultConfiguration();
         return config.getBounds().height;
@@ -187,7 +188,7 @@ public class SDLToolkit extends CacioToolkit {
     @Override
     public PrintJob getPrintJob(Frame frame, String jobtitle,
                                 Properties props) {
-        
+
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
@@ -211,5 +212,8 @@ public class SDLToolkit extends CacioToolkit {
         return null;
     }
 
-
+    @Override
+    public DataTransferer getDataTransferer() {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
 }

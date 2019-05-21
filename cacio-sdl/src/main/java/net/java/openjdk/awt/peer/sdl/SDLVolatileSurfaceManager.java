@@ -35,9 +35,9 @@ import sun.java2d.SurfaceData;
 /**
  * @author Mario Torre <neugens.limasoftware@gmail.com>
  */
-class SDLVolativeSurfaceManager extends VolatileSurfaceManager {
+class SDLVolatileSurfaceManager extends VolatileSurfaceManager {
 
-    SDLVolativeSurfaceManager(SunVolatileImage image, Object context) {
+    SDLVolatileSurfaceManager(SunVolatileImage image, Object context) {
 
         super(image, context);
     }

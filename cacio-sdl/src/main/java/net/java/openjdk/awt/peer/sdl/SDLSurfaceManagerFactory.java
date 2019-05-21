@@ -22,38 +22,25 @@
  * CA 95054 USA or visit www.sun.com if you need additional information or
  * have any questions.
  */
-#include <jni.h>
-#include <SDL/SDL_video.h>
+package net.java.openjdk.awt.peer.sdl;
 
-#include "SDL.h"
-#include "cacio-sdl.h"
+import sun.awt.image.SunVolatileImage;
+import sun.awt.image.VolatileSurfaceManager;
+import sun.java2d.SurfaceManagerFactory;
 
-#include "net_java_openjdk_awt_peer_sdl_SDLVolativeSurfaceManager.h"
+/**
+ * @author Mario Torre <neugens.limasoftware@gmail.com>
+ */
+class SDLSurfaceManagerFactory extends SurfaceManagerFactory {
 
-JNIEXPORT jlong JNICALL Java_net_java_openjdk_awt_peer_sdl_SDLVolativeSurfaceManager_initSurface
-  (JNIEnv *env, jobject thiz __attribute__((unused)), jint width, jint height)
-{
-    SDL_Surface *surface = NULL;
-
-    /*
-     * FIXME: sync these with the ColorModel
-     * returned by SDLGraphicsEnvironment
-     */
-    Uint32 rmask = 0x00FF0000;
-    Uint32 gmask = 0x0000FF00;
-    Uint32 bmask = 0x000000FF;
-    Uint32 amask = 0;
-    
-    /* TODO: pass the depth we really want for the image. */
-    surface = SDL_CreateRGBSurface(SDL_HWSURFACE | SDL_SRCCOLORKEY |
-                                   SDL_DOUBLEBUF,
-                                   width, height, 32,
-                                   rmask, gmask, bmask, amask);
-    if(surface == NULL) {
-        fprintf(stderr, "CreateRGBSurface failed: %s\n", SDL_GetError());
-        JNU_ThrowByName(env, "java/lang/InternalError",
-                        "SDLVolativeSurfaceManager::initSurface failed");
+    public SDLSurfaceManagerFactory() {
     }
 
-    return surface;
+    @Override
+    public VolatileSurfaceManager createVolatileManager(SunVolatileImage image,
+                                                        Object context) {
+
+        return new SDLVolatileSurfaceManager(image, context);
+    }
+
 }
