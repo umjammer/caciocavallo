@@ -30,7 +30,7 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.Frame;
 import java.awt.Panel;
-import sun.awt.ComponentAccessor;
+import sun.awt.AWTAccessor;
 
 public class TestPanel {
 
@@ -60,6 +60,6 @@ public class TestPanel {
         System.err.println("Frame props: " + f.getForeground() + ", " + f.getBackground() + ", " + f.getFont());
         System.err.println("Panel props: " + p.getForeground() + ", " + p.getBackground() + ", " + p.getFont());
         System.err.println("Button props: " + b.getForeground() + ", " + b.getBackground() + ", " + b.getFont());
-        System.err.println("real Button props: " + ComponentAccessor.getForeground(b) + ", " + ComponentAccessor.getBackground(b) + ", " + ComponentAccessor.getFont(b));
+        System.err.println("real Button props: " + AWTAccessor.getComponentAccessor().getForeground(b) + ", " + AWTAccessor.getComponentAccessor().getBackground(b) + ", " + AWTAccessor.getComponentAccessor().getFont(b));
     }
 }
