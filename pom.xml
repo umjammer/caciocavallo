@@ -42,12 +42,12 @@
   </developers>
 
   <modules>
-    <module>cacio-web</module>
     <module>cacio-shared</module>
     <module>cacio-tta</module>
     <module>cacio-sdl</module>
     <module>cacio-x11</module>
     <module>cacio-escher</module>
+    <module>cacio-web</module>
     <module>cacio-wayland</module> <!-- may need to install wayland (cairo) -->
     <module>cacio-directfb</module> <!-- may need to install directfb -->
   </modules>
@@ -62,6 +62,7 @@
       <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
     </repository>
   </distributionManagement>
+
   <build>
     <plugins>
       <plugin>
@@ -112,6 +113,7 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-compiler-plugin</artifactId>
+          <version>2.3.2</version>
           <configuration>
             <source>1.8</source>
             <target>1.8</target>
@@ -133,6 +135,7 @@
       </plugins>
     </pluginManagement>
   </build>
+
   <profiles>
     <profile>
       <id>release-sign-artifacts</id>
@@ -162,4 +165,5 @@
       </build>
     </profile>
   </profiles>
+
 </project>
