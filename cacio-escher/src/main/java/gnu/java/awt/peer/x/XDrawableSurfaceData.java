@@ -39,6 +39,7 @@ package gnu.java.awt.peer.x;
 
 import gnu.x11.Drawable;
 import gnu.x11.GC;
+import gnu.x11.GC.Values.RectangleOrder;
 import gnu.x11.color.ColorMapper;
 
 import java.awt.GraphicsConfiguration;
@@ -318,17 +319,17 @@ class XDrawableSurfaceData
   {
     int pixel = ColorMapper.getInstace().
             convertToNativePixel(sg2d.pixel,
-                                 xDrawable.display.default_pixmap_format); // TODO
+                                 xDrawable.getDisplay().getDefaultVisual());
       
-    xgc.set_foreground(pixel);
+    xgc.setForeground(pixel);
     Region c = sg2d.clipRegion;
     if (c.isRectangular())
       {
         gnu.x11.Rectangle clip = new gnu.x11.Rectangle(c.getLoX(), c.getLoY(),
                                                        c.getWidth(),
                                                        c.getHeight());
-        xgc.set_clip_rectangles(0, 0,
-                                new gnu.x11.Rectangle[]{clip}, GC.UN_SORTED);
+        xgc.setClipRectangles(0, 0,
+                                new gnu.x11.Rectangle[]{clip}, RectangleOrder.UN_SORTED);
       }
     else
       {
@@ -345,8 +346,8 @@ class XDrawableSurfaceData
               gnu.x11.Rectangle clip = new gnu.x11.Rectangle(c.getLoX(), c.getLoY(),
                       c.getWidth(),
                       c.getHeight());
-              xgc.set_clip_rectangles(0, 0,
-                      new gnu.x11.Rectangle[]{clip}, GC.UN_SORTED);
+              xgc.setClipRectangles(0, 0,
+                      new gnu.x11.Rectangle[]{clip}, RectangleOrder.UN_SORTED);
           }
           else
           {

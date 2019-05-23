@@ -73,7 +73,7 @@ public class XDrawableDataBuffer
         awtErr.initCause(e);
         throw awtErr;
     }
-    return pm.get_data_element(0);
+    return pm.getDataElement(0);
   }
 
   @Override
@@ -83,16 +83,16 @@ public class XDrawableDataBuffer
     int y = i / xDrawable.width;
     ZPixmap pm;
     try {
-        pm = new ZPixmap(xDrawable.display, 1, 1,
-                                 xDrawable.display.default_pixmap_format); // TODO
+        pm = new ZPixmap(xDrawable.getDisplay(), 1, 1,
+                                 xDrawable.getDisplay().getDefaultVisual());
     } catch (EscherUnsupportedScreenBitDepthException e) {
         AWTError awtErr = new AWTError("Cannot create a ZPixmpas");
         awtErr.initCause(e);
         throw awtErr;
     }
-    pm.set(0, 0, value >>> 16 & 0xff, value >>> 8 & 0xff, value & 0xff);
+    pm.putPixel(0, 0, value);
     GC gc = new GC(xDrawable);
-    xDrawable.put_image(gc, pm, x, y);
+    xDrawable.putImage(gc, pm, x, y);
     gc.free();
   }
 

@@ -38,6 +38,7 @@ exception statement from your version. */
 package gnu.java.awt.peer.x;
 
 import gnu.x11.Display;
+import gnu.x11.EscherServerConnectionException;
 
 import java.awt.GraphicsDevice;
 import java.io.File;
@@ -90,7 +91,6 @@ public class XGraphicsEnvironment
     Properties props = new Properties();
     File config = new File(System.getProperty("user.home"),
                            ".xawt.properties");
-
     try
       {
         FileInputStream configIn = new FileInputStream(config);
@@ -103,8 +103,7 @@ public class XGraphicsEnvironment
             String propValue = props.getProperty(propName);
             if (propValue != null)
               {
-                Display.Name displayName = new Display.Name(propValue);
-                XGraphicsDevice device = new XGraphicsDevice(displayName);
+                XGraphicsDevice device = new XGraphicsDevice(propValue);
                 if (dev == 1)
                   defaultDevice = device;
                 deviceList.add(device);
@@ -138,14 +137,14 @@ public class XGraphicsEnvironment
   /**
    * Helper method that initializes the default device in the case when there
    * is no configuration for the default.
+   * @throws EscherServerConnectionException 
    */
   private XGraphicsDevice initDefaultDevice()
   {
     String display = System.getenv("DISPLAY");
     if (display == null)
       display = ":0.0";
-    Display.Name displayName = new Display.Name(display);
-    return new XGraphicsDevice(displayName);
+    return new XGraphicsDevice(display);
   }
 
   @Override

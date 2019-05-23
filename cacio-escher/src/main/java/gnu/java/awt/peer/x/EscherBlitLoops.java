@@ -101,8 +101,8 @@ class EscherBlitLoops
         GC gc = dxdsd.getBlitGC(clip);
         Drawable d = dxdsd.getDrawable();
         Drawable s = sxdsd.getDrawable();
-        d.copy_area(s, gc, sx, sy, w, h, dx, dy);
-        d.display.flush();
+        d.copyArea(s, gc, sx, sy, w, h, dx, dy);
+        d.getDisplay().flush();
       }
     SunToolkit.awtUnlock();
   }
@@ -149,8 +149,8 @@ class EscherBlitLoops
       {
         ZPixmap pm;
         try {
-            pm = new ZPixmap(gc.display, w, h,
-                                     gc.display.default_pixmap_format); // TODO
+            pm = new ZPixmap(gc.getDisplay(), w, h,
+                                     gc.getDisplay().getDefaultVisual());
         } catch (EscherUnsupportedScreenBitDepthException e) {
             AWTError awtErr = new AWTError("Cannot create a ZPixmpas");
             awtErr.initCause(e);
@@ -161,10 +161,10 @@ class EscherBlitLoops
             for (int x = sx; x < sx + w; x++)
               {
                 int rgb = bufImg.getRGB(x, y);
-                pm.set(x - sx, y - sy, (rgb >>> 16) & 0xff, (rgb >>> 8) & 0xff, rgb & 0xff);
+                pm.putPixel(x - sx, y - sy, rgb);
               }
           }
-        d.put_image(gc, pm, dx, dy);
+        d.putImage(gc, pm, dx, dy);
       }
     else
       {
@@ -182,14 +182,11 @@ class EscherBlitLoops
             
             for (int xx = 0; xx < w; xx++) {
                 
-                int r = zpixmap.get_red(xx, yy);
-                int g = zpixmap.get_blue(xx, yy);
-                int b = zpixmap.get_blue(xx, yy);
-                RGB rgb = new RGB(r, g, b);
+                RGB rgb = zpixmap.getRGB(xx, yy);
 
-                int red = rgb.red;
-                int green = rgb.green;
-                int blue = rgb.blue;
+                int red = rgb.getRed();
+                int green = rgb.getGreen();
+                int blue = rgb.getBlue();
               
                 int rgbPix = bufImg.getRGB(xx, yy);
       
@@ -197,23 +194,23 @@ class EscherBlitLoops
                 if (alpha == 0) {
   
                     // Completely translucent.
-                    red = rgb.red & 0xff;
-                    green = rgb.green & 0xff;
-                    blue = rgb.blue & 0xff;
+                    red = rgb.getRed() & 0xff;
+                    green = rgb.getGreen() & 0xff;
+                    blue = rgb.getBlue() & 0xff;
                   
                 } else if (alpha < 255) {
                   
                     // Composite pixels.
                     red = (rgbPix >>> 16) & 0xff;
-                    red = red * alpha + (255 - alpha) * rgb.red;
+                    red = red * alpha + (255 - alpha) * rgb.getRed();
                     red = red / 255;
 
                     green = (rgbPix >>> 8) & 0xff;
-                    green = green * alpha + (255 - alpha) * rgb.green;
+                    green = green * alpha + (255 - alpha) * rgb.getGreen();
                     green = green / 255;
 
                     blue = rgbPix & 0xff;
-                    blue = blue * alpha + (255 - alpha) * rgb.blue;
+                    blue = blue * alpha + (255 - alpha) * rgb.getBlue();
                     blue = blue / 255;
                   
                 } else {
@@ -224,11 +221,11 @@ class EscherBlitLoops
                     blue = rgbPix & 0xff;
                 }
 
-                zpixmap.set(xx, yy, red, green, blue);
+                zpixmap.putRGB(xx, yy, red, green, blue);
             }
         }
       
-        d.put_image(gc, zpixmap, dx, dy);
+        d.putImage(gc, zpixmap, dx, dy);
       }
   }
 }

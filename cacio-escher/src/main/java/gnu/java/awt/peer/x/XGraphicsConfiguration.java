@@ -101,9 +101,9 @@ public class XGraphicsConfiguration
   public Rectangle getBounds()
   {
     Display d = device.getDisplay();
-    Screen screen = d.default_screen;
+    Screen screen = d.getDefaultScreen();
     
-    return new Rectangle(0, 0, screen.width, screen.height); 
+    return new Rectangle(0, 0, screen.getWidth(), screen.getHeight()); 
   }
 
   /**
@@ -115,9 +115,9 @@ public class XGraphicsConfiguration
   {
     // TODO: A GraphicsConfiguration should correspond to a Screen instance.
     Display d = device.getDisplay();
-    Screen screen = d.default_screen;
-    int w = screen.width;
-    int h = screen.height;
+    Screen screen = d.getDefaultScreen();
+    int w = screen.getWidth();
+    int h = screen.getHeight();
     return new Dimension(w, h);
   }
 
@@ -129,11 +129,11 @@ public class XGraphicsConfiguration
   int getResolution()
   {
     Display d = device.getDisplay();
-    Screen screen = d.default_screen;
-    int w = screen.width * 254;
-    int h = screen.height * 254;
-    int wmm = screen.width_in_mm * 10;
-    int hmm = screen.height_in_mm * 10;
+    Screen screen = d.getDefaultScreen();
+    int w = screen.getWidth() * 254;
+    int h = screen.getHeight() * 254;
+    int wmm = screen.getWidthInMM() * 10;
+    int hmm = screen.getHeightInMM() * 10;
     int xdpi = w / wmm;
     int ydpi = h / hmm;
     int dpi = (xdpi + ydpi) / 2;

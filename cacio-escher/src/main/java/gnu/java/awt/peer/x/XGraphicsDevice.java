@@ -64,10 +64,25 @@ public class XGraphicsDevice
    */
   private Display display;
 
+  class DisplayName {
+      String hostname;
+      int displayNumber;
+      int screenNumber;
+      public DisplayName(String dn) {
+          String[] pair = dn.split(":");
+          this.hostname = pair[0];
+          this.displayNumber = pair[1].indexOf('.') != -1 ? Integer.valueOf(pair[1].substring(0, pair[1].indexOf('.'))) : Integer.valueOf(pair[1]);
+          this.screenNumber = pair[1].indexOf('.') != -1 ? Integer.valueOf(pair[1].substring(pair[1].lastIndexOf('.'))) : -1;
+      }
+      public String getIDString() { 
+          return ":" + displayNumber + (screenNumber != -1 ? "." + screenNumber : "");
+      }
+  }
+
   /**
    * The display name from which the display will be initialized.
    */
-  private Display.Name displayName;
+  private DisplayName displayName;
 
   /**
    * The event pump for this X Display.
@@ -77,9 +92,9 @@ public class XGraphicsDevice
   /**
    * Creates a new XGraphicsDevice.
    */
-  XGraphicsDevice(Display.Name dn)
+  XGraphicsDevice(String dn)
   {
-    displayName = dn;
+      displayName = new DisplayName(dn); 
   }
 
   public int getType()
@@ -89,7 +104,7 @@ public class XGraphicsDevice
 
   public String getIDstring()
   {
-    return ":" + displayName.display_no + "." + displayName.screen_no;
+    return displayName.getIDString();
   }
 
   public GraphicsConfiguration[] getConfigurations()
@@ -131,8 +146,8 @@ public class XGraphicsDevice
                 if (socket != null)
                   {
                     display = new Display(socket, "localhost",
-                                          displayName.display_no,
-                                          displayName.screen_no);
+                                          displayName.displayNumber,
+                                          displayName.screenNumber);
                   }
               }
 
@@ -148,7 +163,7 @@ public class XGraphicsDevice
             // when the connection is probably remote or when we couldn't load
             // the LocalSocket class stuff.
             if (display == null)
-                display = new Display(displayName);
+                display = new Display(displayName.hostname, displayName.displayNumber, displayName.screenNumber);
           }
         catch (EscherServerConnectionException ex)
           {
@@ -179,7 +194,7 @@ public class XGraphicsDevice
     try
       {
         // TODO: Is this 100% ok?
-        String sockPath = "/tmp/.X11-unix/X" + displayName.display_no;
+        String sockPath = "/tmp/.X11-unix/X" + displayName.displayNumber;
         Class<?> localSocketAddressClass =
           Class.forName("gnu.java.net.local.LocalSocketAddress");
         Constructor<?> localSocketAddressConstr =

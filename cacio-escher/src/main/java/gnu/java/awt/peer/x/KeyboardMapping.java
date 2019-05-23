@@ -64,188 +64,188 @@ final class KeyboardMapping
   static int mapToKeyCode(gnu.x11.Input xInput, int xKeyCode, int xMods)
   {
     int mapped = KeyEvent.VK_UNDEFINED;
-    int keysym = xInput.keycode_to_keysym(xKeyCode, xMods, true);
+    int keysym = xInput.keycodeToKeysym(xKeyCode, xMods, true);
 
     // Special keys.
     if (keysym >= 255 << 8)
       {
         // FIXME: Add missing mappings.
-        switch (keysym)
+        switch (Misc.getCode(keysym))
         {
-          case Misc.BACKSPACE:
+          case BACKSPACE:
             mapped = KeyEvent.VK_BACK_SPACE;
             break;
-          case Misc.TAB:
+          case TAB:
             mapped = KeyEvent.VK_TAB;
             break;
-          case Misc.CLEAR:
+          case CLEAR:
             mapped = KeyEvent.VK_CLEAR;
             break;
-          case Misc.RETURN:
+          case RETURN:
             mapped = KeyEvent.VK_ENTER;
             break;
-          case Misc.PAUSE:
+          case PAUSE:
             mapped = KeyEvent.VK_PAUSE;
             break;
-          case Misc.SCROLL_LOCK:
+          case SCROLL_LOCK:
             mapped = KeyEvent.VK_SCROLL_LOCK;
             break;
-          case Misc.ESCAPE:
+          case ESCAPE:
             mapped = KeyEvent.VK_ESCAPE;
             break;
-          case Misc.HOME:
+          case HOME:
             mapped = KeyEvent.VK_HOME;
             break;
-          case Misc.LEFT:
+          case LEFT:
             mapped = KeyEvent.VK_LEFT;
             break;
-          case Misc.UP:
+          case UP:
             mapped = KeyEvent.VK_UP;
             break;
-          case Misc.RIGHT:
+          case RIGHT:
             mapped = KeyEvent.VK_RIGHT;
             break;
-          case Misc.DOWN:
+          case DOWN:
             mapped = KeyEvent.VK_DOWN;
             break;
-          case Misc.PAGE_UP:
+          case PAGE_UP:
             mapped = KeyEvent.VK_PAGE_UP;
             break;
-          case Misc.PAGE_DOWN:
+          case PAGE_DOWN:
             mapped = KeyEvent.VK_PAGE_DOWN;
             break;
-          case Misc.END:
+          case END:
             mapped = KeyEvent.VK_END;
             break;
-          case Misc.BEGIN:
+          case BEGIN:
             mapped = KeyEvent.VK_BEGIN;
             break;
-          case Misc.INSERT:
+          case INSERT:
             mapped = KeyEvent.VK_INSERT;
             break;
-          case Misc.UNDO:
+          case UNDO:
             mapped = KeyEvent.VK_UNDO;
             break;
-          case Misc.FIND:
+          case FIND:
             mapped = KeyEvent.VK_FIND;
             break;
-          case Misc.CANCEL:
+          case CANCEL:
             mapped = KeyEvent.VK_CANCEL;
             break;
-          case Misc.HELP:
+          case HELP:
             mapped = KeyEvent.VK_HELP;
             break;
-          case Misc.MODE_SWITCH:
+          case MODE_SWITCH:
             mapped = KeyEvent.VK_MODECHANGE;
             break;
-          case Misc.NUM_LOCK:
+          case NUM_LOCK:
             mapped = KeyEvent.VK_NUM_LOCK;
             break;
-          case Misc.KP_LEFT:
+          case KP_LEFT:
             mapped = KeyEvent.VK_KP_LEFT;
             break;
-          case Misc.KP_UP:
+          case KP_UP:
             mapped = KeyEvent.VK_KP_UP;
             break;
-          case Misc.KP_RIGHT:
+          case KP_RIGHT:
             mapped = KeyEvent.VK_KP_RIGHT;
             break;
-          case Misc.KP_DOWN:
+          case KP_DOWN:
             mapped = KeyEvent.VK_KP_DOWN;
             break;
-          case Misc.F1:
+          case F1:
             mapped = KeyEvent.VK_F1;
             break;
-          case Misc.F2:
+          case F2:
             mapped = KeyEvent.VK_F2;
             break;
-          case Misc.F3:
+          case F3:
             mapped = KeyEvent.VK_F3;
             break;
-          case Misc.F4:
+          case F4:
             mapped = KeyEvent.VK_F4;
             break;
-          case Misc.F5:
+          case F5:
             mapped = KeyEvent.VK_F5;
             break;
-          case Misc.F6:
+          case F6:
             mapped = KeyEvent.VK_F6;
             break;
-          case Misc.F7:
+          case F7:
             mapped = KeyEvent.VK_F7;
             break;
-          case Misc.F8:
+          case F8:
             mapped = KeyEvent.VK_F8;
             break;
-          case Misc.F9:
+          case F9:
             mapped = KeyEvent.VK_F9;
             break;
-          case Misc.F10:
+          case F10:
             mapped = KeyEvent.VK_F10;
             break;
-          case Misc.F11:
+          case F11:
             mapped = KeyEvent.VK_F11;
             break;
-          case Misc.F12:
+          case F12:
             mapped = KeyEvent.VK_F12;
             break;
-          case Misc.F13:
+          case F13:
             mapped = KeyEvent.VK_F13;
             break;
-          case Misc.F14:
+          case F14:
             mapped = KeyEvent.VK_F14;
             break;
-          case Misc.F15:
+          case F15:
             mapped = KeyEvent.VK_F15;
             break;
-          case Misc.F16:
+          case F16:
             mapped = KeyEvent.VK_F16;
             break;
-          case Misc.F17:
+          case F17:
             mapped = KeyEvent.VK_F17;
             break;
-          case Misc.F18:
+          case F18:
             mapped = KeyEvent.VK_F18;
             break;
-          case Misc.F19:
+          case F19:
             mapped = KeyEvent.VK_F19;
             break;
-          case Misc.F20:
+          case F20:
             mapped = KeyEvent.VK_F20;
             break;
-          case Misc.F21:
+          case F21:
             mapped = KeyEvent.VK_F21;
             break;
-          case Misc.F22:
+          case F22:
             mapped = KeyEvent.VK_F22;
             break;
-          case Misc.F23:
+          case F23:
             mapped = KeyEvent.VK_F23;
             break;
-          case Misc.F24:
+          case F24:
             mapped = KeyEvent.VK_F24;
             break;
-          case Misc.SHIFT_L:
-          case Misc.SHIFT_R:
+          case SHIFT_L:
+          case SHIFT_R:
             mapped = KeyEvent.VK_SHIFT;
             break;
-          case Misc.CONTROL_L:
-          case Misc.CONTROL_R:
+          case CONTROL_L:
+          case CONTROL_R:
             mapped = KeyEvent.VK_CONTROL;
             break;
-          case Misc.CAPS_LOCK:
-          case Misc.SHIFT_LOCK:
+          case CAPS_LOCK:
+          case SHIFT_LOCK:
             mapped = KeyEvent.VK_CAPS_LOCK;
             break;
-          case Misc.META_L:
-          case Misc.META_R:
+          case META_L:
+          case META_R:
             mapped = KeyEvent.VK_META;
             break;
-          case Misc.ALT_L:
-          case Misc.ALT_R:
+          case ALT_L:
+          case ALT_R:
             mapped = KeyEvent.VK_ALT;
             break;
-          case Misc.DELETE:
+          case DELETE:
             mapped = KeyEvent.VK_DELETE;
             break;
           default:
@@ -258,109 +258,109 @@ final class KeyboardMapping
         // TODO: Add missing mappings, if any.
         // Lowercase characters are mapped to
         // their corresponding upper case pendants.
-        if (keysym >= Latin1.A_SMALL && keysym <= Latin1.Z_SMALL)
+        if (keysym >= Latin1.A_SMALL.getCode() && keysym <= Latin1.Z_SMALL.getCode())
           mapped = keysym - 0x20;
         // Uppercase characters are mapped 1:1.
-        else if (keysym >= Latin1.A && keysym <= Latin1.Z)
+        else if (keysym >= Latin1.A.getCode() && keysym <= Latin1.Z.getCode())
           mapped = keysym;
         // Digits are mapped 1:1.
-        else if (keysym >= Latin1.NUM_0 && keysym <= Latin1.NUM_9)
+        else if (keysym >= Latin1.NUM_0.getCode() && keysym <= Latin1.NUM_9.getCode())
           mapped = keysym;
         else
           {
-            switch (keysym)
+            switch (Latin1.getCode(keysym))
             {
-              case Latin1.SPACE:
+              case SPACE:
                 mapped = KeyEvent.VK_SPACE;
                 break;
-              case Latin1.EXCLAM:
+              case EXCLAM:
                 mapped = KeyEvent.VK_EXCLAMATION_MARK;
                 break;
-              case Latin1.QUOTE_DBL:
+              case QUOTE_DBL:
                 mapped = KeyEvent.VK_QUOTEDBL;
                 break;
-              case Latin1.NUMBER_SIGN:
+              case NUMBER_SIGN:
                 mapped = KeyEvent.VK_NUMBER_SIGN;
                 break;
-              case Latin1.DOLLAR:
+              case DOLLAR:
                 mapped = KeyEvent.VK_DOLLAR;
                 break;
-              case Latin1.AMPERSAND:
+              case AMPERSAND:
                 mapped = KeyEvent.VK_AMPERSAND;
                 break;
-              case Latin1.APOSTROPHE:
+              case APOSTROPHE:
                 mapped = KeyEvent.VK_QUOTE;
                 break;
-              case Latin1.PAREN_LEFT:
+              case PAREN_LEFT:
                 mapped = KeyEvent.VK_LEFT_PARENTHESIS;
                 break;
-              case Latin1.PAREN_RIGHT:
+              case PAREN_RIGHT:
                 mapped = KeyEvent.VK_RIGHT_PARENTHESIS;
                 break;
-              case Latin1.ASTERISK:
+              case ASTERISK:
                 mapped = KeyEvent.VK_ASTERISK;
                 break;
-              case Latin1.PLUS:
+              case PLUS:
                 mapped = KeyEvent.VK_PLUS;
                 break;
-              case Latin1.COMMA:
+              case COMMA:
                 mapped = KeyEvent.VK_COMMA;
                 break;
-              case Latin1.MINUS:
+              case MINUS:
                 mapped = KeyEvent.VK_MINUS;
                 break;
-              case Latin1.PERIOD:
+              case PERIOD:
                 mapped = KeyEvent.VK_PERIOD;
                 break;
-              case Latin1.SLASH:
+              case SLASH:
                 mapped = KeyEvent.VK_SLASH;
                 break;
-              case Latin1.COLON:
+              case COLON:
                 mapped = KeyEvent.VK_COLON;
                 break;
-              case Latin1.SEMICOLON:
+              case SEMICOLON:
                 mapped = KeyEvent.VK_SEMICOLON;
                 break;
-              case Latin1.LESS:
+              case LESS:
                 mapped = KeyEvent.VK_LESS;
                 break;
-              case Latin1.EQUAL:
+              case EQUAL:
                 mapped = KeyEvent.VK_EQUALS;
                 break;
-              case Latin1.GREATER:
+              case GREATER:
                 mapped = KeyEvent.VK_GREATER;
                 break;
-              case Latin1.AT:
+              case AT:
                 mapped = KeyEvent.VK_AT;
                 break;
-              case Latin1.BRACKET_LEFT:
+              case BRACKET_LEFT:
                 mapped = KeyEvent.VK_OPEN_BRACKET;
                 break;
-              case Latin1.BACKSLASH:
+              case BACKSLASH:
                 mapped = KeyEvent.VK_BACK_SLASH;
                 break;
-              case Latin1.BRACKET_RIGHT:
+              case BRACKET_RIGHT:
                 mapped = KeyEvent.VK_CLOSE_BRACKET;
                 break;
-              case Latin1.ASCII_CIRCUM:
+              case ASCII_CIRCUM:
                 mapped = KeyEvent.VK_CIRCUMFLEX;
                 break;
-              case Latin1.UNDERSCORE:
+              case UNDERSCORE:
                 mapped = KeyEvent.VK_UNDERSCORE;
                 break;
-              case Latin1.GRAVE:
+              case GRAVE:
                 mapped = KeyEvent.VK_DEAD_GRAVE;
                 break;
-              case Latin1.BRACE_LEFT:
+              case BRACE_LEFT:
                 mapped = KeyEvent.VK_BRACELEFT;
                 break;
-              case Latin1.BRACE_RIGHT:
+              case BRACE_RIGHT:
                 mapped = KeyEvent.VK_BRACERIGHT;
                 break;
-              case Latin1.ASCII_TILDE:
+              case ASCII_TILDE:
                 mapped = KeyEvent.VK_DEAD_TILDE;
                 break;
-              case Latin1.EXCLAM_DOWN:
+              case EXCLAM_DOWN:
                 mapped = KeyEvent.VK_INVERTED_EXCLAMATION_MARK;
                 break;
               default:
@@ -383,7 +383,7 @@ final class KeyboardMapping
   static char mapToKeyChar(gnu.x11.Input xInput, int xKeyCode, int xMods)
   {
     char mapped = KeyEvent.CHAR_UNDEFINED;
-    char keysym = (char) xInput.keycode_to_keysym(xKeyCode, xMods, false);
+    char keysym = (char) xInput.keycodeToKeysym(xKeyCode, xMods, false);
     // FIXME: Map other encodings properly.
     if (keysym < 256) // Latin1.
       {
@@ -403,15 +403,15 @@ final class KeyboardMapping
   {
     int mods = 0;
 
-    if ((xMods & Input.SHIFT_MASK) != 0)
+    if ((xMods & Input.KeyMask.SHIFT_MASK.getCode()) != 0)
       mods |= KeyEvent.SHIFT_MASK | KeyEvent.SHIFT_DOWN_MASK;
-    if ((xMods & Input.META_MASK) != 0)
+    if ((xMods & Input.KeyMask.META_MASK.getCode()) != 0)
       mods |= KeyEvent.META_MASK | KeyEvent.META_DOWN_MASK;
-    if ((xMods & Input.ALT_MASK) != 0)
+    if ((xMods & Input.KeyMask.ALT_MASK.getCode()) != 0)
       mods |= KeyEvent.ALT_MASK | KeyEvent.ALT_DOWN_MASK;
-    if ((xMods & Input.MOD5_MASK) != 0)
+    if ((xMods & Input.KeyMask.MOD5_MASK.getCode()) != 0)
       mods |= KeyEvent.ALT_GRAPH_MASK | KeyEvent.ALT_GRAPH_DOWN_MASK;
-    if ((xMods & Input.CONTROL_MASK) != 0)
+    if ((xMods & Input.KeyMask.CONTROL_MASK.getCode()) != 0)
       mods |= KeyEvent.CTRL_MASK | KeyEvent.CTRL_DOWN_MASK;
 
     return mods;

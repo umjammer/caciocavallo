@@ -74,7 +74,7 @@ class ZPixmapDataBuffer
     Display d = dev.getDisplay();
     try {
         zpixmap =
-            new ZPixmap(d, w, h, d.default_pixmap_format); // TODO
+            new ZPixmap(d, w, h, d.getDefaultVisual());
         
     } catch (EscherUnsupportedScreenBitDepthException e) {
         // time to throw the real exception
@@ -91,20 +91,20 @@ class ZPixmapDataBuffer
    */
   ZPixmapDataBuffer(ZPixmap zpixmap)
   {
-    super(TYPE_BYTE, zpixmap.get_data_length());
+    super(TYPE_BYTE, zpixmap.getDataLength());
     this.zpixmap = zpixmap;
   }
 
   @Override
   public int getElem(int bank, int i)
   {
-    return 0xff & zpixmap.get_data_element(i);
+    return 0xff & zpixmap.getDataElement(i);
   }
 
   @Override
   public void setElem(int bank, int i, int val)
   {
-    zpixmap.set_data_element(i, (byte) val);
+    zpixmap.setDataElement(i, (byte) val);
   }
 
   ZPixmap getZPixmap()

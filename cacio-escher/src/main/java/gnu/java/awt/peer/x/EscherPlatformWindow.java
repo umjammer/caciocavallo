@@ -25,13 +25,9 @@
 
 package gnu.java.awt.peer.x;
 
-import gnu.x11.Atom;
-import gnu.x11.Drawable;
-import gnu.x11.Window;
-import gnu.x11.event.Event;
-
 import java.awt.AWTException;
 import java.awt.BufferCapabilities;
+import java.awt.BufferCapabilities.FlipContents;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dialog;
@@ -48,13 +44,17 @@ import java.awt.Insets;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.Toolkit;
-import java.awt.BufferCapabilities.FlipContents;
 import java.awt.event.PaintEvent;
 import java.awt.event.WindowEvent;
 import java.awt.image.ColorModel;
 import java.awt.peer.ComponentPeer;
 import java.awt.peer.ContainerPeer;
 
+import gnu.x11.Atom;
+import gnu.x11.Drawable;
+import gnu.x11.Window;
+import gnu.x11.WindowAttributes;
+import gnu.x11.event.Event;
 import sun.awt.CausedFocusEvent.Cause;
 import sun.awt.peer.cacio.CacioComponent;
 import sun.awt.peer.cacio.PlatformToplevelWindow;
@@ -66,15 +66,15 @@ import sun.java2d.pipe.Region;
 class EscherPlatformWindow implements PlatformToplevelWindow {
 
     private static int standardSelect =
-                        Event.BUTTON_PRESS_MASK
-                        | Event.BUTTON_RELEASE_MASK | Event.POINTER_MOTION_MASK
-                        // | Event.RESIZE_REDIRECT_MASK //
-                        | Event.EXPOSURE_MASK | Event.PROPERTY_CHANGE_MASK
-                        | Event.STRUCTURE_NOTIFY_MASK //
-                        // | Event.SUBSTRUCTURE_NOTIFY_MASK
-                        | Event.KEY_PRESS_MASK | Event.KEY_RELEASE_MASK
-                        // | Event.VISIBILITY_CHANGE_MASK //
-                        | Event.FOCUS_CHANGE_MASK
+                        Event.EventMask.BUTTON_PRESS_MASK.getMask()
+                        | Event.EventMask.BUTTON_RELEASE_MASK.getMask() | Event.EventMask.POINTER_MOTION_MASK.getMask()
+                        // | Event.RESIZE_REDIRECT_MASK.getMask() //
+                        | Event.EventMask.EXPOSURE_MASK.getMask() | Event.EventMask.PROPERTY_CHANGE_MASK.getMask()
+                        | Event.EventMask.STRUCTURE_NOTIFY_MASK.getMask() //
+                        // | Event.SUBSTRUCTURE_NOTIFY_MASK.getMask()
+                        | Event.EventMask.KEY_PRESS_MASK.getMask() | Event.EventMask.KEY_RELEASE_MASK.getMask()
+                        // | Event.VISIBILITY_CHANGE_MASK.getMask() //
+                        | Event.EventMask.FOCUS_CHANGE_MASK.getMask()
                         ;
 
     /**
@@ -119,7 +119,7 @@ class EscherPlatformWindow implements PlatformToplevelWindow {
         XGraphicsDevice dev = EscherToolkit.getDefaultDevice();
 
         // TODO: Maybe initialize lazily in show().
-        Window.Attributes atts = new Window.Attributes();
+        WindowAttributes atts = new WindowAttributes();
 
         // FIXME: Howto generate a Window without decorations?
         int x = Math.max(awtComp.getX(), 0);
@@ -131,7 +131,7 @@ class EscherPlatformWindow implements PlatformToplevelWindow {
 
         Insets parentInsets;
         if (parent == null) {
-            parentWindow = dev.getDisplay().default_root; // TODO
+            parentWindow = dev.getDisplay().getDefaultRoot(); // TODO
             parentInsets = new Insets(0, 0, 0, 0);
         } else {
             parentWindow = ((EscherPlatformWindow) parent).xwindow;
@@ -140,11 +140,11 @@ class EscherPlatformWindow implements PlatformToplevelWindow {
 
         xwindow = new Window(parentWindow, x - parentInsets.left,
                              y - parentInsets.top, w, h, 0, atts);
-        xwindow.select_input(standardSelect);
+        xwindow.selectInput(standardSelect);
 
         dev.getEventSource().registerWindow(xwindow, cacioComp);
 
-        xwindow.set_wm_delete_window();
+        xwindow.setWMDeleteWindow();
 
         awtComp.setFont(new Font(Font.DIALOG, Font.PLAIN, 12));
 
@@ -169,7 +169,7 @@ class EscherPlatformWindow implements PlatformToplevelWindow {
             // these.
             Atom at = Atom.intern(dev.getDisplay(), "_MOTIF_WM_HINTS");
             if (at != null) {
-                xwindow.change_property(Window.REPLACE, at, at, 32, new int[] {
+                xwindow.changeProperty(Window.PropertyMode.REPLACE, at, at, 32, new int[] {
                         1 << 1, 0, 0, 0, 0 }, 0, 5);
             }
         }
@@ -213,7 +213,7 @@ class EscherPlatformWindow implements PlatformToplevelWindow {
         Insets i = insets;
         Insets parentInsets = getParentToplevelInsets();
         if (op == ComponentPeer.SET_BOUNDS) {
-            xwindow.move_resize(x - i.left - parentInsets.left,
+            xwindow.moveResize(x - i.left - parentInsets.left,
                     y - i.top - parentInsets.top,
                     width - i.left - i.right,
                     height - i.top - i.bottom);
@@ -274,7 +274,7 @@ class EscherPlatformWindow implements PlatformToplevelWindow {
 
     @Override
     public Point getLocationOnScreen() {
-        Drawable.GeometryInfo geoInfo = xwindow.get_geometry();
+        Drawable.GeometryInfo geoInfo = xwindow.getGeometry();
         Point p = new Point(geoInfo.x - insets.left, geoInfo.y - insets.top);
         return p;
     }
@@ -314,14 +314,14 @@ class EscherPlatformWindow implements PlatformToplevelWindow {
       
       // Determine the frame insets.
       Atom atom = Atom.intern(dev.getDisplay(), "_NET_FRAME_EXTENTS");
-      Window.Property p = xwindow.get_property(false, atom, Atom.CARDINAL, 0,
+      Window.Property p = xwindow.getProperty(false, atom, Atom.CARDINAL, 0,
                                                Window.MAX_WM_LENGTH);
       if (p.format() != 0)
         {
           insets = new Insets(p.value(2), p.value(0), p.value(3), p.value(1));
           Window.Changes ch = new Window.Changes();
-          ch.width(awtComponent.getWidth() - insets.left - insets.top);
-          ch.height(awtComponent.getHeight() - insets.top - insets.bottom);
+          ch.setWidth(awtComponent.getWidth() - insets.left - insets.top);
+          ch.setHeight(awtComponent.getHeight() - insets.top - insets.bottom);
           xwindow.configure(ch);
         }
 
@@ -399,14 +399,14 @@ class EscherPlatformWindow implements PlatformToplevelWindow {
 
     @Override
     public void setTitle(String title) {
-        xwindow.set_wm_name (title);
+        xwindow.setWMName(title);
     }
 
     public boolean requestFocus(Component lightweightChild, boolean temporary,
                                 boolean focusedWindowChangeAllowed, long time,
                                 Cause cause) {
 
-        xwindow.set_input_focus();
+        xwindow.setInputFocus();
 
         return true;
     }
