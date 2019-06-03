@@ -30,7 +30,7 @@ public class WebSocketStreamThread extends Thread {
     public void onConnect(Session session) {
         this.session = session;
         // why jetty wraps HttpServletRequest?, there is no compatibility.
-        // at least the wrapped class should have getter method for original.
+        // at least the wrapped class should have a getter method for original.
         this.state = WebSessionManager.getInstance().getSessionState(new UpgradeHttpServletRequest(null) {
             // depends on getSessionState() implementation uses only two methods bellow.
             public HttpSession getSession(boolean create) {
