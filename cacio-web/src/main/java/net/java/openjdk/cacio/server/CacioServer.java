@@ -28,6 +28,10 @@ package net.java.openjdk.cacio.server;
 import net.java.openjdk.cacio.servlet.*;
 import org.eclipse.jetty.server.*;
 import org.eclipse.jetty.server.handler.*;
+import org.eclipse.jetty.server.session.DefaultSessionCache;
+import org.eclipse.jetty.server.session.NullSessionDataStore;
+import org.eclipse.jetty.server.session.SessionCache;
+import org.eclipse.jetty.server.session.SessionHandler;
 import org.eclipse.jetty.servlet.*;
 import org.eclipse.jetty.util.thread.*;
 
@@ -54,15 +58,20 @@ public class CacioServer {
 	applySystemProperties();
 
 	Server server = new Server(port);
-	server.setThreadPool(new QueuedThreadPool(maxThreads));
+	// https://stackoverflow.com/questions/16299981/jetty-thread-pool-and-sun-httpserver-session#comment27373331_16301885
+	server.setServer(new Server(new QueuedThreadPool(maxThreads)));
 	
 	ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
 	context.setContextPath("/");
 	context.setResourceBase("bin/");
-	context.getSessionHandler().getSessionManager().setMaxInactiveInterval(90);
 	context.getSessionHandler().addEventListener(new CacioSessionListener());
 
-	ResourceHandler handler = new ResourceHandler();
+	SessionHandler sessions = context.getSessionHandler();//.setMaxInactiveInterval(90);
+	SessionCache cache = new DefaultSessionCache(sessions);
+    cache.setSessionDataStore(new NullSessionDataStore());
+    sessions.setSessionCache(cache);
+
+    ResourceHandler handler = new ResourceHandler();
 	handler.setResourceBase("bin");
 	handler.setServer(server);
 

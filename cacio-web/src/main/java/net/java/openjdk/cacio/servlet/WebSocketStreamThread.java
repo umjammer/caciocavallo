@@ -1,62 +1,79 @@
 package net.java.openjdk.cacio.servlet;
 
-import java.io.*;
+import java.io.IOException;
 
-import javax.servlet.http.*;
+import javax.servlet.http.HttpSession;
 
-import org.eclipse.jetty.websocket.*;
-import net.java.openjdk.awt.peer.web.*;
-import net.java.openjdk.cacio.servlet.transport.*;
+import org.eclipse.jetty.websocket.api.Session;
+import org.eclipse.jetty.websocket.api.annotations.OnWebSocketClose;
+import org.eclipse.jetty.websocket.api.annotations.OnWebSocketConnect;
+import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
+import org.eclipse.jetty.websocket.api.annotations.WebSocket;
+import org.eclipse.jetty.websocket.servlet.UpgradeHttpServletRequest;
 
-public class WebSocketStreamThread extends Thread implements WebSocket.OnTextMessage {
-    final WebSessionState state;
-    final HttpSession session;
+import net.java.openjdk.awt.peer.web.WebSessionState;
+import net.java.openjdk.cacio.servlet.transport.Transport;
+
+@WebSocket
+public class WebSocketStreamThread extends Thread {
+    WebSessionState state;
+    private Session session;
     final WebSessionManager sessionManager;
-    
-    Connection con;
+
     volatile boolean close = false;
 
-    public WebSocketStreamThread(HttpSession session, WebSessionState state) {
-	this.state = state;
-	this.session = session;
-	this.sessionManager = WebSessionManager.getInstance();
+    public WebSocketStreamThread() {
+        this.sessionManager = WebSessionManager.getInstance();
     }
 
-    @Override
-    public void onClose(int arg0, String arg1) {
-	close = true;
+    @OnWebSocketConnect
+    public void onConnect(Session session) {
+        this.session = session;
+        // why jetty wraps HttpServletRequest?, there is no compatibility.
+        // at least the wrapped class should have getter method for original.
+        this.state = WebSessionManager.getInstance().getSessionState(new UpgradeHttpServletRequest(null) {
+            // depends on getSessionState() implementation uses only two methods bellow.
+            public HttpSession getSession(boolean create) {
+                // casting depends on UpgradeRequest implementation is only ServletUpgradeRequest.
+                return (HttpSession) session.getUpgradeRequest().getSession();
+            }
+            public String getParameter(String name) {
+                return session.getUpgradeRequest().getParameterMap().get(name).get(0);
+            }
+        });
+        start();
     }
 
-    @Override
-    public void onOpen(Connection c) {
-	this.con = c;
-	start();
+    @OnWebSocketMessage
+    public void onText(String message) {
+        WebSessionManager.getInstance().registerSessionAtCurrentThread(state);
+        if(state.getEventManager() != null) {
+            state.getEventManager().parseEventData(-1, message);
+        }
+    }
+
+    @OnWebSocketClose
+    public void onClose(int statusCode, String reason) {
+        close = true;
     }
 
     public void run() {
-	try {
-	   sessionManager.registerSessionAtCurrentThread(state);
+        try {
+            sessionManager.registerSessionAtCurrentThread(state);
 
-	    while (!close) {
-		Transport transport = state.getScreen().pollForScreenUpdates(15000);
+            while (!close) {
+                Transport transport = state.getScreen().pollForScreenUpdates(15000);
 
-		if (!close) {
-		    con.sendMessage(transport.asString());
-		}
-	    }
-	} catch (IOException e) {
-	    e.printStackTrace();
-	    close = true;
-	}
-	
-	sessionManager.disposeSessionState(session, state);
-    }
+                if (!close) {
+                    session.getRemote().sendStringByFuture(transport.asString());
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            close = true;
+        }
 
-    @Override
-    public void onMessage(String evDataStr) {
-	WebSessionManager.getInstance().registerSessionAtCurrentThread(state);
-	if(state.getEventManager() != null) {
-	    state.getEventManager().parseEventData(-1, evDataStr);
-	}
+        // null: depends on disposeSessionState() implementation doesn't use session parameter inside.
+        sessionManager.disposeSessionState(null, state);
     }
 }

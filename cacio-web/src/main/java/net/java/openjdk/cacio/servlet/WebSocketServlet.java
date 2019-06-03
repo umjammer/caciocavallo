@@ -1,16 +1,11 @@
 package net.java.openjdk.cacio.servlet;
 
-import javax.servlet.http.*;
+import org.eclipse.jetty.websocket.servlet.WebSocketServletFactory;
 
-import net.java.openjdk.awt.peer.web.*;
-
-import org.eclipse.jetty.websocket.*;
-
-public class WebSocketServlet extends org.eclipse.jetty.websocket.WebSocketServlet {
+public class WebSocketServlet extends org.eclipse.jetty.websocket.servlet.WebSocketServlet {
 
     @Override
-    public WebSocket doWebSocketConnect(HttpServletRequest request, String protocol) {
-	WebSessionState state = WebSessionManager.getInstance().getSessionState(request);
-	return new WebSocketStreamThread(request.getSession(), state);
+    public void configure(WebSocketServletFactory factory) {
+        factory.register(WebSocketStreamThread.class);
     }
 }
