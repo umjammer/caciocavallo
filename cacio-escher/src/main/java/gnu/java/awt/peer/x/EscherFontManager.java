@@ -77,8 +77,8 @@ public class EscherFontManager
   public String[] getDefaultPlatformFont() {
     // TODO: This probably only works on my Linux distro (Ubuntu). Maybe
     // figure out something more clever.
-    return new String[] { "DejaVu Sans Serif",
-                          "/usr/share/fonts/truetype/ttf-dejavu/DejaVuSans.ttf"
+    return new String[] { "Arial",
+                          "/Library/Fonts/Arial.ttf"
                         };
   }
 
@@ -93,7 +93,7 @@ public class EscherFontManager
                       false,
                       null); // TODO
           } catch (FontFormatException ex) {
-              throw new Error("Probable fatal error:No fonts found.");
+              throw new Error("Probable fatal error: No fonts found.");
           }
       }
       return defaultPhysicalFont;

@@ -33,6 +33,8 @@ import sun.awt.peer.cacio.PlatformWindowFactory;
 
 class EscherPlatformWindowFactory implements PlatformWindowFactory {
 
+    private EscherEventPump eventPump;
+
     @Override
     public PlatformWindow createPlatformWindow(CacioComponent cacioComponent,
                                                PlatformWindow parent) {
@@ -52,8 +54,9 @@ class EscherPlatformWindowFactory implements PlatformWindowFactory {
 
     @Override
     public CacioEventPump<?> createEventPump() {
-        return null; // TODO: FIX this!
-        // XGraphicsDevice dev = EscherToolkit.getDefaultDevice();
-        // return dev.getEventSource();
+        if (eventPump == null) {
+            eventPump = new EscherEventPump();
+        }
+        return eventPump;
     }
 }

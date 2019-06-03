@@ -446,4 +446,11 @@ class EscherPlatformWindow implements PlatformToplevelWindow {
         // TODO Auto-generated method stub
         
     }
+
+    /**
+     * @return
+     */
+    public CacioComponent getCacioComponent() {
+        return cacioComponent;
+    }
 }

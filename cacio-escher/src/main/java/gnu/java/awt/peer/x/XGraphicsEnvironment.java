@@ -165,4 +165,8 @@ public class XGraphicsEnvironment
     // TODO: Implement properly.
     return true;
   }
+
+  public Display getDisplay() {
+      return defaultDevice.getDisplay();
+  }
 }

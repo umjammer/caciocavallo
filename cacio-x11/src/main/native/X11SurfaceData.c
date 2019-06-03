@@ -98,6 +98,8 @@ static void X11GetRasInfo(JNIEnv* env, SurfaceDataOps* ops, SurfaceDataRasInfo* 
   w = rasInfo->bounds.x2 - x;
   h = rasInfo->bounds.y2 - y;
 
+fprintf(stderr, "%d, %d - %d, %d\n", x, y, w, h);
+fflush(stderr);
   xops->img = XGetImage(display, drawable,
                         x, y, w, h,
                         XAllPlanes(), ZPixmap);
