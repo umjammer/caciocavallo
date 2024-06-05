@@ -22,7 +22,7 @@
  * CA 95054 USA or visit www.sun.com if you need additional information or
  * have any questions.
  */
-package net.java.openjdk.awt.peer.sdl;
+package net.java.openjdk.awt.peer.sdl2;
 
 import java.awt.GraphicsConfiguration;
 import java.awt.GraphicsDevice;
@@ -39,11 +39,11 @@ import sun.awt.peer.cacio.managed.FullScreenWindowFactory;
  *
  * @author Mario Torre <neugens.limasoftware@gmail.com>
  */
-class SDLGraphicsConfiguration extends GraphicsConfiguration {
+class SDL2GraphicsConfiguration extends GraphicsConfiguration {
 
-    private SDLGraphicsDevice device;
+    private SDL2GraphicsDevice device;
 
-    SDLGraphicsConfiguration(SDLGraphicsDevice device) {
+    SDL2GraphicsConfiguration(SDL2GraphicsDevice device) {
         this.device = device;
     }
 

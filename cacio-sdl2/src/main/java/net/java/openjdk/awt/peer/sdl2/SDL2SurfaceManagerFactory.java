@@ -22,7 +22,7 @@
  * CA 95054 USA or visit www.sun.com if you need additional information or
  * have any questions.
  */
-package net.java.openjdk.awt.peer.sdl;
+package net.java.openjdk.awt.peer.sdl2;
 
 import sun.awt.image.SunVolatileImage;
 import sun.awt.image.VolatileSurfaceManager;
@@ -31,16 +31,16 @@ import sun.java2d.SurfaceManagerFactory;
 /**
  * @author Mario Torre <neugens.limasoftware@gmail.com>
  */
-class SDLSurfaceManagerFactory extends SurfaceManagerFactory {
+class SDL2SurfaceManagerFactory extends SurfaceManagerFactory {
 
-    public SDLSurfaceManagerFactory() {
+    public SDL2SurfaceManagerFactory() {
     }
 
     @Override
     public VolatileSurfaceManager createVolatileManager(SunVolatileImage image,
                                                         Object context) {
 
-        return new SDLVolatileSurfaceManager(image, context);
+        return new SDL2VolatileSurfaceManager(image, context);
     }
 
 }

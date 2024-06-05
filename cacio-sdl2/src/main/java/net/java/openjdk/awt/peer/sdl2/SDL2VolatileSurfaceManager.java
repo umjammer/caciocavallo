@@ -22,43 +22,55 @@
  * CA 95054 USA or visit www.sun.com if you need additional information or
  * have any questions.
  */
-package net.java.openjdk.awt.peer.sdl;
+package net.java.openjdk.awt.peer.sdl2;
 
 import java.awt.GraphicsConfiguration;
-import java.awt.GraphicsDevice;
+import java.awt.Rectangle;
+import java.awt.Transparency;
+import sun.awt.SunToolkit;
+import sun.awt.image.SunVolatileImage;
+import sun.awt.image.VolatileSurfaceManager;
+import sun.java2d.SurfaceData;
 
 /**
  * @author Mario Torre <neugens.limasoftware@gmail.com>
  */
-class SDLGraphicsDevice extends GraphicsDevice {
+class SDL2VolatileSurfaceManager extends VolatileSurfaceManager {
 
-    private SDLGraphicsConfiguration defaultConfig;
+    SDL2VolatileSurfaceManager(SunVolatileImage image, Object context) {
 
-    @Override
-    public int getType() {
-
-        return GraphicsDevice.TYPE_RASTER_SCREEN;
+        super(image, context);
     }
 
     @Override
-    public String getIDstring() {
+    protected boolean isAccelerationEnabled() {
 
-        return "SDL Cacio Device";
+       return vImg.getTransparency() == Transparency.OPAQUE;
     }
 
     @Override
-    public GraphicsConfiguration[] getConfigurations() {
+    protected SurfaceData initAcceleratedSurface() {
 
-        return new GraphicsConfiguration[] { getDefaultConfiguration() };
-    }
+        int width = vImg.getWidth();
+        int height = vImg.getHeight();
+        GraphicsConfiguration gc = vImg.getGraphicsConfig();
+        SunToolkit.awtLock();
+        try {
 
-    @Override
-    public synchronized GraphicsConfiguration getDefaultConfiguration() {
+            long nativeSDLdata = initSurface(width, height);
+            SDL2SurfaceData surfaceData =
+                    new SDL2SurfaceData(SDL2SurfaceData.typeDefault,
+                                       gc.getColorModel(),
+                                       new Rectangle(0, 0, width, height),
+                                       vImg.getGraphicsConfig(), vImg,
+                                       nativeSDLdata);
 
-        if (this.defaultConfig == null) {
-            this.defaultConfig = new SDLGraphicsConfiguration(this);
+            return surfaceData;
+
+        } finally {
+            SunToolkit.awtUnlock();
         }
-        return this.defaultConfig;
     }
 
+    private native final long initSurface(int width, int height);
 }

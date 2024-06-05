@@ -22,7 +22,7 @@
  * CA 95054 USA or visit www.sun.com if you need additional information or
  * have any questions.
  */
-package net.java.openjdk.awt.peer.sdl;
+package net.java.openjdk.awt.peer.sdl2;
 
 import java.awt.AWTException;
 import java.awt.Desktop;
@@ -63,7 +63,7 @@ import sun.awt.peer.cacio.managed.FullScreenWindowFactory;
  *
  * @author Mario Torre <neugens.limasoftware@gmail.com>
  */
-public class SDLToolkit extends CacioToolkit {
+public class SDL2Toolkit extends CacioToolkit {
 
     private static Logger logger =
         Logger.getLogger("net.java.openjdk.awt.peer.sdl.CacioToolkit");
@@ -79,7 +79,7 @@ public class SDLToolkit extends CacioToolkit {
         System.loadLibrary("cacio-sdl");
     }
 
-    public SDLToolkit() {
+    public SDL2Toolkit() {
         super();
         setDecorateWindows(true);
     }
@@ -88,7 +88,7 @@ public class SDLToolkit extends CacioToolkit {
     public synchronized PlatformWindowFactory getPlatformWindowFactory() {
 
         if (platformWindow == null) {
-            SDLScreen screen = new SDLScreen();
+            SDL2Screen screen = new SDL2Screen();
             platformWindow = new FullScreenWindowFactory(screen, screen);
         }
         return platformWindow;
@@ -125,8 +125,19 @@ public class SDLToolkit extends CacioToolkit {
     }
 
     @Override
-    public boolean isTaskbarSupported() {
-        return true;
+    protected int getScreenWidth() {
+
+        GraphicsConfiguration config =
+                SDL2GraphicsConfiguration.getDefaultConfiguration();
+        return config.getBounds().width;
+    }
+
+    @Override
+    protected int getScreenHeight() {
+
+        GraphicsConfiguration config =
+                SDL2GraphicsConfiguration.getDefaultConfiguration();
+        return config.getBounds().height;
     }
 
     @Override
@@ -137,19 +148,26 @@ public class SDLToolkit extends CacioToolkit {
     @Override
     public void grab(Window w) {
 
-        logger.log(Level.WARNING, "SDLToolkit::grab not implemented");
+        logger.log(Level.WARNING, "SDL2Toolkit::grab not implemented");
     }
 
     @Override
     public void ungrab(Window w) {
 
-        logger.log(Level.WARNING, "SDLToolkit::ungrab not implemented");
+        logger.log(Level.WARNING, "SDL2Toolkit::ungrab not implemented");
     }
 
     @Override
     public boolean isDesktopSupported() {
 
         return false;
+    }
+
+    @Override
+    protected DesktopPeer createDesktopPeer(Desktop target)
+            throws HeadlessException {
+
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override

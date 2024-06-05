@@ -22,7 +22,7 @@
  * CA 95054 USA or visit www.sun.com if you need additional information or
  * have any questions.
  */
-package net.java.openjdk.awt.peer.sdl;
+package net.java.openjdk.awt.peer.sdl2;
 
 import java.awt.Composite;
 
@@ -39,18 +39,18 @@ import sun.java2d.pipe.Region;
 /**
  * @author Mario Torre <neugens.limasoftware@gmail.com>
  */
-public class SDLBlit extends Blit implements BlitClipHelper.Blitter {
+public class SDL2Blit extends Blit implements BlitClipHelper.Blitter {
 
     static void register() {
         GraphicsPrimitive[] prims = {
 
-            new SDLBlit(SDLSurfaceData.typeDefault, SDLSurfaceData.typeDefault,
+            new SDL2Blit(SDL2SurfaceData.typeDefault, SDL2SurfaceData.typeDefault,
                         false),
         };
         GraphicsPrimitiveMgr.register(prims);
     }
 
-    SDLBlit(SurfaceType srcType, SurfaceType dstType, boolean over) {
+    SDL2Blit(SurfaceType srcType, SurfaceType dstType, boolean over) {
 
         super(srcType,
               over ? CompositeType.SrcOverNoEa : CompositeType.SrcNoEa,

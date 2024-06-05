@@ -22,7 +22,7 @@
  * CA 95054 USA or visit www.sun.com if you need additional information or
  * have any questions.
  */
-package net.java.openjdk.awt.peer.sdl;
+package net.java.openjdk.awt.peer.sdl2;
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -45,7 +45,7 @@ import sun.java2d.SunGraphics2D;
  *
  * @author Mario Torre <neugens@limasoftware.net>
  */
-class SDLScreen implements PlatformScreen, CacioEventSource {
+class SDL2Screen implements PlatformScreen, CacioEventSource {
 
     private static final int width;
     private static final int height;
@@ -60,17 +60,17 @@ class SDLScreen implements PlatformScreen, CacioEventSource {
 
     private long nativeSDLdata;
     private EventData eventData;
-    private SDLSurfaceData surfaceData;
+    private SDL2SurfaceData surfaceData;
 
-    SDLScreen() {
-System.err.println("SDLScreen::<init>: " + width + ", " + height);
+    SDL2Screen() {
+System.err.println("SDL2Screen::<init>: " + width + ", " + height);
         nativeSDLdata = nativeInitScreen(width, height);
     }
 
     public Graphics2D getClippedGraphics(Color fg, Color bg, Font font,
                                          List<Rectangle> clipRects) {
 
-        SDLSurfaceData data = getSurfaceData();
+        SDL2SurfaceData data = getSurfaceData();
         Graphics2D g2d = new SunGraphics2D(data, fg, bg, font);
         if (clipRects != null && clipRects.size() > 0) {
             Area a = new Area(getBounds());
@@ -89,7 +89,7 @@ System.err.println("SDLScreen::<init>: " + width + ", " + height);
 
     public GraphicsConfiguration getGraphicsConfiguration() {
 
-        return SDLGraphicsConfiguration.getDefaultConfiguration();
+        return SDL2GraphicsConfiguration.getDefaultConfiguration();
     }
 
     public Rectangle getBounds() {
@@ -115,10 +115,10 @@ System.err.println("SDLScreen::<init>: " + width + ", " + height);
         return eventData;
     }
 
-    private SDLSurfaceData getSurfaceData() {
+    private SDL2SurfaceData getSurfaceData() {
 
         if (surfaceData == null) {
-            surfaceData = new SDLSurfaceData(SDLSurfaceData.typeDefault,
+            surfaceData = new SDL2SurfaceData(SDL2SurfaceData.typeDefault,
                                              getColorModel(), getBounds(),
                                              getGraphicsConfiguration(), this,
                                              nativeSDLdata);

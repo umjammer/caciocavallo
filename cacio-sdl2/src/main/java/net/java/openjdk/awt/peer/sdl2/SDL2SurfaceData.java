@@ -22,7 +22,7 @@
  * CA 95054 USA or visit www.sun.com if you need additional information or
  * have any questions.
  */
-package net.java.openjdk.awt.peer.sdl;
+package net.java.openjdk.awt.peer.sdl2;
 
 import java.awt.GraphicsConfiguration;
 import java.awt.Rectangle;
@@ -37,22 +37,22 @@ import sun.java2d.loops.SurfaceType;
  *
  * @author Mario Torre <neugens.limasoftware@gmail.com>
  */
-class SDLSurfaceData extends SurfaceData {
+class SDL2SurfaceData extends SurfaceData {
 
     static SurfaceType typeDefault =
             SurfaceType.IntRgb.deriveSubType("Cacio SDL default");
 
     static {
         initIDs();
-        SDLBlit.register();
+        SDL2Blit.register();
     }
 
     private Rectangle bounds;
     private GraphicsConfiguration configuration;
     private Object destination;
 
-    SDLSurfaceData(SurfaceType surfaceType, ColorModel cm, Rectangle b,
-                   GraphicsConfiguration gc, Object dest, long drawable) {
+    SDL2SurfaceData(SurfaceType surfaceType, ColorModel cm, Rectangle b,
+                    GraphicsConfiguration gc, Object dest, long drawable) {
         
         super(surfaceType, cm);
 

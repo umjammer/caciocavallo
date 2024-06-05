@@ -22,7 +22,7 @@
  * CA 95054 USA or visit www.sun.com if you need additional information or
  * have any questions.
  */
-package net.java.openjdk.awt.peer.sdl;
+package net.java.openjdk.awt.peer.sdl2;
 
 import java.awt.GraphicsDevice;
 
@@ -34,7 +34,7 @@ import sun.java2d.SurfaceManagerFactory;
  *
  * @author Mario Torre <neugens.liamsoftware@gmail.com>
  */
-public class SDLGraphicsEnvironment extends SunGraphicsEnvironment {
+public class SDL2GraphicsEnvironment extends SunGraphicsEnvironment {
 
     static {
         System.loadLibrary("cacio-sdl2");
@@ -42,7 +42,7 @@ public class SDLGraphicsEnvironment extends SunGraphicsEnvironment {
         if (!initialised) {
             throw new ExceptionInInitializerError("Cannot initiliase libSDL!");
         }
-        SurfaceManagerFactory.setInstance(new SDLSurfaceManagerFactory());
+        SurfaceManagerFactory.setInstance(new SDL2SurfaceManagerFactory());
     }
 
     @Override
@@ -54,7 +54,7 @@ public class SDLGraphicsEnvironment extends SunGraphicsEnvironment {
     @Override
     protected GraphicsDevice makeScreenDevice(int screennum) {
 
-        return new SDLGraphicsDevice();
+        return new SDL2GraphicsDevice();
     }
 
     @Override
