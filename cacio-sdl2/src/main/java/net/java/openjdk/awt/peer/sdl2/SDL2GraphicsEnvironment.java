@@ -27,7 +27,6 @@ package net.java.openjdk.awt.peer.sdl2;
 import java.awt.GraphicsDevice;
 
 import sun.java2d.SunGraphicsEnvironment;
-import sun.java2d.SurfaceManagerFactory;
 
 /**
  * Graphics Environment implementation based on libSDL.
@@ -42,7 +41,6 @@ public class SDL2GraphicsEnvironment extends SunGraphicsEnvironment {
         if (!initialised) {
             throw new ExceptionInInitializerError("Cannot initiliase libSDL!");
         }
-        SurfaceManagerFactory.setInstance(new SDL2SurfaceManagerFactory());
     }
 
     @Override

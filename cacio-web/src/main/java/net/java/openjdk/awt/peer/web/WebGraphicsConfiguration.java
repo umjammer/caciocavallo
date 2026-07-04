@@ -25,6 +25,10 @@
 
 package net.java.openjdk.awt.peer.web;
 
+import sun.awt.image.SunVolatileImage;
+import sun.awt.image.SurfaceManager;
+import sun.awt.image.VolatileSurfaceManager;
+
 import java.awt.*;
 import java.awt.geom.*;
 import java.awt.image.*;
@@ -38,7 +42,17 @@ import net.java.openjdk.cacio.servlet.*;
  * @author Clemens Eisserer <linuxhippy@gmail.com>
  * @author Mario Torre <neugens.limasoftware@gmail.com>
  */
-public class WebGraphicsConfiguration extends GraphicsConfiguration {
+public class WebGraphicsConfiguration extends GraphicsConfiguration
+        implements SurfaceManager.Factory {
+
+    private final WebSurfaceManagerFactory surfaceManagerFactory = new WebSurfaceManagerFactory();
+
+    @Override
+    public VolatileSurfaceManager createVolatileManager(SunVolatileImage image,
+                                                        Object context) {
+        return surfaceManagerFactory.createVolatileManager(image, context);
+    }
+
 
     private WebGraphicsDevice device;
     private WeakReference<WebScreen> screenRef;

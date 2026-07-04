@@ -111,17 +111,15 @@ public class X11Toolkit extends CacioToolkit {
     }
 
     @Override
-    public RobotPeer createRobot(Robot arg0, GraphicsDevice arg1) throws AWTException {
+    public RobotPeer createRobot(GraphicsDevice arg1) throws AWTException {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
-    @Override
-    protected int getScreenWidth() {
+        protected int getScreenWidth() {
         return X11GraphicsConfiguration.getDefaultGC().getBounds().width;
     }
 
-    @Override
-    protected int getScreenHeight() {
+        protected int getScreenHeight() {
         return X11GraphicsConfiguration.getDefaultGC().getBounds().height;
     }
 
@@ -146,7 +144,12 @@ public class X11Toolkit extends CacioToolkit {
     }
 
     @Override
-    protected DesktopPeer createDesktopPeer(Desktop target) throws HeadlessException {
+    public boolean isTaskbarSupported() {
+        return false;
+    }
+
+    @Override
+    public DesktopPeer createDesktopPeer(Desktop target) throws HeadlessException {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 

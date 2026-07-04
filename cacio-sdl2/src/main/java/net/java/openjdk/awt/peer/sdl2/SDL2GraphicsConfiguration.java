@@ -24,6 +24,10 @@
  */
 package net.java.openjdk.awt.peer.sdl2;
 
+import sun.awt.image.SunVolatileImage;
+import sun.awt.image.SurfaceManager;
+import sun.awt.image.VolatileSurfaceManager;
+
 import java.awt.GraphicsConfiguration;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
@@ -39,7 +43,17 @@ import sun.awt.peer.cacio.managed.FullScreenWindowFactory;
  *
  * @author Mario Torre <neugens.limasoftware@gmail.com>
  */
-class SDL2GraphicsConfiguration extends GraphicsConfiguration {
+class SDL2GraphicsConfiguration extends GraphicsConfiguration
+        implements SurfaceManager.Factory {
+
+    private final SDL2SurfaceManagerFactory surfaceManagerFactory = new SDL2SurfaceManagerFactory();
+
+    @Override
+    public VolatileSurfaceManager createVolatileManager(SunVolatileImage image,
+                                                        Object context) {
+        return surfaceManagerFactory.createVolatileManager(image, context);
+    }
+
 
     private SDL2GraphicsDevice device;
 

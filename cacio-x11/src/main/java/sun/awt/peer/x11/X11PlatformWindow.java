@@ -39,7 +39,7 @@ import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.image.ColorModel;
 import java.awt.peer.ContainerPeer;
-import sun.awt.CausedFocusEvent.Cause;
+import java.awt.event.FocusEvent.Cause;
 import sun.awt.SunToolkit;
 import sun.awt.peer.cacio.CacioComponent;
 import sun.awt.peer.cacio.PlatformToplevelWindow;

@@ -27,7 +27,7 @@ package net.java.openjdk.awt.peer.web;
 
 import sun.awt.image.SunVolatileImage;
 import sun.awt.image.VolatileSurfaceManager;
-import sun.java2d.SurfaceManagerFactory;
+import sun.awt.image.SurfaceManager;
 
 /**
  * WebSurfaceManagerFactory implementation for Caciocavallo-Web.
@@ -35,7 +35,7 @@ import sun.java2d.SurfaceManagerFactory;
  * @author Clemens Eisserer <linuxhippy@gmail.com>
  * @author Mario Torre <neugens.limasoftware@gmail.com>
  */
-class WebSurfaceManagerFactory extends SurfaceManagerFactory {
+class WebSurfaceManagerFactory implements SurfaceManager.Factory {
 
     public WebSurfaceManagerFactory() {
     }

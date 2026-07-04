@@ -46,6 +46,9 @@ import java.awt.GraphicsDevice;
 import java.awt.Rectangle;
 import java.awt.geom.AffineTransform;
 import java.awt.image.ColorModel;
+import sun.awt.image.SunVolatileImage;
+import sun.awt.image.SurfaceManager;
+import sun.awt.image.VolatileSurfaceManager;
 import sun.java2d.SurfaceData;
 import sun.java2d.loops.CompositeType;
 import sun.java2d.loops.RenderLoops;
@@ -53,7 +56,18 @@ import sun.java2d.loops.SurfaceType;
 
 public class XGraphicsConfiguration
     extends GraphicsConfiguration
+    implements SurfaceManager.Factory
 {
+
+  private final EscherSurfaceManagerFactory surfaceManagerFactory =
+      new EscherSurfaceManagerFactory();
+
+  @Override
+  public VolatileSurfaceManager createVolatileManager(SunVolatileImage image,
+                                                      Object context)
+  {
+    return surfaceManagerFactory.createVolatileManager(image, context);
+  }
 
   static
   {

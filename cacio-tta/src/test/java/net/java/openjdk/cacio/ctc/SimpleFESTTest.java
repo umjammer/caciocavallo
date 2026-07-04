@@ -16,7 +16,7 @@ import javax.swing.JTextField;
 import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
 
-import junit.framework.Assert;
+import org.junit.jupiter.api.Assertions;
 import net.java.openjdk.cacio.ctc.junit.CacioFESTRunner;
 
 import org.fest.swing.annotation.GUITest;
@@ -28,20 +28,19 @@ import org.fest.swing.fixture.JButtonFixture;
 import org.fest.swing.fixture.JMenuItemFixture;
 import org.fest.swing.fixture.JPopupMenuFixture;
 import org.fest.swing.fixture.JTextComponentFixture;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 
-@RunWith(CacioFESTRunner.class)
-//@RunWith(GUITestRunner.class)
+@ExtendWith(CacioFESTRunner.class)
 public class SimpleFESTTest {
 
     private JFrame frame;
     private FrameFixture ff;
     private Set<String> menuClicks = new HashSet<>();
 
-    @Before
+    @BeforeEach
     public void setUp() {
         GuiActionRunner.execute(new GuiTask() {
 
@@ -50,15 +49,11 @@ public class SimpleFESTTest {
                 frame = new JFrame();
                 frame.setLayout(new FlowLayout());
                 final JButton b = new JButton("TEST");
-                b.addActionListener(new ActionListener() {
-
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        if (b.getText().equals("TEST")) {
-                            b.setText("FLUFF");
-                        } else {
-                            b.setText("TEST");
-                        }
+                b.addActionListener(e -> {
+                    if (b.getText().equals("TEST")) {
+                        b.setText("FLUFF");
+                    } else {
+                        b.setText("TEST");
                     }
                 });
                 JPopupMenu popupMenu = new JPopupMenu();
@@ -77,12 +72,7 @@ public class SimpleFESTTest {
                     public void menuCanceled(MenuEvent e) {
                     }
                 };
-                ActionListener menuItemListener = new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        menuClicks.add(((JMenuItem)e.getSource()).getText());
-                    }
-                };
+                ActionListener menuItemListener = e -> menuClicks.add(((JMenuItem)e.getSource()).getText());
                 menuClicks.clear();
                 fileMenu.addMenuListener(menuListener);
                 JMenuItem openMenu = new JMenuItem("Open");
@@ -106,7 +96,7 @@ public class SimpleFESTTest {
         ff = new FrameFixture(frame);
     }
 
-    @After
+    @AfterEach
     public void tearDown() throws Exception {
         ff.cleanUp();
         GuiActionRunner.execute(new GuiTask() {
@@ -160,7 +150,7 @@ public class SimpleFESTTest {
         JPopupMenuFixture fixture = t.showPopupMenu();
         JMenuItemFixture menuItem = fixture.menuItemWithPath("Test");
         menuItem.click();
-        Assert.assertTrue(menuClicks.contains("Test"));
+        Assertions.assertTrue(menuClicks.contains("Test"));
     }
 
     @Test
@@ -170,7 +160,7 @@ public class SimpleFESTTest {
         JPopupMenuFixture fixture = t.showPopupMenu();
         JMenuItemFixture menuItem = fixture.menuItemWithPath("File");
         menuItem.click();
-        Assert.assertTrue(menuClicks.contains("File"));
+        Assertions.assertTrue(menuClicks.contains("File"));
     }
 
     @Test
@@ -180,8 +170,8 @@ public class SimpleFESTTest {
         JPopupMenuFixture fixture = t.showPopupMenu();
         JMenuItemFixture menuItem = fixture.menuItemWithPath("File", "Open");
         menuItem.click();
-        Assert.assertTrue(menuClicks.contains("File"));
-        Assert.assertTrue(menuClicks.contains("Open"));
+        Assertions.assertTrue(menuClicks.contains("File"));
+        Assertions.assertTrue(menuClicks.contains("Open"));
     }
 
     @Test

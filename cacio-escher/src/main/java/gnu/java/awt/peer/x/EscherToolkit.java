@@ -81,7 +81,7 @@ public class EscherToolkit extends CacioToolkit {
     }
 
     @Override
-    public RobotPeer createRobot(Robot target, GraphicsDevice screen)
+    public RobotPeer createRobot(GraphicsDevice screen)
             throws AWTException {
         // TODO Auto-generated method stub
         return null;
@@ -106,14 +106,12 @@ public class EscherToolkit extends CacioToolkit {
         return null;
     }
 
-    @Override
-    protected int getScreenHeight() {
+        protected int getScreenHeight() {
         // TODO Auto-generated method stub
         return 0;
     }
 
-    @Override
-    protected int getScreenWidth() {
+        protected int getScreenWidth() {
         // TODO Auto-generated method stub
         return 0;
     }
@@ -127,6 +125,11 @@ public class EscherToolkit extends CacioToolkit {
     @Override
     public boolean isDesktopSupported() {
         // TODO Auto-generated method stub
+        return false;
+    }
+
+    @Override
+    public boolean isTaskbarSupported() {
         return false;
     }
 
@@ -155,13 +158,14 @@ public class EscherToolkit extends CacioToolkit {
     }
 
     @Override
-    protected DesktopPeer createDesktopPeer(Desktop target)
+    public DesktopPeer createDesktopPeer(Desktop target)
             throws HeadlessException {
         // TODO Auto-generated method stub
         return null;
     }
 
-    protected synchronized MouseInfoPeer getMouseInfoPeer() {
+    @Override
+    public synchronized MouseInfoPeer getMouseInfoPeer() {
         // TODO: Implement properly. Can't use the DefaultMouseInfoPeer...
         throw new UnsupportedOperationException();
     }

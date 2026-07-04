@@ -1,8 +1,6 @@
 
 package net.java.openjdk.cacio.ctc;
 
-import static org.junit.Assert.assertEquals;
-
 import java.awt.AWTException;
 import java.awt.EventQueue;
 import java.awt.Point;
@@ -13,15 +11,15 @@ import java.awt.event.MouseEvent;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
-
 import javax.swing.JFrame;
 
 import net.java.openjdk.cacio.ctc.junit.CacioTestRunner;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-@RunWith(value = CacioTestRunner.class)
+@ExtendWith(value = CacioTestRunner.class)
 public class DragMouseTest {
 
     @Test

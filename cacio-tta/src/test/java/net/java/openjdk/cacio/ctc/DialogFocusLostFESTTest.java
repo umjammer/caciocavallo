@@ -28,7 +28,6 @@ package net.java.openjdk.cacio.ctc;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-
 import javax.swing.AbstractAction;
 import javax.swing.JButton;
 import javax.swing.JDialog;
@@ -36,7 +35,6 @@ import javax.swing.JFrame;
 import javax.swing.JTextField;
 
 import net.java.openjdk.cacio.ctc.junit.CacioFESTRunner;
-
 import org.fest.swing.annotation.GUITest;
 import org.fest.swing.edt.GuiActionRunner;
 import org.fest.swing.edt.GuiTask;
@@ -45,19 +43,18 @@ import org.fest.swing.fixture.DialogFixture;
 import org.fest.swing.fixture.FrameFixture;
 import org.fest.swing.fixture.JButtonFixture;
 import org.fest.swing.fixture.JTextComponentFixture;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 
-@RunWith(CacioFESTRunner.class)
-//@RunWith(GUITestRunner.class)
+@ExtendWith(CacioFESTRunner.class)
 public class DialogFocusLostFESTTest {
 
     private JFrame frame;
     private FrameFixture ff;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         GuiActionRunner.execute(new GuiTask() {
             @Override
@@ -96,7 +93,7 @@ public class DialogFocusLostFESTTest {
         ff = new FrameFixture(frame);
     }
 
-    @After
+    @AfterEach
     public void tearDown() throws Exception {
         ff.cleanUp();
         GuiActionRunner.execute(new GuiTask() {

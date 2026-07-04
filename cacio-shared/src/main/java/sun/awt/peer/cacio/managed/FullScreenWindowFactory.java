@@ -27,7 +27,6 @@ package sun.awt.peer.cacio.managed;
 
 import java.awt.Dimension;
 import java.awt.GraphicsConfiguration;
-import java.security.AccessController;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -38,14 +37,12 @@ import sun.awt.peer.cacio.CacioEventSource;
 import sun.awt.peer.cacio.PlatformToplevelWindow;
 import sun.awt.peer.cacio.PlatformWindow;
 import sun.awt.peer.cacio.PlatformWindowFactory;
-import sun.security.action.GetPropertyAction;
 
 public class FullScreenWindowFactory implements PlatformWindowFactory {
 
     private static final Dimension screenSize;
     static {
-        String size = AccessController.doPrivileged(
-                new GetPropertyAction("cacio.managed.screensize", "1024x768"));
+        String size = System.getProperty("cacio.managed.screensize", "1024x768");
         int x = size.indexOf('x');
         int width = Integer.parseInt(size.substring(0, x));
         int height = Integer.parseInt(size.substring(x + 1));

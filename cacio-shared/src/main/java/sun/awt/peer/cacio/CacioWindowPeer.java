@@ -25,6 +25,10 @@
 
 package sun.awt.peer.cacio;
 
+import java.awt.GraphicsConfiguration;
+
+import sun.awt.AWTAccessor;
+
 import java.awt.AWTEvent;
 import java.awt.Color;
 import java.awt.Component;
@@ -101,7 +105,8 @@ class CacioWindowPeer extends CacioContainerPeer<Window, JRootPane>
 
             CacioComponentPeer parentPeer = null;
 
-            ComponentPeer parentComponentPeer = parentComp.getPeer();
+            ComponentPeer parentComponentPeer =
+                AWTAccessor.getComponentAccessor().getPeer(parentComp);
             if (parentComponentPeer instanceof CacioComponentPeer) {
                 parentPeer = (CacioComponentPeer) parentComponentPeer;
 
@@ -331,8 +336,9 @@ class CacioWindowPeer extends CacioContainerPeer<Window, JRootPane>
     }
 
     @Override
-    public void repositionSecurityWarning() {
-        throw new UnsupportedOperationException("Not supported yet.");
+    public GraphicsConfiguration getAppropriateGraphicsConfiguration(
+            GraphicsConfiguration gc) {
+        return gc;
     }
 
     @Override

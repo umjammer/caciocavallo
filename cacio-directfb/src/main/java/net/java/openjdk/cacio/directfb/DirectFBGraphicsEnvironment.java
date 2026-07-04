@@ -26,7 +26,9 @@
 package net.java.openjdk.cacio.directfb;
 
 import java.awt.GraphicsDevice;
+import java.io.IOException;
 
+import org.scijava.nativelib.NativeLoader;
 import sun.awt.SunToolkit;
 import sun.java2d.SunGraphicsEnvironment;
 import sun.java2d.SurfaceManagerFactory;
@@ -39,9 +41,11 @@ public class DirectFBGraphicsEnvironment extends SunGraphicsEnvironment {
         } catch (ClassNotFoundException ex) {
             ex.printStackTrace();
         }
-        NarSystem.loadLibrary();
-        // System.loadLibrary("awt_xawt");
-        // System.loadLibrary("awt");
+        try {
+            NativeLoader.loadLibrary("directfb");
+        } catch (IOException e) {
+            throw new IllegalStateException(e);
+        }
         SurfaceManagerFactory.setInstance(new DirectFBSurfaceManagerFactory());
     }
 

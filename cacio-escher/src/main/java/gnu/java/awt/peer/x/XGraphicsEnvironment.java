@@ -49,7 +49,6 @@ import java.util.ArrayList;
 import java.util.Properties;
 
 import sun.java2d.SunGraphicsEnvironment;
-import sun.java2d.SurfaceManagerFactory;
 
 /**
  * Represents the X environment for AWT.
@@ -63,7 +62,6 @@ public class XGraphicsEnvironment
   static
   {
     System.err.println("setting the surface manager");
-    SurfaceManagerFactory.setInstance(new EscherSurfaceManagerFactory());
     System.err.println("finished setting the surface manager");
     System.setProperty("sun.font.fontmanager", "gnu.java.awt.peer.x.EscherFontManager");
   }

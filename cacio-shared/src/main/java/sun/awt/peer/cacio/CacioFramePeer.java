@@ -25,6 +25,8 @@
 
 package sun.awt.peer.cacio;
 
+import sun.awt.AWTAccessor;
+
 import java.awt.Frame;
 import java.awt.MenuBar;
 import java.awt.Rectangle;
@@ -61,10 +63,10 @@ class CacioFramePeer extends CacioWindowPeer implements FramePeer {
 
     public void setMenuBar(MenuBar mb) {
 
-        MenuBarPeer mbp = (MenuBarPeer) mb.getPeer();
+        MenuBarPeer mbp = (MenuBarPeer) AWTAccessor.getMenuComponentAccessor().getPeer(mb);
         if (mbp == null) {
             mb.addNotify();
-            mbp = (MenuBarPeer) mb.getPeer();
+            mbp = (MenuBarPeer) AWTAccessor.getMenuComponentAccessor().getPeer(mb);
         }
         assert mbp instanceof CacioMenuBarPeer;
         JMenuBar jmb = ((CacioMenuBarPeer) mbp).getSwingMenu();

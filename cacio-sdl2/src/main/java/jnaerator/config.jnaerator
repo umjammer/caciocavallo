@@ -1,0 +1,14 @@
+-I /usr/local/include
+
+-root net.java.openjdk.awt.jna.sdl2
+
+//-parseInOneChunk
+-runtime JNA
+
+//-o "$(DIR)/../java" // overwrite versioned files instead of writing to target/generated-sources/java
+
+//-v
+//-choicesOut "$(DIR)/sdl2.choices"
+
+src/main/native/cacio-sdl.h
+src/main/native/SurfaceData.h

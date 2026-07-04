@@ -107,20 +107,18 @@ public class WebToolkit extends CacioToolkit {
     }
 
     @Override
-    public RobotPeer createRobot(Robot target, GraphicsDevice screen) throws AWTException {
+    public RobotPeer createRobot(GraphicsDevice screen) throws AWTException {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
-    @Override
-    protected int getScreenWidth() {
+        protected int getScreenWidth() {
         
         GraphicsConfiguration config =
                 WebGraphicsConfiguration.getDefaultConfiguration();
         return config.getBounds().width;
     }
 
-    @Override
-    protected int getScreenHeight() {
+        protected int getScreenHeight() {
         
         GraphicsConfiguration config =
                 WebGraphicsConfiguration.getDefaultConfiguration();
@@ -148,7 +146,12 @@ public class WebToolkit extends CacioToolkit {
     }
 
     @Override
-    protected DesktopPeer createDesktopPeer(Desktop target)
+    public boolean isTaskbarSupported() {
+        return false;
+    }
+
+    @Override
+    public DesktopPeer createDesktopPeer(Desktop target)
             throws HeadlessException {
 
         throw new UnsupportedOperationException("Not supported yet.");

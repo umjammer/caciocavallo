@@ -25,6 +25,8 @@
 
 package sun.awt.peer.cacio;
 
+import sun.awt.AWTAccessor;
+
 import java.awt.Menu;
 import java.awt.MenuItem;
 import java.awt.peer.MenuItemPeer;
@@ -60,10 +62,10 @@ class CacioMenuPeer extends CacioMenuItemPeer
     }
 
     public void addItem(MenuItem item) {
-        MenuItemPeer mip = (MenuItemPeer) item.getPeer();
+        MenuItemPeer mip = (MenuItemPeer) AWTAccessor.getMenuComponentAccessor().getPeer(item);
         if (mip == null) {
             item.addNotify();
-            mip = (MenuItemPeer) item.getPeer();
+            mip = (MenuItemPeer) AWTAccessor.getMenuComponentAccessor().getPeer(item);
         }
         assert mip instanceof CacioMenuItemPeer;
         JMenuItem jmi = ((CacioMenuItemPeer) mip).getSwingMenu();

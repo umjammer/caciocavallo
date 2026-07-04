@@ -39,10 +39,10 @@ package gnu.java.awt.peer.x;
 
 import sun.awt.image.SunVolatileImage;
 import sun.awt.image.VolatileSurfaceManager;
-import sun.java2d.SurfaceManagerFactory;
+import sun.awt.image.SurfaceManager;
 
 class EscherSurfaceManagerFactory
-    extends SurfaceManagerFactory
+    implements SurfaceManager.Factory
 {
 
   @Override

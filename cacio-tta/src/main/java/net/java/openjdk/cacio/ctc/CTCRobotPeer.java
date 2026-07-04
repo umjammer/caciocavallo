@@ -171,10 +171,4 @@ public class CTCRobotPeer implements RobotPeer {
         return CTCScreen.getInstance().getRGBPixels(bounds);
     }
 
-    @Override
-    public void dispose() {
-        // TODO Auto-generated method stub
-
-    }
-
 }

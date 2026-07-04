@@ -26,20 +26,20 @@ import org.fest.swing.core.Robot;
 import org.fest.swing.edt.GuiActionRunner;
 import org.fest.swing.edt.GuiQuery;
 import org.fest.swing.edt.GuiTask;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 
-@RunWith(value = CacioFESTRunner.class)
+@ExtendWith(value = CacioFESTRunner.class)
 public class ResizeWindowTest {
 
 	private DraggablePopupMenu popupMenu;
 	protected int action;
 	private Robot robot;
 
-	@Before
+	@BeforeEach
 	public void setUp() {
 		this.popupMenu = GuiActionRunner
 				.execute(new GuiQuery<DraggablePopupMenu>() {
@@ -63,7 +63,7 @@ public class ResizeWindowTest {
 		robot.settings().eventPostingDelay(50);
 	}
 
-	@After
+	@AfterEach
 	public void tearDown() throws Exception {
 		robot.cleanUp();
 	}
@@ -80,7 +80,7 @@ public class ResizeWindowTest {
 		});
 	}
 
-	@Ignore
+	@Disabled
 	@Test
 	@GUITest
 	public void resize() {

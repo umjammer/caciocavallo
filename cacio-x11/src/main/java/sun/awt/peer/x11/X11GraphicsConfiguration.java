@@ -25,6 +25,10 @@
 
 package sun.awt.peer.x11;
 
+import sun.awt.image.SunVolatileImage;
+import sun.awt.image.SurfaceManager;
+import sun.awt.image.VolatileSurfaceManager;
+
 import java.awt.GraphicsConfiguration;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
@@ -34,7 +38,17 @@ import java.awt.geom.AffineTransform;
 import java.awt.image.ColorModel;
 import java.awt.image.DirectColorModel;
 
-class X11GraphicsConfiguration extends GraphicsConfiguration {
+class X11GraphicsConfiguration extends GraphicsConfiguration
+        implements SurfaceManager.Factory {
+
+    private final X11SurfaceManagerFactory surfaceManagerFactory = new X11SurfaceManagerFactory();
+
+    @Override
+    public VolatileSurfaceManager createVolatileManager(SunVolatileImage image,
+                                                        Object context) {
+        return surfaceManagerFactory.createVolatileManager(image, context);
+    }
+
 
 
     private X11GraphicsDevice device;

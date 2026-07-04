@@ -48,7 +48,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
-import sun.awt.CausedFocusEvent.Cause;
+import java.awt.event.FocusEvent.Cause;
 import sun.awt.ConstrainableGraphics;
 import sun.java2d.pipe.Region;
 

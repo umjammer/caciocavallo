@@ -32,7 +32,6 @@ import java.util.*;
 
 import net.java.openjdk.awt.peer.web.*;
 import net.java.openjdk.cacio.servlet.imgformat.*;
-import sun.misc.*;
 
 /**
  * String-based transport. Encodes the command-list as string and encodes the
@@ -57,7 +56,6 @@ public class Base64PngTransport extends Transport {
     private static byte[] emptyResponseData = "0".getBytes();
     private static String emptyResponseString = "0";
 
-    BASE64Encoder base64Encoder;
     int compressionLevel;
 
     String cmdString;
@@ -67,7 +65,6 @@ public class Base64PngTransport extends Transport {
 	super("text/plain");
 
 	this.compressionLevel = compressionLevel;
-	base64Encoder = new BASE64Encoder();
     }
 
     /**

@@ -26,12 +26,12 @@ package net.java.openjdk.awt.peer.sdl2;
 
 import sun.awt.image.SunVolatileImage;
 import sun.awt.image.VolatileSurfaceManager;
-import sun.java2d.SurfaceManagerFactory;
+import sun.awt.image.SurfaceManager;
 
 /**
  * @author Mario Torre <neugens.limasoftware@gmail.com>
  */
-class SDL2SurfaceManagerFactory extends SurfaceManagerFactory {
+class SDL2SurfaceManagerFactory implements SurfaceManager.Factory {
 
     public SDL2SurfaceManagerFactory() {
     }

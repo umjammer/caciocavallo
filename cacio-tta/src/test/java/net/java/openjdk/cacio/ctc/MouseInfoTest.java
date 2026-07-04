@@ -36,7 +36,7 @@
 
 package net.java.openjdk.cacio.ctc;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.awt.AWTException;
 import java.awt.Point;
@@ -47,11 +47,10 @@ import javax.swing.JFrame;
 import net.java.openjdk.cacio.ctc.junit.CacioFESTRunner;
 
 import org.fest.swing.annotation.GUITest;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 
-@RunWith(CacioFESTRunner.class)
-//@RunWith(GUITestRunner.class)
+@ExtendWith(CacioFESTRunner.class)
 public class MouseInfoTest {
 
     @Test

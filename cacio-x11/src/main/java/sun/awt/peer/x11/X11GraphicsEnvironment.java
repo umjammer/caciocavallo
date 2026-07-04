@@ -29,7 +29,6 @@ import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
 
 import sun.java2d.SunGraphicsEnvironment;
-import sun.java2d.SurfaceManagerFactory;
 
 public class X11GraphicsEnvironment extends SunGraphicsEnvironment {
 
@@ -40,7 +39,6 @@ public class X11GraphicsEnvironment extends SunGraphicsEnvironment {
     public X11GraphicsEnvironment() {
         System.loadLibrary("cacio-x11");
         display = initDisplay();
-        SurfaceManagerFactory.setInstance(new X11SurfaceManagerFactory());
     }
 
     @Override

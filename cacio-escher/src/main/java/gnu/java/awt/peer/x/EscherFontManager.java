@@ -91,7 +91,7 @@ public class EscherFontManager
               createFont2D(fontFile,
                       Font.TRUETYPE_FONT,
                       false,
-                      null); // TODO
+                      false)[0];
           } catch (FontFormatException ex) {
               throw new Error("Probable fatal error: No fonts found.");
           }

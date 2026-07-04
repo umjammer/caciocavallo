@@ -53,8 +53,8 @@ class EscherTextRenderer
     XDrawableSurfaceData xdsd = (XDrawableSurfaceData) sg2d.surfaceData;
     Drawable xd = xdsd.getDrawable();
     GC gc = xdsd.getRenderGC(sg2d);
-    int strbounds[] = gl.getBounds();
     int numglyphs = gl.getNumGlyphs();
+    int strbounds[] = gl.getBounds(numglyphs);
     for (int gi = 0; gi < numglyphs; gi++)
       {
         gl.setGlyphIndex(gi);

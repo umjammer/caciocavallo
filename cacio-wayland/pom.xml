@@ -25,13 +25,16 @@
 
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
+
   <parent>
     <groupId>net.java.openjdk.cacio</groupId>
     <artifactId>cacio</artifactId>
     <version>1.10-SNAPSHOT</version>
   </parent>
+
   <artifactId>cacio-wayland</artifactId>
   <packaging>nar</packaging>
+
   <name>Cacio Wayland Module</name>
 
   <properties>
@@ -42,25 +45,12 @@
     <cairo.lib>/usr/local/lib</cairo.lib>
   </properties>
 
-  <dependencies>
-    <dependency>
-      <groupId>net.java.openjdk.cacio</groupId>
-      <artifactId>cacio-shared</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.scijava</groupId>
-      <artifactId>native-lib-loader</artifactId>
-      <version>2.0.2</version>
-    </dependency>
-  </dependencies>
-
   <build>
     <plugins>
       <plugin>
         <groupId>com.github.maven-nar</groupId>
         <artifactId>nar-maven-plugin</artifactId>
-        <version>3.5.2</version>
+        <version>3.10.1</version>
         <extensions>true</extensions>
         <configuration>
           <libraries>
@@ -117,13 +107,28 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
+        <version>3.10.1</version>
         <configuration>
           <source>1.8</source>
           <target>1.8</target>
+          <encoding>UTF-8</encoding>
         </configuration>
       </plugin>
     </plugins>
   </build>
 
+  <dependencies>
+    <dependency>
+      <groupId>net.java.openjdk.cacio</groupId>
+      <artifactId>cacio-shared</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.scijava</groupId>
+      <artifactId>native-lib-loader</artifactId>
+      <version>2.4.0</version>
+    </dependency>
+  </dependencies>
 </project>
 

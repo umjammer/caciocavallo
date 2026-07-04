@@ -55,7 +55,7 @@ import gnu.x11.Drawable;
 import gnu.x11.Window;
 import gnu.x11.WindowAttributes;
 import gnu.x11.event.Event;
-import sun.awt.CausedFocusEvent.Cause;
+import java.awt.event.FocusEvent.Cause;
 import sun.awt.peer.cacio.CacioComponent;
 import sun.awt.peer.cacio.PlatformToplevelWindow;
 import sun.awt.peer.cacio.PlatformWindow;

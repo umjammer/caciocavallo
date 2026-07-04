@@ -27,7 +27,6 @@ package net.java.openjdk.awt.peer.web;
 
 import java.awt.GraphicsDevice;
 import sun.java2d.SunGraphicsEnvironment;
-import sun.java2d.SurfaceManagerFactory;
 
 /**
  * Graphics Environment implementation for caciocavallo-web.
@@ -39,7 +38,6 @@ public class WebGraphicsEnvironment extends SunGraphicsEnvironment {
 
     static {
         LibraryLoader.loadLibs();
-        SurfaceManagerFactory.setInstance(new WebSurfaceManagerFactory());
     }
 
     @Override

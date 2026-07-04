@@ -6,10 +6,25 @@
   <version>1.10-SNAPSHOT</version>
   <packaging>pom</packaging>
 
+  <modules>
+    <module>cacio-shared</module>
+    <module>cacio-tta</module>
+<!--
+    <module>cacio-sdl</module>
+-->
+    <module>cacio-sdl2</module>
+    <module>cacio-x11</module>
+    <module>cacio-escher</module>
+    <module>cacio-web</module>
+<!--
+    <module>cacio-wayland</module> - may need to install wayland (cairo) -
+    <module>cacio-directfb</module> - may need to install directfb -
+-->
+  </modules>
+
   <name>Caciocavallo Main Module</name>
   <description>Portable GUI backends for Java</description>
   <url>http://openjdk.java.net/projects/caciocavallo/</url>
-
   <licenses>
     <license>
       <name>GPL2 with classpath exception</name>
@@ -18,14 +33,12 @@
       <comments>GPL2 with special linking exception</comments>
     </license>
   </licenses>
-
   <scm>
     <connection>scm:hg:http://hg.openjdk.java.net/caciocavallo/ng/</connection>
     <developerConnection>scm:hg:ssh://hg.openjdk.java.net/caciocavallo/ng/</developerConnection>
     <url>http://hg.openjdk.java.net/caciocavallo/ng/</url>
     <tag>HEAD</tag>
   </scm>
-
   <developers>
     <developer>
       <id>rkennke</id>
@@ -40,17 +53,6 @@
       <url>http://jroller.com/neugens/</url>
     </developer>
   </developers>
-
-  <modules>
-    <module>cacio-shared</module>
-    <module>cacio-tta</module>
-    <module>cacio-sdl</module>
-    <module>cacio-x11</module>
-    <module>cacio-escher</module>
-    <module>cacio-web</module>
-    <module>cacio-wayland</module> <!-- may need to install wayland (cairo) -->
-    <module>cacio-directfb</module> <!-- may need to install directfb -->
-  </modules>
 
   <distributionManagement>
     <snapshotRepository>
@@ -81,6 +83,19 @@
           <doclint>none</doclint>
           <quiet>true</quiet>
           <verbose>false</verbose>
+          <source>25</source>
+          <additionalOptions>
+            <additionalOption>--add-exports=java.desktop/java.awt.peer=ALL-UNNAMED</additionalOption>
+            <additionalOption>--add-exports=java.desktop/java.awt.dnd.peer=ALL-UNNAMED</additionalOption>
+            <additionalOption>--add-exports=java.desktop/sun.awt=ALL-UNNAMED</additionalOption>
+            <additionalOption>--add-exports=java.desktop/sun.awt.datatransfer=ALL-UNNAMED</additionalOption>
+            <additionalOption>--add-exports=java.desktop/sun.awt.event=ALL-UNNAMED</additionalOption>
+            <additionalOption>--add-exports=java.desktop/sun.awt.image=ALL-UNNAMED</additionalOption>
+            <additionalOption>--add-exports=java.desktop/sun.font=ALL-UNNAMED</additionalOption>
+            <additionalOption>--add-exports=java.desktop/sun.java2d=ALL-UNNAMED</additionalOption>
+            <additionalOption>--add-exports=java.desktop/sun.java2d.loops=ALL-UNNAMED</additionalOption>
+            <additionalOption>--add-exports=java.desktop/sun.java2d.pipe=ALL-UNNAMED</additionalOption>
+          </additionalOptions>
         </configuration>
       </plugin>
       <plugin>
@@ -113,28 +128,72 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-compiler-plugin</artifactId>
-          <version>2.3.2</version>
+          <version>3.12.1</version>
           <configuration>
-            <source>1.8</source>
-            <target>1.8</target>
+            <source>25</source>
+            <target>25</target>
+            <encoding>UTF-8</encoding>
+            <compilerArgs>
+              <arg>--add-exports=java.desktop/java.awt.peer=ALL-UNNAMED</arg>
+              <arg>--add-exports=java.desktop/java.awt.dnd.peer=ALL-UNNAMED</arg>
+              <arg>--add-exports=java.desktop/sun.awt=ALL-UNNAMED</arg>
+              <arg>--add-exports=java.desktop/sun.awt.datatransfer=ALL-UNNAMED</arg>
+              <arg>--add-exports=java.desktop/sun.awt.event=ALL-UNNAMED</arg>
+              <arg>--add-exports=java.desktop/sun.awt.image=ALL-UNNAMED</arg>
+              <arg>--add-exports=java.desktop/sun.font=ALL-UNNAMED</arg>
+              <arg>--add-exports=java.desktop/sun.java2d=ALL-UNNAMED</arg>
+              <arg>--add-exports=java.desktop/sun.java2d.loops=ALL-UNNAMED</arg>
+              <arg>--add-exports=java.desktop/sun.java2d.pipe=ALL-UNNAMED</arg>
+            </compilerArgs>
           </configuration>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-surefire-plugin</artifactId>
-          <version>2.12</version>
+          <version>3.2.5</version>
           <configuration>
-	    <runOrder>random</runOrder>
             <systemPropertyVariables>
               <java.awt.headless>false</java.awt.headless>
               <awt.toolkit>net.java.openjdk.cacio.ctc.CTCToolkit</awt.toolkit>
               <java.awt.graphicsenv>net.java.openjdk.cacio.ctc.CTCGraphicsEnvironment</java.awt.graphicsenv>
             </systemPropertyVariables>
+            <argLine>
+              -Djava.util.logging.config.file=${project.build.testOutputDirectory}/logging.properties
+              -XX:+EnableDynamicAgentLoading
+              -Djdk.attach.allowAttachSelf=true
+              --add-exports=java.desktop/java.awt.peer=ALL-UNNAMED
+              --add-exports=java.desktop/sun.awt=ALL-UNNAMED
+              --add-exports=java.desktop/sun.awt.datatransfer=ALL-UNNAMED
+              --add-exports=java.desktop/sun.awt.event=ALL-UNNAMED
+              --add-exports=java.desktop/sun.awt.image=ALL-UNNAMED
+              --add-exports=java.desktop/sun.font=ALL-UNNAMED
+              --add-exports=java.desktop/sun.java2d=ALL-UNNAMED
+              --add-exports=java.desktop/sun.java2d.loops=ALL-UNNAMED
+              --add-exports=java.desktop/sun.java2d.pipe=ALL-UNNAMED
+              --add-opens=java.desktop/java.awt=ALL-UNNAMED
+              --add-opens=java.desktop/sun.awt=ALL-UNNAMED
+              --add-opens=java.desktop/sun.java2d=ALL-UNNAMED
+              --add-opens=java.base/java.util=ALL-UNNAMED
+              --add-opens=java.base/java.lang.reflect=ALL-UNNAMED
+            </argLine>
+            <trimStackTrace>false</trimStackTrace>
           </configuration>
         </plugin>
       </plugins>
     </pluginManagement>
   </build>
+
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>org.junit</groupId>
+        <artifactId>junit-bom</artifactId>
+        <version>5.10.3</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
 
   <profiles>
     <profile>

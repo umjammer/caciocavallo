@@ -41,7 +41,7 @@ import java.awt.image.ColorModel;
 import java.awt.peer.ComponentPeer;
 import java.awt.peer.ContainerPeer;
 
-import sun.awt.CausedFocusEvent.Cause;
+import java.awt.event.FocusEvent.Cause;
 import sun.java2d.pipe.Region;
 
 public interface PlatformWindow {
