@@ -75,6 +75,67 @@ static int lastPressX, lastPressY;
 
 static SDL_bool closeRequested;
 
+/** AWT Cursor constants, as passed down from ProxyWindow. */
+#define java_awt_Cursor_DEFAULT_CURSOR      0
+#define java_awt_Cursor_CROSSHAIR_CURSOR    1
+#define java_awt_Cursor_TEXT_CURSOR         2
+#define java_awt_Cursor_WAIT_CURSOR         3
+#define java_awt_Cursor_SW_RESIZE_CURSOR    4
+#define java_awt_Cursor_SE_RESIZE_CURSOR    5
+#define java_awt_Cursor_NW_RESIZE_CURSOR    6
+#define java_awt_Cursor_NE_RESIZE_CURSOR    7
+#define java_awt_Cursor_N_RESIZE_CURSOR     8
+#define java_awt_Cursor_S_RESIZE_CURSOR     9
+#define java_awt_Cursor_W_RESIZE_CURSOR    10
+#define java_awt_Cursor_E_RESIZE_CURSOR    11
+#define java_awt_Cursor_HAND_CURSOR        12
+#define java_awt_Cursor_MOVE_CURSOR        13
+
+static SDL_Cursor *cursors[java_awt_Cursor_MOVE_CURSOR + 1];
+static int shownCursor = -1;
+
+/** @return the SDL system cursor closest to the given AWT cursor type */
+static SDL_SystemCursor systemCursorFor(int awtCursorType)
+{
+    switch (awtCursorType) {
+    case java_awt_Cursor_CROSSHAIR_CURSOR: return SDL_SYSTEM_CURSOR_CROSSHAIR;
+    case java_awt_Cursor_TEXT_CURSOR:      return SDL_SYSTEM_CURSOR_IBEAM;
+    case java_awt_Cursor_WAIT_CURSOR:      return SDL_SYSTEM_CURSOR_WAIT;
+    case java_awt_Cursor_HAND_CURSOR:      return SDL_SYSTEM_CURSOR_HAND;
+    case java_awt_Cursor_MOVE_CURSOR:      return SDL_SYSTEM_CURSOR_SIZEALL;
+    /* SDL only has the two diagonals and the two axes, not eight directions */
+    case java_awt_Cursor_NW_RESIZE_CURSOR:
+    case java_awt_Cursor_SE_RESIZE_CURSOR: return SDL_SYSTEM_CURSOR_SIZENWSE;
+    case java_awt_Cursor_NE_RESIZE_CURSOR:
+    case java_awt_Cursor_SW_RESIZE_CURSOR: return SDL_SYSTEM_CURSOR_SIZENESW;
+    case java_awt_Cursor_W_RESIZE_CURSOR:
+    case java_awt_Cursor_E_RESIZE_CURSOR:  return SDL_SYSTEM_CURSOR_SIZEWE;
+    case java_awt_Cursor_N_RESIZE_CURSOR:
+    case java_awt_Cursor_S_RESIZE_CURSOR:  return SDL_SYSTEM_CURSOR_SIZENS;
+    default:                               return SDL_SYSTEM_CURSOR_ARROW;
+    }
+}
+
+void CacioSDL2_setCursor(int awtCursorType)
+{
+    if (awtCursorType < 0
+        || awtCursorType > java_awt_Cursor_MOVE_CURSOR
+        || awtCursorType == shownCursor) {
+        return;
+    }
+
+    if (cursors[awtCursorType] == NULL) {
+        cursors[awtCursorType] =
+            SDL_CreateSystemCursor(systemCursorFor(awtCursorType));
+        if (cursors[awtCursorType] == NULL) {
+            return;
+        }
+    }
+
+    shownCursor = awtCursorType;
+    SDL_SetCursor(cursors[awtCursorType]);
+}
+
 void CacioSDL2_activateApp(void)
 {
 #ifdef __APPLE__

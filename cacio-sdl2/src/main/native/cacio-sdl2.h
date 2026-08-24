@@ -153,6 +153,12 @@ int CacioSDL2_isCloseRequested(void);
 #endif
 
 /**
+ * Shows one of SDL's system cursors, given an AWT Cursor type. Cursors are
+ * created once and kept. Main thread only.
+ */
+void CacioSDL2_setCursor(int awtCursorType);
+
+/**
  * Brings the application to the front. SDL_RaiseWindow only orders the window
  * within its own application, so without this the window opens behind whatever
  * the user was last looking at. Main thread only; a no-op off macOS.

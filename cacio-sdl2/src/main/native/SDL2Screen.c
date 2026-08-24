@@ -162,6 +162,15 @@ JNIEXPORT jlong JNICALL Java_net_java_openjdk_awt_peer_sdl2_SDL2Screen_nativeIni
     return (jlong) data;
 }
 
+JNIEXPORT void JNICALL Java_net_java_openjdk_awt_peer_sdl2_SDL2Screen_nativeSetCursor
+  (JNIEnv *env __attribute__((unused)), jobject thiz __attribute__((unused)),
+   jint cursorType)
+{
+    CACIO_ON_MAIN({
+        CacioSDL2_setCursor(cursorType);
+    });
+}
+
 JNIEXPORT void JNICALL Java_net_java_openjdk_awt_peer_sdl2_SDL2Screen_nativeGetEvent
   (JNIEnv *env, jobject thiz __attribute__((unused)), jobject eventData)
 {

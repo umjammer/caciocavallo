@@ -99,9 +99,15 @@ public class TestCase {
         }
     }
 
+    /**
+     * @return a frame that is up and has been laid out, or null -- a frame
+     *         reports itself showing before it has been given a size, so the
+     *         size is what says the demo is really up
+     */
     static Window showingWindow() {
         for (Frame frame : Frame.getFrames()) {
-            if (frame.isShowing()) {
+            if (frame.isShowing()
+                && frame.getWidth() > 0 && frame.getHeight() > 0) {
                 return frame;
             }
         }

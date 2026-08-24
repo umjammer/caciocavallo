@@ -25,6 +25,7 @@
 package net.java.openjdk.awt.peer.sdl2;
 
 import java.awt.Color;
+import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics2D;
@@ -126,6 +127,12 @@ class SDL2Screen implements PlatformScreen, CacioEventSource {
         return surfaceData;
     }
 
+    @Override
+    public void setCursor(Cursor cursor) {
+        nativeSetCursor(cursor.getType());
+    }
+
+    private native final void nativeSetCursor(int cursorType);
     private native final void nativeGetEvent(EventData eventData);
     private native final long nativeInitScreen(int width, int height, int background);
     private native final static void initIDs();
