@@ -45,16 +45,18 @@ import java.awt.im.spi.InputMethodDescriptor;
 import java.awt.image.ColorModel;
 import java.awt.peer.DesktopPeer;
 import java.awt.peer.FontPeer;
+import java.awt.peer.FramePeer;
 import java.awt.peer.RobotPeer;
 import java.awt.peer.SystemTrayPeer;
 import java.awt.peer.TrayIconPeer;
 import java.util.Map;
 import java.util.Properties;
 
+import sun.awt.LightweightFrame;
 import sun.awt.datatransfer.DataTransferer;
-import sun.awt.peer.cacio.CacioToolkit;
-import sun.awt.peer.cacio.managed.FullScreenWindowFactory;
-import sun.awt.peer.cacio.PlatformWindowFactory;
+import com.github.caciocavallosilano.cacio.peer.CacioToolkit;
+import com.github.caciocavallosilano.cacio.peer.managed.FullScreenWindowFactory;
+import com.github.caciocavallosilano.cacio.peer.PlatformWindowFactory;
 
 public class X11Toolkit extends CacioToolkit {
 
@@ -196,5 +198,10 @@ public class X11Toolkit extends CacioToolkit {
     @Override
     public DataTransferer getDataTransferer() {
         throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public FramePeer createLightweightFrame(LightweightFrame target) throws HeadlessException {
+        return null;
     }
 }

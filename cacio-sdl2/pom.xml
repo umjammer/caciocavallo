@@ -54,9 +54,9 @@
 
   <dependencies>
     <dependency>
-      <groupId>net.java.openjdk.cacio</groupId>
+      <groupId>${cacio.groupId}</groupId>
       <artifactId>cacio-shared</artifactId>
-      <version>${project.version}</version>
+      <version>${cacio.version}</version>
     </dependency>
 
     <dependency>

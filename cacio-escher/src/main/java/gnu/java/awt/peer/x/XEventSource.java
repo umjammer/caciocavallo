@@ -67,9 +67,9 @@ import gnu.x11.event.KeyPress;
 import gnu.x11.event.KeyRelease;
 import gnu.x11.event.MotionNotify;
 import gnu.x11.event.PropertyNotify;
-import sun.awt.peer.cacio.CacioComponent;
-import sun.awt.peer.cacio.CacioEventSource;
-import sun.awt.peer.cacio.managed.EventData;
+import com.github.caciocavallosilano.cacio.peer.CacioComponent;
+import com.github.caciocavallosilano.cacio.peer.CacioEventSource;
+import com.github.caciocavallosilano.cacio.peer.managed.EventData;
 
 /**
  * Fetches events from X, translates them to AWT events and pumps them up

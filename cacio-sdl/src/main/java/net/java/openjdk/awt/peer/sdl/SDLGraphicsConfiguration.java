@@ -32,7 +32,7 @@ import java.awt.Transparency;
 import java.awt.geom.AffineTransform;
 import java.awt.image.ColorModel;
 import java.awt.image.DirectColorModel;
-import sun.awt.peer.cacio.managed.FullScreenWindowFactory;
+import com.github.caciocavallosilano.cacio.peer.managed.FullScreenWindowFactory;
 
 /**
  * SDL based implementation of the GraphicConfiguration.

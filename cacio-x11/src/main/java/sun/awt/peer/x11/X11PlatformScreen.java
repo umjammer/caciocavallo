@@ -35,11 +35,11 @@ import java.awt.geom.Area;
 import java.awt.image.ColorModel;
 import java.util.List;
 
-import sun.awt.peer.cacio.CacioEventSource;
-import sun.awt.peer.cacio.WindowClippedGraphics;
-import sun.awt.peer.cacio.managed.EventData;
-import sun.awt.peer.cacio.managed.FullScreenWindowFactory;
-import sun.awt.peer.cacio.managed.PlatformScreen;
+import com.github.caciocavallosilano.cacio.peer.CacioEventSource;
+import com.github.caciocavallosilano.cacio.peer.WindowClippedGraphics;
+import com.github.caciocavallosilano.cacio.peer.managed.EventData;
+import com.github.caciocavallosilano.cacio.peer.managed.FullScreenWindowFactory;
+import com.github.caciocavallosilano.cacio.peer.managed.PlatformScreen;
 import sun.java2d.SunGraphics2D;
 
 class X11PlatformScreen implements PlatformScreen, CacioEventSource {

@@ -26,8 +26,8 @@
 package net.java.openjdk.awt.peer.web;
 
 import java.awt.*;
-import sun.awt.peer.cacio.*;
-import sun.awt.peer.cacio.managed.*;
+import com.github.caciocavallosilano.cacio.peer.*;
+import com.github.caciocavallosilano.cacio.peer.managed.*;
 
 /**
  * FullScreenWindowFactory for Caciocavallo-Web.
@@ -61,7 +61,7 @@ public class WebWindowFactory extends FullScreenWindowFactory {
 	    return ((WebGraphicsConfiguration) config).getScreen();
 	}
 
-    /* @see sun.awt.peer.cacio.managed.PlatformScreenSelector#getPlatformScreen(sun.awt.peer.cacio.CacioComponent) */
+    /* @see com.github.caciocavallosilano.cacio.peer.managed.PlatformScreenSelector#getPlatformScreen(com.github.caciocavallosilano.cacio.peer.CacioComponent) */
     @Override
     public PlatformScreen getPlatformScreen(CacioComponent comp) {
         // TODO Auto-generated method stub

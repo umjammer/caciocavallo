@@ -45,6 +45,7 @@ import java.awt.im.spi.InputMethodDescriptor;
 import java.awt.image.ColorModel;
 import java.awt.peer.DesktopPeer;
 import java.awt.peer.FontPeer;
+import java.awt.peer.FramePeer;
 import java.awt.peer.RobotPeer;
 import java.awt.peer.SystemTrayPeer;
 import java.awt.peer.TrayIconPeer;
@@ -53,10 +54,11 @@ import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import sun.awt.LightweightFrame;
 import sun.awt.datatransfer.DataTransferer;
-import sun.awt.peer.cacio.CacioToolkit;
-import sun.awt.peer.cacio.PlatformWindowFactory;
-import sun.awt.peer.cacio.managed.FullScreenWindowFactory;
+import com.github.caciocavallosilano.cacio.peer.CacioToolkit;
+import com.github.caciocavallosilano.cacio.peer.PlatformWindowFactory;
+import com.github.caciocavallosilano.cacio.peer.managed.FullScreenWindowFactory;
 
 /**
  * SDL based backend for CacioCavallo.
@@ -120,20 +122,18 @@ public class SDLToolkit extends CacioToolkit {
     }
 
     @Override
-    public RobotPeer createRobot(Robot target, GraphicsDevice screen) throws AWTException {
+    public RobotPeer createRobot(GraphicsDevice screen) throws AWTException {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
-    @Override
-    protected int getScreenWidth() {
+        protected int getScreenWidth() {
 
         GraphicsConfiguration config =
                 SDLGraphicsConfiguration.getDefaultConfiguration();
         return config.getBounds().width;
     }
 
-    @Override
-    protected int getScreenHeight() {
+        protected int getScreenHeight() {
 
         GraphicsConfiguration config =
                 SDLGraphicsConfiguration.getDefaultConfiguration();
@@ -164,7 +164,12 @@ public class SDLToolkit extends CacioToolkit {
     }
 
     @Override
-    protected DesktopPeer createDesktopPeer(Desktop target)
+    public boolean isTaskbarSupported() {
+        return false;
+    }
+
+    @Override
+    public DesktopPeer createDesktopPeer(Desktop target)
             throws HeadlessException {
 
         throw new UnsupportedOperationException("Not supported yet.");
@@ -215,5 +220,10 @@ public class SDLToolkit extends CacioToolkit {
     @Override
     public DataTransferer getDataTransferer() {
         throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public FramePeer createLightweightFrame(LightweightFrame target) throws HeadlessException {
+        return null;
     }
 }

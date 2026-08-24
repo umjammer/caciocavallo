@@ -27,8 +27,8 @@ package net.java.openjdk.cacio.directfb;
 
 import java.awt.GraphicsEnvironment;
 
-import sun.awt.peer.cacio.CacioEventSource;
-import sun.awt.peer.cacio.managed.EventData;
+import com.github.caciocavallosilano.cacio.peer.CacioEventSource;
+import com.github.caciocavallosilano.cacio.peer.managed.EventData;
 
 class DirectFBEventSource implements CacioEventSource {
 

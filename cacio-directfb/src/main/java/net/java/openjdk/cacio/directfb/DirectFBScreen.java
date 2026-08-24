@@ -34,8 +34,8 @@ import java.awt.geom.Area;
 import java.awt.image.ColorModel;
 import java.util.List;
 
-import sun.awt.peer.cacio.WindowClippedGraphics;
-import sun.awt.peer.cacio.managed.PlatformScreen;
+import com.github.caciocavallosilano.cacio.peer.WindowClippedGraphics;
+import com.github.caciocavallosilano.cacio.peer.managed.PlatformScreen;
 import sun.java2d.SurfaceData;
 import sun.java2d.SunGraphics2D;
 

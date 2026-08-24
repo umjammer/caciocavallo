@@ -39,8 +39,8 @@ import java.util.Properties;
 
 import sun.awt.LightweightFrame;
 import sun.awt.datatransfer.DataTransferer;
-import sun.awt.peer.cacio.*;
-import sun.awt.peer.cacio.managed.FullScreenWindowFactory;
+import com.github.caciocavallosilano.cacio.peer.*;
+import com.github.caciocavallosilano.cacio.peer.managed.FullScreenWindowFactory;
 
 public class WaylandToolkit extends CacioToolkit {
 

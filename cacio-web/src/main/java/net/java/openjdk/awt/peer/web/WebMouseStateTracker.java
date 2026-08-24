@@ -28,7 +28,7 @@ package net.java.openjdk.awt.peer.web;
 import java.awt.event.*;
 import java.util.*;
 
-import sun.awt.peer.cacio.managed.*;
+import com.github.caciocavallosilano.cacio.peer.managed.*;
 
 /**
  * 

@@ -12,9 +12,9 @@ import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
 import java.util.List;
 
-import sun.awt.peer.cacio.WindowClippedGraphics;
-import sun.awt.peer.cacio.managed.FullScreenWindowFactory;
-import sun.awt.peer.cacio.managed.PlatformScreen;
+import com.github.caciocavallosilano.cacio.peer.WindowClippedGraphics;
+import com.github.caciocavallosilano.cacio.peer.managed.FullScreenWindowFactory;
+import com.github.caciocavallosilano.cacio.peer.managed.PlatformScreen;
 
 
 public class CTCScreen implements PlatformScreen {

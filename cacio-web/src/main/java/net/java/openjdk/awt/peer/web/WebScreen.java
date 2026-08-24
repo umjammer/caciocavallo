@@ -37,8 +37,8 @@ import java.util.concurrent.locks.*;
 import net.java.openjdk.cacio.servlet.*;
 import net.java.openjdk.cacio.servlet.transport.*;
 import sun.awt.*;
-import sun.awt.peer.cacio.*;
-import sun.awt.peer.cacio.managed.*;
+import com.github.caciocavallosilano.cacio.peer.*;
+import com.github.caciocavallosilano.cacio.peer.managed.*;
 import sun.java2d.*;
 
 /**

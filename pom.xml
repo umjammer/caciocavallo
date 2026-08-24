@@ -7,7 +7,9 @@
   <packaging>pom</packaging>
 
   <modules>
+<!--
     <module>cacio-shared</module>
+-->
     <module>cacio-tta</module>
 <!--
     <module>cacio-sdl</module>
@@ -55,15 +57,23 @@
   </developers>
 
   <distributionManagement>
-    <snapshotRepository>
-      <id>ossrh</id>
-      <url>https://oss.sonatype.org/content/repositories/snapshots</url>
-    </snapshotRepository>
     <repository>
       <id>ossrh</id>
       <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
     </repository>
   </distributionManagement>
+
+  <repositories>
+    <repository>
+      <id>jitpack.io</id>
+      <url>https://jitpack.io</url>
+    </repository>
+  </repositories>
+
+  <properties>
+    <cacio.groupId>com.github.CaciocavalloSilano.caciocavallo</cacio.groupId>
+    <cacio.version>java-25-71a93cd59f-1</cacio.version>
+  </properties>
 
   <build>
     <plugins>
@@ -224,5 +234,4 @@
       </build>
     </profile>
   </profiles>
-
 </project>

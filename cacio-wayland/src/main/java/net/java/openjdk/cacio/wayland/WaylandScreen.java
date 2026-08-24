@@ -25,8 +25,8 @@
 
 package net.java.openjdk.cacio.wayland;
 
-import sun.awt.peer.cacio.WindowClippedGraphics;
-import sun.awt.peer.cacio.managed.PlatformScreen;
+import com.github.caciocavallosilano.cacio.peer.WindowClippedGraphics;
+import com.github.caciocavallosilano.cacio.peer.managed.PlatformScreen;
 
 import sun.java2d.SunGraphics2D;
 import sun.java2d.SurfaceData;

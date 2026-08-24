@@ -27,7 +27,7 @@ package net.java.openjdk.cacio.ctc;
 
 import java.awt.event.MouseEvent;
 
-import sun.awt.peer.cacio.managed.EventData;
+import com.github.caciocavallosilano.cacio.peer.managed.EventData;
 
 class MouseClickSupport {
 

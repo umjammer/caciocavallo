@@ -45,8 +45,8 @@ import net.java.openjdk.cacio.servlet.*;
 
 import sun.awt.*;
 import sun.awt.datatransfer.DataTransferer;
-import sun.awt.peer.cacio.CacioToolkit;
-import sun.awt.peer.cacio.PlatformWindowFactory;
+import com.github.caciocavallosilano.cacio.peer.CacioToolkit;
+import com.github.caciocavallosilano.cacio.peer.PlatformWindowFactory;
 
 /**
  * Toolkit implementation for Caciocavallo-Web

@@ -37,8 +37,8 @@ import gnu.x11.event.Event;
 import gnu.x11.event.Expose;
 import gnu.x11.event.MotionNotify;
 import sun.awt.SunToolkit;
-import sun.awt.peer.cacio.CacioComponent;
-import sun.awt.peer.cacio.CacioEventPump;
+import com.github.caciocavallosilano.cacio.peer.CacioComponent;
+import com.github.caciocavallosilano.cacio.peer.CacioEventPump;
 
 class EscherEventPump extends CacioEventPump<Event> {
 

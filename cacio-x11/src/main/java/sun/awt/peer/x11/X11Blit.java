@@ -27,7 +27,6 @@ package sun.awt.peer.x11;
 
 import java.awt.Composite;
 import sun.awt.SunToolkit;
-import sun.awt.peer.cacio.BlitClipHelper;
 import sun.java2d.SurfaceData;
 import sun.java2d.loops.Blit;
 import sun.java2d.loops.CompositeType;

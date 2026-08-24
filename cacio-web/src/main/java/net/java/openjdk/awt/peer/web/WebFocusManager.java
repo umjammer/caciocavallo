@@ -1,7 +1,7 @@
 package net.java.openjdk.awt.peer.web;
 
 import net.java.openjdk.cacio.servlet.*;
-import sun.awt.peer.cacio.managed.*;
+import com.github.caciocavallosilano.cacio.peer.managed.*;
 
 public class WebFocusManager extends FocusManager {
     

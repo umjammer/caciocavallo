@@ -47,6 +47,7 @@ import java.awt.im.spi.InputMethodDescriptor;
 import java.awt.image.ColorModel;
 import java.awt.peer.DesktopPeer;
 import java.awt.peer.FontPeer;
+import java.awt.peer.FramePeer;
 import java.awt.peer.MouseInfoPeer;
 import java.awt.peer.RobotPeer;
 import java.awt.peer.SystemTrayPeer;
@@ -54,10 +55,11 @@ import java.awt.peer.TrayIconPeer;
 import java.util.Map;
 import java.util.Properties;
 
+import sun.awt.LightweightFrame;
 import sun.awt.datatransfer.DataTransferer;
-import sun.awt.peer.cacio.CacioEventSource;
-import sun.awt.peer.cacio.CacioToolkit;
-import sun.awt.peer.cacio.PlatformWindowFactory;
+import com.github.caciocavallosilano.cacio.peer.CacioEventSource;
+import com.github.caciocavallosilano.cacio.peer.CacioToolkit;
+import com.github.caciocavallosilano.cacio.peer.PlatformWindowFactory;
 
 public class EscherToolkit extends CacioToolkit {
 
@@ -233,6 +235,11 @@ public class EscherToolkit extends CacioToolkit {
     @Override
     public DataTransferer getDataTransferer() {
         // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public FramePeer createLightweightFrame(LightweightFrame target) throws HeadlessException {
         return null;
     }
 }

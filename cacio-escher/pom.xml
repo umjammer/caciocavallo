@@ -8,8 +8,8 @@
   </parent>
 
   <artifactId>cacio-escher</artifactId>
-  <packaging>jar</packaging>
 
+  <packaging>jar</packaging>
   <name>Cacio Escher Module</name>
 
   <build>
@@ -21,18 +21,11 @@
     </plugins>
   </build>
 
-  <repositories>
-    <repository>
-      <id>jitpack.io</id>
-      <url>https://jitpack.io</url>
-    </repository>
-  </repositories>
-
   <dependencies>
     <dependency>
-      <groupId>net.java.openjdk.cacio</groupId>
+      <groupId>${cacio.groupId}</groupId>
       <artifactId>cacio-shared</artifactId>
-      <version>${project.version}</version>
+      <version>${cacio.version}</version>
     </dependency>
     <dependency>
       <groupId>com.github.umjammer</groupId>
@@ -47,5 +40,4 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
-
 </project>

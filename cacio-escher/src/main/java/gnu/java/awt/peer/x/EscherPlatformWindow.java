@@ -56,9 +56,9 @@ import gnu.x11.Window;
 import gnu.x11.WindowAttributes;
 import gnu.x11.event.Event;
 import java.awt.event.FocusEvent.Cause;
-import sun.awt.peer.cacio.CacioComponent;
-import sun.awt.peer.cacio.PlatformToplevelWindow;
-import sun.awt.peer.cacio.PlatformWindow;
+import com.github.caciocavallosilano.cacio.peer.CacioComponent;
+import com.github.caciocavallosilano.cacio.peer.PlatformToplevelWindow;
+import com.github.caciocavallosilano.cacio.peer.PlatformWindow;
 import sun.java2d.SunGraphics2D;
 import sun.java2d.SurfaceData;
 import sun.java2d.pipe.Region;
@@ -433,14 +433,14 @@ class EscherPlatformWindow implements PlatformToplevelWindow {
         return null;
     }
 
-    /* @see sun.awt.peer.cacio.PlatformWindow#requestFocus() */
+    /* @see com.github.caciocavallosilano.cacio.peer.PlatformWindow#requestFocus() */
     @Override
     public void requestFocus() {
         // TODO Auto-generated method stub
         
     }
 
-    /* @see sun.awt.peer.cacio.PlatformToplevelWindow#setBlocked(boolean) */
+    /* @see com.github.caciocavallosilano.cacio.peer.PlatformToplevelWindow#setBlocked(boolean) */
     @Override
     public void setBlocked(boolean blocked) {
         // TODO Auto-generated method stub
