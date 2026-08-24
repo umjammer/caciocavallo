@@ -107,5 +107,4 @@ public final class CacioSDL2Runner {
             injector.injectRaw(Map.of(clazz.getName(), buffer));
         }
     }
-
 }

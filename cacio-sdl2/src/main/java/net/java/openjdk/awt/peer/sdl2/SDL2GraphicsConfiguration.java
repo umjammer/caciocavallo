@@ -22,6 +22,7 @@
  * CA 95054 USA or visit www.sun.com if you need additional information or
  * have any questions.
  */
+
 package net.java.openjdk.awt.peer.sdl2;
 
 import sun.awt.image.SunVolatileImage;
@@ -38,6 +39,7 @@ import java.awt.image.ColorModel;
 import java.awt.image.DirectColorModel;
 import com.github.caciocavallosilano.cacio.peer.managed.FullScreenWindowFactory;
 
+
 /**
  * SDL based implementation of the GraphicConfiguration.
  *
@@ -53,7 +55,6 @@ class SDL2GraphicsConfiguration extends GraphicsConfiguration
                                                         Object context) {
         return surfaceManagerFactory.createVolatileManager(image, context);
     }
-
 
     private SDL2GraphicsDevice device;
 
@@ -108,8 +109,6 @@ class SDL2GraphicsConfiguration extends GraphicsConfiguration
     @Override
     public Rectangle getBounds() {
 
-        /* TODO: implement properly */
         return new Rectangle(FullScreenWindowFactory.getScreenDimension());
     }
-
 }

@@ -22,6 +22,7 @@
  * CA 95054 USA or visit www.sun.com if you need additional information or
  * have any questions.
  */
+
 package net.java.openjdk.awt.peer.sdl2;
 
 import java.awt.GraphicsConfiguration;
@@ -31,6 +32,7 @@ import java.awt.image.Raster;
 
 import sun.java2d.SurfaceData;
 import sun.java2d.loops.SurfaceType;
+
 
 /**
  * SurfaceData implementation based on libSDL.
@@ -47,9 +49,9 @@ class SDL2SurfaceData extends SurfaceData {
         SDL2Blit.register();
     }
 
-    private Rectangle bounds;
-    private GraphicsConfiguration configuration;
-    private Object destination;
+    private final Rectangle bounds;
+    private final GraphicsConfiguration configuration;
+    private final Object destination;
 
     SDL2SurfaceData(SurfaceType surfaceType, ColorModel cm, Rectangle b,
                     GraphicsConfiguration gc, Object dest, long drawable) {
@@ -91,6 +93,6 @@ class SDL2SurfaceData extends SurfaceData {
         return destination;
     }
 
-    private native final void initOps(long sdlSurface, int width, int height);
-    private static final native void initIDs();
+    private native void initOps(long sdlSurface, int width, int height);
+    private static native void initIDs();
 }

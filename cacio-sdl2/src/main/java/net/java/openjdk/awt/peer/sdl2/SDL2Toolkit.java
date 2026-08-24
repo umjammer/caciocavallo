@@ -22,6 +22,7 @@
  * CA 95054 USA or visit www.sun.com if you need additional information or
  * have any questions.
  */
+
 package net.java.openjdk.awt.peer.sdl2;
 
 import java.awt.AWTException;
@@ -59,6 +60,7 @@ import sun.awt.datatransfer.DataTransferer;
 import com.github.caciocavallosilano.cacio.peer.CacioToolkit;
 import com.github.caciocavallosilano.cacio.peer.PlatformWindowFactory;
 import com.github.caciocavallosilano.cacio.peer.managed.FullScreenWindowFactory;
+
 
 /**
  * SDL based backend for CacioCavallo.
@@ -126,14 +128,14 @@ public class SDL2Toolkit extends CacioToolkit {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
-        protected int getScreenWidth() {
+    protected int getScreenWidth() {
 
         GraphicsConfiguration config =
                 SDL2GraphicsConfiguration.getDefaultConfiguration();
         return config.getBounds().width;
     }
 
-        protected int getScreenHeight() {
+    protected int getScreenHeight() {
 
         GraphicsConfiguration config =
                 SDL2GraphicsConfiguration.getDefaultConfiguration();
@@ -212,6 +214,7 @@ public class SDL2Toolkit extends CacioToolkit {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
+    @Override
     public InputMethodDescriptor getInputMethodAdapterDescriptor() throws AWTException {
 
         return null;

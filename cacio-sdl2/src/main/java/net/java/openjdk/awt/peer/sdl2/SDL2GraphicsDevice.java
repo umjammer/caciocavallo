@@ -22,10 +22,12 @@
  * CA 95054 USA or visit www.sun.com if you need additional information or
  * have any questions.
  */
+
 package net.java.openjdk.awt.peer.sdl2;
 
 import java.awt.GraphicsConfiguration;
 import java.awt.GraphicsDevice;
+
 
 /**
  * @author Mario Torre <neugens.limasoftware@gmail.com>
@@ -60,5 +62,4 @@ class SDL2GraphicsDevice extends GraphicsDevice {
         }
         return this.defaultConfig;
     }
-
 }

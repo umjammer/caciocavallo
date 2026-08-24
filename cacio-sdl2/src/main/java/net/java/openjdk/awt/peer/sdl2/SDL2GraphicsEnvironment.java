@@ -22,11 +22,13 @@
  * CA 95054 USA or visit www.sun.com if you need additional information or
  * have any questions.
  */
+
 package net.java.openjdk.awt.peer.sdl2;
 
 import java.awt.GraphicsDevice;
 
 import sun.java2d.SunGraphicsEnvironment;
+
 
 /**
  * Graphics Environment implementation based on libSDL.
@@ -39,7 +41,7 @@ public class SDL2GraphicsEnvironment extends SunGraphicsEnvironment {
         System.loadLibrary("cacio-sdl2");
         boolean initialised = nativeInit();
         if (!initialised) {
-            throw new ExceptionInInitializerError("Cannot initiliase libSDL!");
+            throw new ExceptionInInitializerError("Cannot initialise libSDL!");
         }
     }
 
@@ -82,5 +84,5 @@ public class SDL2GraphicsEnvironment extends SunGraphicsEnvironment {
 
     private static native boolean nativeIsCloseRequested();
 
-    private static final native boolean nativeInit();
+    private static native boolean nativeInit();
 }

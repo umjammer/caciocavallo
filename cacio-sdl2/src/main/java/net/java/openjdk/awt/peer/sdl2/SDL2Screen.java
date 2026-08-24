@@ -22,6 +22,7 @@
  * CA 95054 USA or visit www.sun.com if you need additional information or
  * have any questions.
  */
+
 package net.java.openjdk.awt.peer.sdl2;
 
 import java.awt.Color;
@@ -41,6 +42,7 @@ import com.github.caciocavallosilano.cacio.peer.managed.EventData;
 import com.github.caciocavallosilano.cacio.peer.managed.FullScreenWindowFactory;
 import com.github.caciocavallosilano.cacio.peer.managed.PlatformScreen;
 import sun.java2d.SunGraphics2D;
+
 
 /**
  *
@@ -70,12 +72,13 @@ class SDL2Screen implements PlatformScreen, CacioEventSource {
                 FullScreenWindowFactory.getScreenBackground().getRGB());
     }
 
+    @Override
     public Graphics2D getClippedGraphics(Color fg, Color bg, Font font,
                                          List<Rectangle> clipRects) {
 
         SDL2SurfaceData data = getSurfaceData();
         Graphics2D g2d = new SunGraphics2D(data, fg, bg, font);
-        if (clipRects != null && clipRects.size() > 0) {
+        if (clipRects != null && !clipRects.isEmpty()) {
             Area a = new Area(getBounds());
             for (Rectangle clip : clipRects) {
                 a.subtract(new Area(clip));
@@ -85,20 +88,24 @@ class SDL2Screen implements PlatformScreen, CacioEventSource {
         return g2d;
     }
 
+    @Override
     public ColorModel getColorModel() {
 
         return getGraphicsConfiguration().getColorModel();
     }
 
+    @Override
     public GraphicsConfiguration getGraphicsConfiguration() {
 
         return SDL2GraphicsConfiguration.getDefaultConfiguration();
     }
 
+    @Override
     public Rectangle getBounds() {
         return new Rectangle(0, 0, width, height);
     }
 
+    @Override
     public EventData getNextEvent() {
 
         if (eventData == null) {
@@ -132,8 +139,8 @@ class SDL2Screen implements PlatformScreen, CacioEventSource {
         nativeSetCursor(cursor.getType());
     }
 
-    private native final void nativeSetCursor(int cursorType);
-    private native final void nativeGetEvent(EventData eventData);
-    private native final long nativeInitScreen(int width, int height, int background);
-    private native final static void initIDs();
+    private native void nativeSetCursor(int cursorType);
+    private native void nativeGetEvent(EventData eventData);
+    private native long nativeInitScreen(int width, int height, int background);
+    private native static void initIDs();
 }

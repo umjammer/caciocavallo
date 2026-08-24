@@ -22,6 +22,7 @@
  * CA 95054 USA or visit www.sun.com if you need additional information or
  * have any questions.
  */
+
 package net.java.openjdk.awt.peer.sdl2;
 
 import java.awt.GraphicsConfiguration;
@@ -31,6 +32,7 @@ import sun.awt.SunToolkit;
 import sun.awt.image.SunVolatileImage;
 import sun.awt.image.VolatileSurfaceManager;
 import sun.java2d.SurfaceData;
+
 
 /**
  * @author Mario Torre <neugens.limasoftware@gmail.com>
@@ -72,5 +74,5 @@ class SDL2VolatileSurfaceManager extends VolatileSurfaceManager {
         }
     }
 
-    private native final long initSurface(int width, int height);
+    private native long initSurface(int width, int height);
 }

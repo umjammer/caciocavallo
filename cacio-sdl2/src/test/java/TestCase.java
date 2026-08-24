@@ -54,8 +54,6 @@ public class TestCase {
 
         CacioSDL2Runner.install();
 
-
-
         Thread demo = new Thread(TestCase::launchSwingSet2, "SwingSet2");
         demo.setDaemon(true);
         demo.start();

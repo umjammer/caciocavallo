@@ -23,5 +23,4 @@ public class SDL2Interceptor {
     public static GraphicsEnvironment intercept() {
         return localEnv;
     }
-
 }
