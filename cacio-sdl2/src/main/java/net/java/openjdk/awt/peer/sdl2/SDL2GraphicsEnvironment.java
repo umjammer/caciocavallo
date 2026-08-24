@@ -61,5 +61,26 @@ public class SDL2GraphicsEnvironment extends SunGraphicsEnvironment {
         return true;
     }
 
+    /**
+     * Services the platform run loop for up to {@code timeoutMillis}.
+     *
+     * On macOS every SDL video call has to run on the process main thread, so
+     * the backend hands those calls over to it; an application using this
+     * backend has to be started with {@code -XstartOnFirstThread}, run its UI
+     * on another thread and call this from its main thread in a loop. On the
+     * other platforms it does nothing.
+     */
+    public static native void pumpMainThread(int timeoutMillis);
+
+    /**
+     * Returns whether the user has asked to close the SDL window, by its close
+     * button or by quitting the application.
+     */
+    public static boolean isCloseRequested() {
+        return nativeIsCloseRequested();
+    }
+
+    private static native boolean nativeIsCloseRequested();
+
     private static final native boolean nativeInit();
 }

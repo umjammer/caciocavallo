@@ -23,18 +23,17 @@
  * have any questions.
  */
 #include <jni.h>
-#include <SDL2/SDL_video.h>
 
 #include "SDL.h"
-#include "jnu.h"
-#include "cacio-sdl.h"
+#include "cacio-sdl2.h"
 
-#include "net_java_openjdk_awt_peer_sdl_SDLVolatileSurfaceManager.h"
+#include "net_java_openjdk_awt_peer_sdl2_SDL2VolatileSurfaceManager.h"
 
-JNIEXPORT jlong JNICALL Java_net_java_openjdk_awt_peer_sdl_SDLVolatileSurfaceManager_initSurface
+JNIEXPORT jlong JNICALL Java_net_java_openjdk_awt_peer_sdl2_SDL2VolatileSurfaceManager_initSurface
   (JNIEnv *env, jobject thiz __attribute__((unused)), jint width, jint height)
 {
     SDL_Surface *surface = NULL;
+    struct SDLWindowAndRenderer *data = NULL;
 
     /*
      * FIXME: sync these with the ColorModel
@@ -52,8 +51,23 @@ JNIEXPORT jlong JNICALL Java_net_java_openjdk_awt_peer_sdl_SDLVolatileSurfaceMan
     if(surface == NULL) {
         fprintf(stderr, "CreateRGBSurface failed: %s\n", SDL_GetError());
         JNU_ThrowByName(env, "java/lang/InternalError",
-                        "SDLVolatileSurfaceManager::initSurface failed");
+                        "SDL2VolatileSurfaceManager::initSurface failed");
+        return 0L;
     }
 
-    return (jlong) surface;
+    /*
+     * SDL2SurfaceData.initOps() reads a struct SDLWindowAndRenderer out of the
+     * jlong, so an off-screen surface has to be wrapped in one too. A NULL
+     * window marks it as never presented on its own.
+     */
+    data = calloc(1, sizeof(*data));
+    if (data == NULL) {
+        SDL_FreeSurface(surface);
+        JNU_ThrowByName(env, "java/lang/OutOfMemoryError",
+                        "SDL2VolatileSurfaceManager::initSurface");
+        return 0L;
+    }
+    data->surface = surface;
+
+    return (jlong) data;
 }

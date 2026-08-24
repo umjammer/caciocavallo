@@ -25,17 +25,41 @@
 
 #include "jni.h"
 
-#include "SDL.h"
-#include "net_java_openjdk_awt_peer_sdl_SDLGraphicsEnvironment.h"
+#include "cacio-sdl2.h"
+#include "net_java_openjdk_awt_peer_sdl2_SDL2GraphicsEnvironment.h"
 
-JNIEXPORT jboolean JNICALL Java_net_java_openjdk_awt_peer_sdl_SDLGraphicsEnvironment_nativeInit
+JNIEXPORT jboolean JNICALL Java_net_java_openjdk_awt_peer_sdl2_SDL2GraphicsEnvironment_nativeInit
   (JNIEnv *env __attribute__((unused)), jclass clazz __attribute__((unused)))
 {
-    if (SDL_Init(SDL_INIT_VIDEO) != 0) {
+    __block int rc = -1;
+
+    CacioSDL2_init();
+
+    CACIO_ON_MAIN({
+        rc = SDL_Init(SDL_INIT_VIDEO);
+    });
+
+    if (rc != 0) {
         fprintf(stderr, "*** Unable to initialize SDL: %s\n", SDL_GetError());
         return JNI_FALSE;
     }
-    atexit(SDL_Quit);
- 
+    /*
+     * No atexit(SDL_Quit): the JVM shuts down on the DestroyJavaVM thread, and
+     * tearing Cocoa down from there traps. The process is going away anyway.
+     */
+
     return JNI_TRUE;
+}
+
+JNIEXPORT void JNICALL Java_net_java_openjdk_awt_peer_sdl2_SDL2GraphicsEnvironment_pumpMainThread
+  (JNIEnv *env __attribute__((unused)), jclass clazz __attribute__((unused)),
+   jint timeoutMillis)
+{
+    CacioSDL2_pump(timeoutMillis);
+}
+
+JNIEXPORT jboolean JNICALL Java_net_java_openjdk_awt_peer_sdl2_SDL2GraphicsEnvironment_nativeIsCloseRequested
+  (JNIEnv *env __attribute__((unused)), jclass clazz __attribute__((unused)))
+{
+    return CacioSDL2_isCloseRequested() ? JNI_TRUE : JNI_FALSE;
 }

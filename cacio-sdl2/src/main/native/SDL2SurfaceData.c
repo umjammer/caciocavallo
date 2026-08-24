@@ -23,13 +23,11 @@
  * have any questions.
  */
 #include <jni.h>
-#include <SDL2/SDL_video.h>
 
 #include "SDL.h"
-#include "cacio-sdl.h"
-#include "net_java_openjdk_awt_peer_sdl_SDLSurfaceData.h"
+#include "cacio-sdl2.h"
+#include "net_java_openjdk_awt_peer_sdl2_SDL2SurfaceData.h"
 
-extern void JNU_ThrowByName(JNIEnv *env, const char *name, const char *msg);
 
 static jclass sunToolkitCls;
 static jmethodID sunToolkitLockMID;
@@ -44,10 +42,12 @@ static void SDLRelease(JNIEnv* env, SurfaceDataOps* ops,
 static void SDLUnlock(JNIEnv* env, SurfaceDataOps* ops,
                       SurfaceDataRasInfo* rasInfo);
 
-JNIEXPORT void JNICALL Java_net_java_openjdk_awt_peer_sdl_SDLSurfaceData_initIDs
+JNIEXPORT void JNICALL Java_net_java_openjdk_awt_peer_sdl2_SDL2SurfaceData_initIDs
   (JNIEnv *env, jclass cls __attribute__((unused)))
 {
     sunToolkitCls = (*env)->FindClass(env, "sun/awt/SunToolkit");
+    if ((*env)->ExceptionCheck(env)) return;
+    sunToolkitCls = (*env)->NewGlobalRef(env, sunToolkitCls);
     if ((*env)->ExceptionCheck(env)) return;
 
     sunToolkitLockMID = (*env)->GetStaticMethodID(env, sunToolkitCls,
@@ -59,7 +59,7 @@ JNIEXPORT void JNICALL Java_net_java_openjdk_awt_peer_sdl_SDLSurfaceData_initIDs
     if ((*env)->ExceptionCheck(env)) return;
 }
 
-JNIEXPORT void JNICALL Java_net_java_openjdk_awt_peer_sdl_SDLSurfaceData_initOps
+JNIEXPORT void JNICALL Java_net_java_openjdk_awt_peer_sdl2_SDL2SurfaceData_initOps
   (JNIEnv *env, jobject thiz, jlong nativeSDLSurface, jint width, jint height)
 {
     struct SDLWindowAndRenderer *data = NULL;
@@ -89,7 +89,6 @@ static jint SDLLock(JNIEnv* env, SurfaceDataOps* ops,
 
     operations = (SDLSurfaceDataOps*) ops;
 
-		fprintf(stderr, "1 %p\n", ops);
     (*env)->CallStaticVoidMethod(env, sunToolkitCls, sunToolkitLockMID);
 
     if (rasInfo->bounds.x1 < 0) {
@@ -115,7 +114,6 @@ static jint SDLLock(JNIEnv* env, SurfaceDataOps* ops,
     if (rasInfo->bounds.y2 > operations->height) {
       rasInfo->bounds.y2 = operations->height;
     }
-		fprintf(stderr, "2 %p\n", operations->surface);
 
 /*
     if (rasInfo->bounds.y1 >= 1600) {
@@ -139,20 +137,17 @@ static jint SDLLock(JNIEnv* env, SurfaceDataOps* ops,
     } else {
         ret = SD_SUCCESS;
     }
-		fprintf(stderr, "3\n");
 
     if (SDL_MUSTLOCK(operations->surface) != 0) {
-			fprintf(stderr, "4\n");
 
         if (SDL_LockSurface(operations->surface) < 0) {
-						fprintf(stderr, "5\n");
             (*env)->CallStaticVoidMethod(env, sunToolkitCls,
                                          sunToolkitUnlockMID);
             JNU_ThrowByName(env, "java/lang/InternalError",
-                "SDLSurfaceData::SDLLock: cannot lock SDL_Surface.");
+                "SDL2SurfaceData::SDLLock: cannot lock SDL_Surface.");
+            return -1;
         }
     }
-		fprintf(stderr, "4'\n");
 
     return ret;
 }
@@ -196,7 +191,6 @@ static void SDLUnlock(JNIEnv* env, SurfaceDataOps* ops, SurfaceDataRasInfo* rasI
     operations = (SDLSurfaceDataOps*) ops;
 
     if (SDL_MUSTLOCK(operations->surface) != 0) {
-        fprintf(stderr, "SDL_MUSTLOCK::unlocking\n");
         SDL_UnlockSurface(operations->surface);
     }
 
@@ -223,8 +217,14 @@ static void SDLUnlock(JNIEnv* env, SurfaceDataOps* ops, SurfaceDataRasInfo* rasI
         height = 0;
     }
 
-    /*SDL_UpdateRect(operations->surface, rasInfo->bounds.x1, rasInfo->bounds.y1,
-                   width, height);
-    */
+    /*
+     * Only records what changed. Presenting here would mean a main-thread
+     * round trip and a full framebuffer update for every one of the many
+     * lock/unlock cycles a single Swing repaint goes through; the main thread
+     * presents the accumulated region once per tick instead.
+     */
+    CacioSDL2_addDamage(operations->window, rasInfo->bounds.x1,
+                        rasInfo->bounds.y1, width, height);
+
     (*env)->CallStaticVoidMethod(env, sunToolkitCls, sunToolkitUnlockMID);
 }

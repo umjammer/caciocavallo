@@ -63,8 +63,10 @@ class SDL2Screen implements PlatformScreen, CacioEventSource {
     private SDL2SurfaceData surfaceData;
 
     SDL2Screen() {
-System.err.println("SDL2Screen::<init>: " + width + ", " + height);
-        nativeSDLdata = nativeInitScreen(width, height);
+        // the screen starts out showing cacio's desktop colour, which is also
+        // what it clears to behind a window that moved away or was hidden
+        nativeSDLdata = nativeInitScreen(width, height,
+                FullScreenWindowFactory.getScreenBackground().getRGB());
     }
 
     public Graphics2D getClippedGraphics(Color fg, Color bg, Font font,
@@ -103,14 +105,12 @@ System.err.println("SDL2Screen::<init>: " + width + ", " + height);
         }
 
         eventData.clear();
-        
+
+        // blocks for a short while when there is nothing to report, so there
+        // is no need -- and no room, with a mouse to keep up with -- to sleep
         nativeGetEvent(eventData);
 
-        if (eventData.getId() == 0) {
-            try {
-                Thread.sleep(100);
-            } catch (Exception ex) { /* nothing to do */ }
-        }
+        eventData.setTime(System.currentTimeMillis());
         eventData.setSource(this);
         return eventData;
     }
@@ -127,6 +127,6 @@ System.err.println("SDL2Screen::<init>: " + width + ", " + height);
     }
 
     private native final void nativeGetEvent(EventData eventData);
-    private native final long nativeInitScreen(int width, int height);
+    private native final long nativeInitScreen(int width, int height, int background);
     private native final static void initIDs();
 }

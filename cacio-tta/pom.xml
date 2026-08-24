@@ -24,7 +24,7 @@
   <dependencies>
     <dependency>
       <groupId>${cacio.groupId}</groupId>
-      <artifactId>cacio-shared</artifactId>
+      <artifactId>${cacio.artifactId}</artifactId>
       <version>${cacio.version}</version>
     </dependency>
     <dependency>

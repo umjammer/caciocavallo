@@ -23,15 +23,13 @@
  * have any questions.
  */
 #include <jni.h>
-#include <SDL2/SDL_video.h>
 
 #include "SDL.h"
-#include "cacio-sdl.h"
-#include "jnu.h"
+#include "cacio-sdl2.h"
 
-#include "net_java_openjdk_awt_peer_sdl_SDLBlit.h"
+#include "net_java_openjdk_awt_peer_sdl2_SDL2Blit.h"
 
-JNIEXPORT void JNICALL Java_net_java_openjdk_awt_peer_sdl_SDLBlit_nativeBlit
+JNIEXPORT void JNICALL Java_net_java_openjdk_awt_peer_sdl2_SDL2Blit_nativeBlit
   (JNIEnv *env, jobject thiz, jobject src, jobject dest,
    jint sx, jint sy, jint dx, jint dy, jint w, jint h)
 {
@@ -60,9 +58,17 @@ JNIEXPORT void JNICALL Java_net_java_openjdk_awt_peer_sdl_SDLBlit_nativeBlit
    if (res < 0) {
         fprintf(stderr, "Unable to blit surfaces: %s\n", SDL_GetError());
         JNU_ThrowByName(env, "java/lang/InternalError",
-                "SDLBlit::nativeBlit: cannot blit surfaces");
+                "SDL2Blit::nativeBlit: cannot blit surfaces");
         return;
    }
 
- //  SDL_RenderPresent(destOperations->renderer);
+   /*
+    * Swing double buffers, so most of what reaches the screen after the first
+    * paint arrives as a blit rather than as drawing on the screen surface
+    * itself. Without recording the damage here those repaints sit in the
+    * framebuffer and are never presented. SDL_BlitSurface has clipped
+    * blitDestRect to what it actually wrote.
+    */
+   CacioSDL2_addDamage(destOperations->window, blitDestRect.x, blitDestRect.y,
+                       blitDestRect.w, blitDestRect.h);
 }

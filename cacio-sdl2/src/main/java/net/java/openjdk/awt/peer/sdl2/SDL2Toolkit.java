@@ -78,7 +78,7 @@ public class SDL2Toolkit extends CacioToolkit {
     private PlatformWindowFactory platformWindow;
 
     static {
-        System.loadLibrary("cacio-sdl");
+        System.loadLibrary("cacio-sdl2");
     }
 
     public SDL2Toolkit() {
