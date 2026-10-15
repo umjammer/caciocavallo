@@ -25,34 +25,39 @@
 
 package net.java.openjdk.cacio.servlet.transport;
 
-import java.awt.image.*;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.util.List;
 
-import java.io.*;
-import java.util.*;
+import net.java.openjdk.awt.peer.web.ScreenUpdate;
+import net.java.openjdk.awt.peer.web.TreeImagePacker;
+import net.java.openjdk.awt.peer.web.WebRect;
+import net.java.openjdk.cacio.servlet.imgformat.Base64Encoder;
+import net.java.openjdk.cacio.servlet.imgformat.PNGEncoder;
 
-import net.java.openjdk.awt.peer.web.*;
-import net.java.openjdk.cacio.servlet.imgformat.*;
 
 /**
  * String-based transport. Encodes the command-list as string and encodes the
  * image-data in png-format applies base64 encoding.
- * 
+ * <p>
  * On the client the command-list part and the base64 encoded image-data are
  * split, and the image-data is loaded using data-URIs.
- * 
+ * <p>
  * Although less efficient space-wise, quite efficient for devices with weak
  * CPUs, as the image-data has not to be processed using javascript. Base64
  * decoding and data-URI interpretation is usually very fast using native code.
- * 
+ * <p>
  * Using this backend a Sony Xperia Arc (Android 2.2, Snapdragon 1Ghz) is able
  * to play Java2Demo almost real-time, while its a slide-show with the RLE based
  * backends due the additional processing required on the client-side.
- * 
+ * <p>
  * Javascript counterpart: XHRBase64Transport.js
- * 
+ *
  * @author Clemens Eisserer <linuxhippy@gmail.com>
  */
 public class Base64PngTransport extends Transport {
+
     private static final byte[] emptyResponseData = "0".getBytes();
     private static final String emptyResponseString = "0";
 
@@ -62,71 +67,71 @@ public class Base64PngTransport extends Transport {
     BufferedImage packedImage;
 
     public Base64PngTransport(int compressionLevel) {
-	super("text/plain");
+        super("text/plain");
 
-	this.compressionLevel = compressionLevel;
+        this.compressionLevel = compressionLevel;
     }
 
     /**
      * Encodes the command-list.
-     * 
+     *
      * @param cmdList
      * @return a string where each integer-value is seperated by a colon.
      */
     protected String encodeImageCmdStream(List<Integer> cmdList) {
-	StringBuilder cmdBuilder = new StringBuilder(cmdList.size() * 4);
-	cmdBuilder.append(cmdList.size());
+        StringBuilder cmdBuilder = new StringBuilder(cmdList.size() * 4);
+        cmdBuilder.append(cmdList.size());
         for (Integer integer : cmdList) {
             cmdBuilder.append(':');
             cmdBuilder.append(integer);
         }
 
-	// Delimeter for following image data
-	cmdBuilder.append(':');
+        // Delimeter for following image data
+        cmdBuilder.append(':');
 
-	return cmdBuilder.toString();
+        return cmdBuilder.toString();
     }
 
     @Override
     public void prepareUpdate(List<ScreenUpdate> pendingUpdateList, TreeImagePacker packer, List<Integer> cmdList) {
-	dataAvailable = true;
-	cmdString = encodeImageCmdStream(cmdList);
+        dataAvailable = true;
+        cmdString = encodeImageCmdStream(cmdList);
 
-	WebRect packedRegionBox = packer.getBoundingBox();
-	if (packedRegionBox.getWidth() > 0 && packedRegionBox.getHeight() > 0) {
-	    packedImage = new BufferedImage(packedRegionBox.getWidth(), packedRegionBox.getHeight(), BufferedImage.TYPE_INT_RGB);
-	    copyUpdatesToPackedImage(pendingUpdateList, packedImage, 0);
-	}
+        WebRect packedRegionBox = packer.getBoundingBox();
+        if (packedRegionBox.getWidth() > 0 && packedRegionBox.getHeight() > 0) {
+            packedImage = new BufferedImage(packedRegionBox.getWidth(), packedRegionBox.getHeight(), BufferedImage.TYPE_INT_RGB);
+            copyUpdatesToPackedImage(pendingUpdateList, packedImage, 0);
+        }
     }
 
     @Override
     public String asString() {
-	if (dataAvailable) {
-	    return cmdString + new String(getEncodedImageData());
-	} else {
-	    return emptyResponseString;
-	}
+        if (dataAvailable) {
+            return cmdString + new String(getEncodedImageData());
+        } else {
+            return emptyResponseString;
+        }
     }
 
     @Override
     public void writeToStream(OutputStream os) throws IOException {
-	if (dataAvailable) {
-	    os.write(cmdString.getBytes());
-	    os.write(getEncodedImageData());
-	} else {
-	    os.write(emptyResponseData);
-	}
+        if (dataAvailable) {
+            os.write(cmdString.getBytes());
+            os.write(getEncodedImageData());
+        } else {
+            os.write(emptyResponseData);
+        }
     }
 
     protected byte[] getEncodedImageData() {
-	dataAvailable = false;
+        dataAvailable = false;
 
-	if (packedImage != null) {
-	    byte[] bData = PNGEncoder.getInstance().encode(packedImage, compressionLevel);
-	    packedImage = null;
-	    return Base64Encoder.encode(bData);
-	}
+        if (packedImage != null) {
+            byte[] bData = PNGEncoder.getInstance().encode(packedImage, compressionLevel);
+            packedImage = null;
+            return Base64Encoder.encode(bData);
+        }
 
-	return new byte[0];
+        return new byte[0];
     }
 }

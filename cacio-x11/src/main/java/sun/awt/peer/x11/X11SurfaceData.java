@@ -29,8 +29,10 @@ import java.awt.GraphicsConfiguration;
 import java.awt.Rectangle;
 import java.awt.image.ColorModel;
 import java.awt.image.Raster;
+
 import sun.java2d.SurfaceData;
 import sun.java2d.loops.SurfaceType;
+
 
 class X11SurfaceData extends SurfaceData {
 

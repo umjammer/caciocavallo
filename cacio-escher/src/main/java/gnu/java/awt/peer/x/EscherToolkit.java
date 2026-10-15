@@ -54,15 +54,14 @@ import java.awt.peer.TrayIconPeer;
 import java.util.Map;
 import java.util.Properties;
 
-import sun.awt.LightweightFrame;
-import sun.awt.datatransfer.DataTransferer;
 import com.github.caciocavallosilano.cacio.peer.CacioEventSource;
 import com.github.caciocavallosilano.cacio.peer.CacioToolkit;
 import com.github.caciocavallosilano.cacio.peer.PlatformWindowFactory;
+import sun.awt.LightweightFrame;
+import sun.awt.datatransfer.DataTransferer;
+
 
 public class EscherToolkit extends CacioToolkit {
-
-    static final boolean DEBUG = false; 
 
     private PlatformWindowFactory platformWindowFactory;
 
@@ -75,57 +74,32 @@ public class EscherToolkit extends CacioToolkit {
     }
 
     @Override
-    public DragSourceContextPeer createDragSourceContextPeer(
-            DragGestureEvent dge) throws InvalidDnDOperationException {
-        // TODO Auto-generated method stub
+    public DragSourceContextPeer createDragSourceContextPeer(DragGestureEvent dge)
+            throws InvalidDnDOperationException {
         return null;
     }
 
     @Override
-    public RobotPeer createRobot(GraphicsDevice screen)
-            throws AWTException {
-        // TODO Auto-generated method stub
+    public RobotPeer createRobot(GraphicsDevice screen) throws AWTException {
         return null;
     }
 
     @Override
     public SystemTrayPeer createSystemTray(SystemTray target) {
-        // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public TrayIconPeer createTrayIcon(TrayIcon target)
-            throws HeadlessException, AWTException {
-        // TODO Auto-generated method stub
+    public TrayIconPeer createTrayIcon(TrayIcon target) throws HeadlessException, AWTException {
         return null;
-    }
-
-    @Override
-    public FontPeer getFontPeer(String name, int style) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-        protected int getScreenHeight() {
-        // TODO Auto-generated method stub
-        return 0;
-    }
-
-        protected int getScreenWidth() {
-        // TODO Auto-generated method stub
-        return 0;
     }
 
     @Override
     public void grab(Window w) {
-        // TODO Auto-generated method stub
-
     }
 
     @Override
     public boolean isDesktopSupported() {
-        // TODO Auto-generated method stub
         return false;
     }
 
@@ -136,32 +110,24 @@ public class EscherToolkit extends CacioToolkit {
 
     @Override
     public boolean isTraySupported() {
-        // TODO Auto-generated method stub
         return false;
     }
 
     @Override
     protected boolean syncNativeQueue(long timeout) {
-        // TODO Auto-generated method stub
         return false;
     }
 
     @Override
     public void ungrab(Window w) {
-        // TODO Auto-generated method stub
-
     }
 
     @Override
     public void beep() {
-        // TODO Auto-generated method stub
-
     }
 
     @Override
-    public DesktopPeer createDesktopPeer(Desktop target)
-            throws HeadlessException {
-        // TODO Auto-generated method stub
+    public DesktopPeer createDesktopPeer(Desktop target) throws HeadlessException {
         return null;
     }
 
@@ -179,7 +145,6 @@ public class EscherToolkit extends CacioToolkit {
 
     @Override
     public PrintJob getPrintJob(Frame frame, String jobtitle, Properties props) {
-        // TODO Auto-generated method stub
         return null;
     }
 
@@ -195,46 +160,27 @@ public class EscherToolkit extends CacioToolkit {
 
     @Override
     public Clipboard getSystemClipboard() throws HeadlessException {
-        // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public Map<TextAttribute, ?> mapInputMethodHighlight(
-            InputMethodHighlight highlight) throws HeadlessException {
-        // TODO Auto-generated method stub
+    public Map<TextAttribute, ?> mapInputMethodHighlight(InputMethodHighlight highlight)
+            throws HeadlessException {
         return null;
     }
 
     @Override
     public void sync() {
-        // TODO Auto-generated method stub
-
     }
 
     @Override
-    public InputMethodDescriptor getInputMethodAdapterDescriptor()
-            throws AWTException {
-        // TODO Auto-generated method stub
+    public InputMethodDescriptor getInputMethodAdapterDescriptor() throws AWTException {
         return null;
     }
 
     public static XGraphicsDevice getDefaultDevice() {
-        XGraphicsEnvironment env = (XGraphicsEnvironment)
-                            XGraphicsEnvironment.getLocalGraphicsEnvironment();
+        XGraphicsEnvironment env = (XGraphicsEnvironment) XGraphicsEnvironment.getLocalGraphicsEnvironment();
         return (XGraphicsDevice) env.getDefaultScreenDevice();
-    }
-
-    public CacioEventSource getEventSource() {
-        // TODO: Implement me.
-        return null;
-    }
-
-    /* @see sun.awt.ComponentFactory#getDataTransferer() */
-    @Override
-    public DataTransferer getDataTransferer() {
-        // TODO Auto-generated method stub
-        return null;
     }
 
     @Override

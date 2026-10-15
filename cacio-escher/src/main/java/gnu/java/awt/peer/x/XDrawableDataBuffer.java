@@ -37,63 +37,58 @@ exception statement from your version. */
 
 package gnu.java.awt.peer.x;
 
+import java.awt.AWTError;
+import java.awt.image.DataBuffer;
+
 import gnu.x11.Drawable;
 import gnu.x11.EscherUnsupportedScreenBitDepthException;
 import gnu.x11.GC;
 import gnu.x11.image.Image;
 import gnu.x11.image.ZPixmap;
 
-import java.awt.AWTError;
-import java.awt.image.DataBuffer;
 
-public class XDrawableDataBuffer
-  extends DataBuffer
-{
+public class XDrawableDataBuffer extends DataBuffer {
 
-  private final Drawable xDrawable;
+    private final Drawable xDrawable;
 
-  XDrawableDataBuffer(Drawable d)
-  {
-    super(DataBuffer.TYPE_INT, d.width, d.height);
-    xDrawable = d;
-  }
-
-  @Override
-  public int getElem(int bank, int i)
-  {
-    int x = i % xDrawable.width;
-    int y = i / xDrawable.width;
-    if (true || x < 0 || y < 0 || x >= xDrawable.width || y >= xDrawable.height)
-      return 0;
-    ZPixmap pm;
-    try {
-        pm = (ZPixmap) xDrawable.image(x, y, 1, 1, -1, Image.Format.ZPIXMAP);
-    } catch (EscherUnsupportedScreenBitDepthException e) {
-        AWTError awtErr = new AWTError("Cannot create a ZPixmpas");
-        awtErr.initCause(e);
-        throw awtErr;
+    XDrawableDataBuffer(Drawable d) {
+        super(DataBuffer.TYPE_INT, d.width, d.height);
+        xDrawable = d;
     }
-    return pm.getDataElement(0);
-  }
 
-  @Override
-  public void setElem(int bank, int i, int value)
-  {
-    int x = i % xDrawable.width;
-    int y = i / xDrawable.width;
-    ZPixmap pm;
-    try {
-        pm = new ZPixmap(xDrawable.getDisplay(), 1, 1,
-                                 xDrawable.getDisplay().getDefaultVisual());
-    } catch (EscherUnsupportedScreenBitDepthException e) {
-        AWTError awtErr = new AWTError("Cannot create a ZPixmpas");
-        awtErr.initCause(e);
-        throw awtErr;
+    @Override
+    public int getElem(int bank, int i) {
+        int x = i % xDrawable.width;
+        int y = i / xDrawable.width;
+        if (true || x < 0 || y < 0 || x >= xDrawable.width || y >= xDrawable.height)
+            return 0;
+        ZPixmap pm;
+        try {
+            pm = (ZPixmap) xDrawable.image(x, y, 1, 1, -1, Image.Format.ZPIXMAP);
+        } catch (EscherUnsupportedScreenBitDepthException e) {
+            AWTError awtErr = new AWTError("Cannot create a ZPixmpas");
+            awtErr.initCause(e);
+            throw awtErr;
+        }
+        return pm.getDataElement(0);
     }
-    pm.putPixel(0, 0, value);
-    GC gc = new GC(xDrawable);
-    xDrawable.putImage(gc, pm, x, y);
-    gc.free();
-  }
 
+    @Override
+    public void setElem(int bank, int i, int value) {
+        int x = i % xDrawable.width;
+        int y = i / xDrawable.width;
+        ZPixmap pm;
+        try {
+            pm = new ZPixmap(xDrawable.getDisplay(), 1, 1,
+                    xDrawable.getDisplay().getDefaultVisual());
+        } catch (EscherUnsupportedScreenBitDepthException e) {
+            AWTError awtErr = new AWTError("Cannot create a ZPixmpas");
+            awtErr.initCause(e);
+            throw awtErr;
+        }
+        pm.putPixel(0, 0, value);
+        GC gc = new GC(xDrawable);
+        xDrawable.putImage(gc, pm, x, y);
+        gc.free();
+    }
 }

@@ -48,16 +48,21 @@ import java.awt.peer.FramePeer;
 import java.awt.peer.RobotPeer;
 import java.awt.peer.SystemTrayPeer;
 import java.awt.peer.TrayIconPeer;
+import java.lang.System.Logger;
+import java.lang.System.Logger.Level;
 import java.util.Map;
 import java.util.Properties;
 
+import com.github.caciocavallosilano.cacio.peer.CacioToolkit;
+import com.github.caciocavallosilano.cacio.peer.PlatformWindowFactory;
+import com.github.caciocavallosilano.cacio.peer.managed.FullScreenWindowFactory;
 import sun.awt.LightweightFrame;
 import sun.awt.datatransfer.DataTransferer;
-import com.github.caciocavallosilano.cacio.peer.CacioToolkit;
-import com.github.caciocavallosilano.cacio.peer.managed.FullScreenWindowFactory;
-import com.github.caciocavallosilano.cacio.peer.PlatformWindowFactory;
+
 
 public class X11Toolkit extends CacioToolkit {
+
+    private static final Logger logger = System.getLogger(X11Toolkit.class.getName());
 
     static {
         System.loadLibrary("cacio-x11");
@@ -116,11 +121,11 @@ public class X11Toolkit extends CacioToolkit {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
-        protected int getScreenWidth() {
+    protected int getScreenWidth() {
         return X11GraphicsConfiguration.getDefaultGC().getBounds().width;
     }
 
-        protected int getScreenHeight() {
+    protected int getScreenHeight() {
         return X11GraphicsConfiguration.getDefaultGC().getBounds().height;
     }
 
@@ -131,12 +136,12 @@ public class X11Toolkit extends CacioToolkit {
 
     @Override
     public void grab(Window arg0) {
-        System.err.println("IMPLEMENT ME: X11Toolkit.grab()");
+        logger.log(Level.DEBUG, "IMPLEMENT ME: X11Toolkit.grab()");
     }
 
     @Override
     public void ungrab(Window arg0) {
-        System.err.println("IMPLEMENT ME: X11Toolkit.ungrab()");
+        logger.log(Level.DEBUG, "IMPLEMENT ME: X11Toolkit.ungrab()");
     }
 
     @Override

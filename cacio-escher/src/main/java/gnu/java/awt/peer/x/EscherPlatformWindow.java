@@ -44,38 +44,38 @@ import java.awt.Insets;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.Toolkit;
+import java.awt.event.FocusEvent.Cause;
 import java.awt.event.PaintEvent;
 import java.awt.event.WindowEvent;
 import java.awt.image.ColorModel;
 import java.awt.peer.ComponentPeer;
 import java.awt.peer.ContainerPeer;
 
+import com.github.caciocavallosilano.cacio.peer.CacioComponent;
+import com.github.caciocavallosilano.cacio.peer.PlatformToplevelWindow;
+import com.github.caciocavallosilano.cacio.peer.PlatformWindow;
 import gnu.x11.Atom;
 import gnu.x11.Drawable;
 import gnu.x11.Window;
 import gnu.x11.WindowAttributes;
 import gnu.x11.event.Event;
-import java.awt.event.FocusEvent.Cause;
-import com.github.caciocavallosilano.cacio.peer.CacioComponent;
-import com.github.caciocavallosilano.cacio.peer.PlatformToplevelWindow;
-import com.github.caciocavallosilano.cacio.peer.PlatformWindow;
 import sun.java2d.SunGraphics2D;
 import sun.java2d.SurfaceData;
 import sun.java2d.pipe.Region;
 
+
 class EscherPlatformWindow implements PlatformToplevelWindow {
 
     private static final int standardSelect =
-                        Event.EventMask.BUTTON_PRESS_MASK.getMask()
-                        | Event.EventMask.BUTTON_RELEASE_MASK.getMask() | Event.EventMask.POINTER_MOTION_MASK.getMask()
-                        // | Event.RESIZE_REDIRECT_MASK.getMask() //
-                        | Event.EventMask.EXPOSURE_MASK.getMask() | Event.EventMask.PROPERTY_CHANGE_MASK.getMask()
-                        | Event.EventMask.STRUCTURE_NOTIFY_MASK.getMask() //
-                        // | Event.SUBSTRUCTURE_NOTIFY_MASK.getMask()
-                        | Event.EventMask.KEY_PRESS_MASK.getMask() | Event.EventMask.KEY_RELEASE_MASK.getMask()
-                        // | Event.VISIBILITY_CHANGE_MASK.getMask() //
-                        | Event.EventMask.FOCUS_CHANGE_MASK.getMask()
-                        ;
+            Event.EventMask.BUTTON_PRESS_MASK.getMask()
+                    | Event.EventMask.BUTTON_RELEASE_MASK.getMask() | Event.EventMask.POINTER_MOTION_MASK.getMask()
+                    // | Event.RESIZE_REDIRECT_MASK.getMask() //
+                    | Event.EventMask.EXPOSURE_MASK.getMask() | Event.EventMask.PROPERTY_CHANGE_MASK.getMask()
+                    | Event.EventMask.STRUCTURE_NOTIFY_MASK.getMask() //
+                    // | Event.SUBSTRUCTURE_NOTIFY_MASK.getMask()
+                    | Event.EventMask.KEY_PRESS_MASK.getMask() | Event.EventMask.KEY_RELEASE_MASK.getMask()
+                    // | Event.VISIBILITY_CHANGE_MASK.getMask() //
+                    | Event.EventMask.FOCUS_CHANGE_MASK.getMask();
 
     /**
      * The corresponding CacioCavallo component.
@@ -139,7 +139,7 @@ class EscherPlatformWindow implements PlatformToplevelWindow {
         }
 
         xwindow = new Window(parentWindow, x - parentInsets.left,
-                             y - parentInsets.top, w, h, 0, atts);
+                y - parentInsets.top, w, h, 0, atts);
         xwindow.selectInput(standardSelect);
 
         dev.getEventSource().registerWindow(xwindow, cacioComp);
@@ -168,7 +168,7 @@ class EscherPlatformWindow implements PlatformToplevelWindow {
             Atom at = Atom.intern(dev.getDisplay(), "_MOTIF_WM_HINTS");
             if (at != null) {
                 xwindow.changeProperty(Window.PropertyMode.REPLACE, at, at, 32, new int[] {
-                        1 << 1, 0, 0, 0, 0 }, 0, 5);
+                        1 << 1, 0, 0, 0, 0}, 0, 5);
             }
         }
         // TODO: Get an estimate of the insets here by used the
@@ -180,9 +180,9 @@ class EscherPlatformWindow implements PlatformToplevelWindow {
         GraphicsDevice gd = ge.getDefaultScreenDevice();
         GraphicsConfiguration gc = gd.getDefaultConfiguration();
         surfaceData =
-          new XDrawableSurfaceData((XGraphicsConfiguration) gc, xwindow,
-                                   XDrawableSurfaceData.EscherIntRgb,
-                                   getColorModel());
+                new XDrawableSurfaceData((XGraphicsConfiguration) gc, xwindow,
+                        XDrawableSurfaceData.EscherIntRgb,
+                        getColorModel());
 
         if (awtComp.isVisible())
             show();
@@ -190,8 +190,6 @@ class EscherPlatformWindow implements PlatformToplevelWindow {
 
     @Override
     public void applyShape(Region shape) {
-        // TODO Auto-generated method stub
-
     }
 
     @Override
@@ -202,7 +200,6 @@ class EscherPlatformWindow implements PlatformToplevelWindow {
 
     @Override
     public Rectangle getBounds() {
-        // TODO Auto-generated method stub
         return null;
     }
 
@@ -215,8 +212,7 @@ class EscherPlatformWindow implements PlatformToplevelWindow {
                     y - i.top - parentInsets.top,
                     width - i.left - i.right,
                     height - i.top - i.bottom);
-        }
-        else if (op == ComponentPeer.SET_LOCATION)
+        } else if (op == ComponentPeer.SET_LOCATION)
             xwindow.move(x - i.left - parentInsets.left,
                     y - i.top - parentInsets.top);
         else if (op == ComponentPeer.SET_SIZE)
@@ -227,6 +223,7 @@ class EscherPlatformWindow implements PlatformToplevelWindow {
     }
 
     private static final Insets EMPTY_INSETS = new Insets(0, 0, 0, 0);
+
     private Insets getParentToplevelInsets() {
         Insets insets;
         Component awtComp = cacioComponent.getAWTComponent();
@@ -245,8 +242,7 @@ class EscherPlatformWindow implements PlatformToplevelWindow {
     }
 
     @Override
-    public Graphics2D getGraphics(Color foreground, Color background,
-            Font font) {
+    public Graphics2D getGraphics(Color foreground, Color background, Font font) {
         Component awtComponent = cacioComponent.getAWTComponent();
         Color fg = foreground;
         if (fg == null)
@@ -261,7 +257,6 @@ class EscherPlatformWindow implements PlatformToplevelWindow {
 
     @Override
     public GraphicsConfiguration getGraphicsConfiguration() {
-        // TODO Auto-generated method stub
         return new XGraphicsConfiguration(EscherToolkit.getDefaultDevice());
     }
 
@@ -280,59 +275,53 @@ class EscherPlatformWindow implements PlatformToplevelWindow {
     @Override
     public void setVisible(boolean visible) {
         if (visible) {
-           show(); 
+            show();
         } else {
             hide();
         }
     }
 
-    private void show()
-    {
-      // Prevent ResizeRedirect events.
-      //xwindow.select_input(Event.NO_EVENT_MASK);
-      //xwindow.select_input(noResizeRedirectSelect);
+    private void show() {
+        // Prevent ResizeRedirect events.
+        //xwindow.select_input(Event.NO_EVENT_MASK);
+        //xwindow.select_input(noResizeRedirectSelect);
 
-      XGraphicsDevice dev = EscherToolkit.getDefaultDevice();
-      xwindow.map();
-      EventQueue eq = Toolkit.getDefaultToolkit().getSystemEventQueue();
-      Component awtComponent = cacioComponent.getAWTComponent();
-      if (awtComponent instanceof java.awt.Window w) {
-          eq.postEvent(new WindowEvent(w, WindowEvent.WINDOW_OPENED));
-      }
-      eq.postEvent(new PaintEvent(awtComponent, PaintEvent.PAINT,
-                                  new Rectangle(0, 0, awtComponent.getWidth(),
-                                                awtComponent.getHeight())));
-      Graphics g = getGraphics(foreground, background, font);
-      g.clearRect(0, 0, awtComponent.getWidth(), awtComponent.getHeight());
-      g.dispose();
+        XGraphicsDevice dev = EscherToolkit.getDefaultDevice();
+        xwindow.map();
+        EventQueue eq = Toolkit.getDefaultToolkit().getSystemEventQueue();
+        Component awtComponent = cacioComponent.getAWTComponent();
+        if (awtComponent instanceof java.awt.Window w) {
+            eq.postEvent(new WindowEvent(w, WindowEvent.WINDOW_OPENED));
+        }
+        eq.postEvent(new PaintEvent(awtComponent, PaintEvent.PAINT,
+                new Rectangle(0, 0, awtComponent.getWidth(), awtComponent.getHeight())));
+        Graphics g = getGraphics(foreground, background, font);
+        g.clearRect(0, 0, awtComponent.getWidth(), awtComponent.getHeight());
+        g.dispose();
 //      // Reset input selection.
 //      atts.set_override_redirect(false);
 //      xwindow.change_attributes(atts);
-      
-      // Determine the frame insets.
-      Atom atom = Atom.intern(dev.getDisplay(), "_NET_FRAME_EXTENTS");
-      Window.Property p = xwindow.getProperty(false, atom, Atom.CARDINAL, 0,
-                                               Window.MAX_WM_LENGTH);
-      if (p.format() != 0)
-        {
-          insets = new Insets(p.value(2), p.value(0), p.value(3), p.value(1));
-          Window.Changes ch = new Window.Changes();
-          ch.setWidth(awtComponent.getWidth() - insets.left - insets.top);
-          ch.setHeight(awtComponent.getHeight() - insets.top - insets.bottom);
-          xwindow.configure(ch);
-        }
 
+        // Determine the frame insets.
+        Atom atom = Atom.intern(dev.getDisplay(), "_NET_FRAME_EXTENTS");
+        Window.Property p = xwindow.getProperty(false, atom, Atom.CARDINAL, 0, Window.MAX_WM_LENGTH);
+        if (p.format() != 0) {
+            insets = new Insets(p.value(2), p.value(0), p.value(3), p.value(1));
+            Window.Changes ch = new Window.Changes();
+            ch.setWidth(awtComponent.getWidth() - insets.left - insets.top);
+            ch.setHeight(awtComponent.getHeight() - insets.top - insets.bottom);
+            xwindow.configure(ch);
+        }
     }
 
     /**
      * Makes the component invisible. This is called from
      * {@link Component#hide()}.
-     *
+     * <p>
      * This is implemented to call setVisible(false) on the Swing component.
      */
-    private void hide()
-    {
-      xwindow.unmap();
+    private void hide() {
+        xwindow.unmap();
     }
 
     @Override
@@ -342,56 +331,42 @@ class EscherPlatformWindow implements PlatformToplevelWindow {
 
     @Override
     public boolean isObscured() {
-        // TODO Auto-generated method stub
         return false;
     }
 
     @Override
     public boolean isReparentSuppored() {
-        // TODO Auto-generated method stub
         return false;
     }
 
     @Override
     public void reparent(ContainerPeer newContainer) {
-        // TODO Auto-generated method stub
-
     }
 
     @Override
     public boolean isRestackSupported() {
-        // TODO Auto-generated method stub
         return false;
     }
 
     @Override
     public void restack() {
-        // TODO Auto-generated method stub
-
     }
 
     @Override
     public int getState() {
-        // TODO Auto-generated method stub
         return 0;
     }
 
     @Override
     public void setMaximizedBounds(Rectangle bounds) {
-        // TODO Auto-generated method stub
-        
     }
 
     @Override
     public void setResizable(boolean resizable) {
-        // TODO Auto-generated method stub
-        
     }
 
     @Override
     public void setState(int state) {
-        // TODO Auto-generated method stub
-        
     }
 
     @Override
@@ -409,8 +384,7 @@ class EscherPlatformWindow implements PlatformToplevelWindow {
     }
 
     @Override
-    public void createBuffers(int numBuffers, BufferCapabilities caps)
-            throws AWTException {
+    public void createBuffers(int numBuffers, BufferCapabilities caps) throws AWTException {
         throw new AWTException("Not yet implemented.");
     }
 
@@ -430,18 +404,12 @@ class EscherPlatformWindow implements PlatformToplevelWindow {
         return null;
     }
 
-    /* @see com.github.caciocavallosilano.cacio.peer.PlatformWindow#requestFocus() */
     @Override
     public void requestFocus() {
-        // TODO Auto-generated method stub
-        
     }
 
-    /* @see com.github.caciocavallosilano.cacio.peer.PlatformToplevelWindow#setBlocked(boolean) */
     @Override
     public void setBlocked(boolean blocked) {
-        // TODO Auto-generated method stub
-        
     }
 
     /**

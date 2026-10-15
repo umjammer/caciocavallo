@@ -26,9 +26,11 @@
 package sun.awt.peer.x11;
 
 import java.awt.Composite;
+
 import sun.java2d.SurfaceData;
 import sun.java2d.pipe.Region;
 import sun.java2d.pipe.SpanIterator;
+
 
 /**
  * Implements clipping for blit functions for systems that don't support
@@ -58,15 +60,15 @@ public class BlitClipHelper {
          *     destination area, clipped against tiles of the clip.</li>
          * </ul>
          *
-         * @param src the source surface
-         * @param dst the destination surface
+         * @param src  the source surface
+         * @param dst  the destination surface
          * @param comp the composite setting
-         * @param sx the source area, upper left X coordinate
-         * @param sy the source area, upper left Y coordinate
-         * @param dx the destination area, upper left X coordinate
-         * @param dy the destination area, upper left Y coordinate
-         * @param w the width of the source/destination area
-         * @param h the height of the source/destination area
+         * @param sx   the source area, upper left X coordinate
+         * @param sy   the source area, upper left Y coordinate
+         * @param dx   the destination area, upper left X coordinate
+         * @param dy   the destination area, upper left Y coordinate
+         * @param w    the width of the source/destination area
+         * @param h    the height of the source/destination area
          */
         void doBlit(SurfaceData src, SurfaceData dst, Composite comp,
                     int sx, int sy, int dx, int dy, int w, int h);
@@ -84,14 +86,14 @@ public class BlitClipHelper {
 
         if (clip == null) {
             blitWithRectangularClip(blitter, src, dst, comp, -1, -1, -1, -1,
-                                    sx, sy, dx, dy, w, h);
+                    sx, sy, dx, dy, w, h);
         } else if (clip.isRectangular()) {
             int cx = clip.getLoX();
             int cy = clip.getLoY();
             int cw = clip.getWidth();
             int ch = clip.getHeight();
             blitWithRectangularClip(blitter, src, dst, comp, cx, cy, cw, ch,
-                                    sx, sy, dx, dy, w, h);
+                    sx, sy, dx, dy, w, h);
         } else {
             SpanIterator si = clip.getSpanIterator();
             int[] spanbox = new int[4];
@@ -101,8 +103,8 @@ public class BlitClipHelper {
                 int cw = spanbox[2] - spanbox[0];
                 int ch = spanbox[3] - spanbox[1];
                 blitWithRectangularClip(blitter, src, dst, comp,
-                                        cx, cy, cw, ch,
-                                        sx, sy, dx, dy, w, h);
+                        cx, cy, cw, ch,
+                        sx, sy, dx, dy, w, h);
             }
         }
     }
@@ -117,35 +119,35 @@ public class BlitClipHelper {
                                                 int w, int h) {
 
         int dstX = dx;
-	int dstY = dy;
-	int srcX = sx;
-	int srcY = sy;
-	int width = w;
-	int height = h;
-	if (cw != -1) { // Original clip was null.
-	    int cx1 = cx;
-	    int cy1 = cy;
-	    // Clip against destination rectangle.
-	    dstX = Math.max(dstX, cx1);
-	    dstY = Math.max(dstY, cy1);
-	    width = width - (dstX - dx);
-	    height = height - (dstY - dy);
-	    srcX = sx + w - width;
-	    srcY = sy + h - height;
-	    // Now the right and bottom part...
-	    int cx2 = cx + cw;
-	    int cy2 = cy + ch;
-	    int dstX2 = dstX + width;
-	    int dstY2 = dstY + height;
-	    dstX2 = Math.min(cx2, dstX2);
-	    dstY2 = Math.min(cy2, dstY2);
-	    width = dstX2 - dstX;
-	    height = dstY2 - dstY;
-	}
+        int dstY = dy;
+        int srcX = sx;
+        int srcY = sy;
+        int width = w;
+        int height = h;
+        if (cw != -1) { // Original clip was null.
+            int cx1 = cx;
+            int cy1 = cy;
+            // Clip against destination rectangle.
+            dstX = Math.max(dstX, cx1);
+            dstY = Math.max(dstY, cy1);
+            width = width - (dstX - dx);
+            height = height - (dstY - dy);
+            srcX = sx + w - width;
+            srcY = sy + h - height;
+            // Now the right and bottom part...
+            int cx2 = cx + cw;
+            int cy2 = cy + ch;
+            int dstX2 = dstX + width;
+            int dstY2 = dstY + height;
+            dstX2 = Math.min(cx2, dstX2);
+            dstY2 = Math.min(cy2, dstY2);
+            width = dstX2 - dstX;
+            height = dstY2 - dstY;
+        }
 
-	if (width <= 0 || height <= 0) {
-	    return;
-	}
+        if (width <= 0 || height <= 0) {
+            return;
+        }
 
         blitter.doBlit(src, dst, comp, srcX, srcY, dstX, dstY, width, height);
     }

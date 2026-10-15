@@ -3,9 +3,10 @@ package net.java.openjdk.cacio.servlet;
 import java.io.IOException;
 import java.lang.System.Logger;
 import java.lang.System.Logger.Level;
-
 import javax.servlet.http.HttpSession;
 
+import net.java.openjdk.awt.peer.web.WebSessionState;
+import net.java.openjdk.cacio.servlet.transport.Transport;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketClose;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketConnect;
@@ -13,8 +14,6 @@ import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
 import org.eclipse.jetty.websocket.api.annotations.WebSocket;
 import org.eclipse.jetty.websocket.servlet.UpgradeHttpServletRequest;
 
-import net.java.openjdk.awt.peer.web.WebSessionState;
-import net.java.openjdk.cacio.servlet.transport.Transport;
 
 @WebSocket
 public class WebSocketStreamThread extends Thread {
@@ -43,6 +42,7 @@ public class WebSocketStreamThread extends Thread {
                 // casting depends on UpgradeRequest implementation is only ServletUpgradeRequest.
                 return (HttpSession) session.getUpgradeRequest().getSession();
             }
+
             @Override
             public String getParameter(String name) {
                 return session.getUpgradeRequest().getParameterMap().get(name).getFirst();
@@ -54,7 +54,7 @@ public class WebSocketStreamThread extends Thread {
     @OnWebSocketMessage
     public void onText(String message) {
         WebSessionManager.getInstance().registerSessionAtCurrentThread(state);
-        if(state.getEventManager() != null) {
+        if (state.getEventManager() != null) {
             state.getEventManager().parseEventData(-1, message);
         }
     }

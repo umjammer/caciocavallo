@@ -25,41 +25,43 @@
 
 package net.java.openjdk.cacio.servlet;
 
-import java.awt.*;
-import java.io.*;
+import java.awt.Dimension;
+import java.io.IOException;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
-import javax.servlet.*;
-import javax.servlet.http.*;
+import net.java.openjdk.awt.peer.web.WebSessionState;
+import net.java.openjdk.cacio.servlet.transport.Transport;
 
-import net.java.openjdk.awt.peer.web.*;
-import net.java.openjdk.cacio.servlet.transport.*;
 
 /**
  * Servlet for actually starting an Application, after the environment (e.g.
  * screen-size and supported transport backends) has been set-up accordingly by
  * the SessionInitializeServlet.
- * 
+ * <p>
  * Usually called automatically by the client-initialization code, not by the
  * user.
- * 
+ *
  * @author Clemens Eisserer <linuxhippy@gmail.com>
  */
 public class AppStartServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-	int width = Integer.parseInt(request.getParameter("w"));
-	int height = Integer.parseInt(request.getParameter("h"));
-	String transport = request.getParameter("t");
+        int width = Integer.parseInt(request.getParameter("w"));
+        int height = Integer.parseInt(request.getParameter("h"));
+        String transport = request.getParameter("t");
 
-	WebSessionState state = WebSessionManager.getInstance().getSessionState(request);
-	if (state != null) {
-	    state.setInitialScreenDimension(new Dimension(width, height));
-	    state.setBackend(Transport.getTransportForName(transport, state.getCompressLevel()));
-	    
-	    if(!state.isContextInitialized()) {
-		new AppContextCreator().startAppInNewAppContext(state);
-	    }
-	}
+        WebSessionState state = WebSessionManager.getInstance().getSessionState(request);
+        if (state != null) {
+            state.setInitialScreenDimension(new Dimension(width, height));
+            state.setBackend(Transport.getTransportForName(transport, state.getCompressLevel()));
+
+            if (!state.isContextInitialized()) {
+                new AppContextCreator().startAppInNewAppContext(state);
+            }
+        }
     }
 }

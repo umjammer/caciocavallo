@@ -24,7 +24,6 @@
  */
 
 
-
 import java.awt.Button;
 import java.awt.Color;
 import java.awt.Font;
@@ -34,6 +33,7 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
 import sun.awt.AWTAccessor;
+
 
 public class TestPanel {
 

@@ -25,19 +25,26 @@
 
 package net.java.openjdk.cacio.servlet;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.lang.System.Logger;
 import java.lang.System.Logger.Level;
 import java.nio.charset.StandardCharsets;
-import java.util.*;
+import java.util.ArrayList;
 import javax.servlet.ServletException;
-import javax.servlet.http.*;
-import net.java.openjdk.awt.peer.web.*;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
+import net.java.openjdk.awt.peer.web.WebSessionState;
+
 
 /**
  * Servlet downloading the html/javascript code and pre-initializing the
  * session.
- * 
+ *
  * @author Clemens Eisserer <linuxhippy@gmail.com>
  */
 public class SessionInitializeServlet extends HttpServlet {
@@ -47,86 +54,86 @@ public class SessionInitializeServlet extends HttpServlet {
     String startHtml = null;
 
     public SessionInitializeServlet() throws Exception {
-	startHtml = loadStartHTML();
+        startHtml = loadStartHTML();
     }
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-	String className = request.getParameter("cls");
-	String format = request.getParameter("format");
-	format = (format != null && !format.trim().isEmpty()) ? format.toLowerCase() : "rle";
+        String className = request.getParameter("cls");
+        String format = request.getParameter("format");
+        format = (format != null && !format.trim().isEmpty()) ? format.toLowerCase() : "rle";
 
-	String subSessionStr = request.getParameter("ssid");
-	if (subSessionStr == null) {
-	    HttpSession session = request.getSession();
-	    System.out.println("Starter-Session: " + session.getId());
-	    System.out.println("Loading Application Class: " + className);
+        String subSessionStr = request.getParameter("ssid");
+        if (subSessionStr == null) {
+            HttpSession session = request.getSession();
+            System.out.println("Starter-Session: " + session.getId());
+            System.out.println("Loading Application Class: " + className);
 
-	    WebSessionState state = WebSessionManager.getInstance().register(session);
-	    state.setCmdLineParams(generateParameterArray(request));
-	    state.setMainClsName(className);
-	    state.setCompressLevel(getCompressionLevel(request));
-	    subSessionStr = String.valueOf(state.getSubSessionID());
-	}
+            WebSessionState state = WebSessionManager.getInstance().register(session);
+            state.setCmdLineParams(generateParameterArray(request));
+            state.setMainClsName(className);
+            state.setCompressLevel(getCompressionLevel(request));
+            subSessionStr = String.valueOf(state.getSubSessionID());
+        }
 
-	response.setContentType("text/html");
-	String ssidStartHtml = startHtml.replaceAll("SSID", subSessionStr);
-	ssidStartHtml = ssidStartHtml.replaceAll("IMGFORMAT", "\"" + format + "\"");
-	response.getWriter().write(ssidStartHtml);
+        response.setContentType("text/html");
+        String ssidStartHtml = startHtml.replaceAll("SSID", subSessionStr);
+        ssidStartHtml = ssidStartHtml.replaceAll("IMGFORMAT", "\"" + format + "\"");
+        response.getWriter().write(ssidStartHtml);
     }
 
     /**
      * Helper-Method for parsing the compressionLevel for png compression out of
      * the parameter-stream. If compressionLevel can not be determined, the
      * default value 2 will be used.
-     * 
+     *
      * @param request
      * @return
      */
     protected int getCompressionLevel(HttpServletRequest request) {
-	String cLevelStr = request.getParameter("clevel");
-	int cLevel = 2;
+        String cLevelStr = request.getParameter("clevel");
+        int cLevel = 2;
 
-	if (cLevelStr != null) {
-	    try {
-		cLevel = Integer.parseInt(cLevelStr);
-	    } catch (Exception ex) {
-            logger.log(Level.ERROR, ex.getMessage(), ex);
-	    }
-	}
-	return cLevel;
+        if (cLevelStr != null) {
+            try {
+                cLevel = Integer.parseInt(cLevelStr);
+            } catch (Exception ex) {
+                logger.log(Level.ERROR, ex.getMessage(), ex);
+            }
+        }
+        return cLevel;
     }
 
     /**
      * Parses the parameters supplied as part of the URL
-     * 
+     *
      * @param request
      * @return the parameters contained in a list
      */
     protected String[] generateParameterArray(HttpServletRequest request) {
-	ArrayList<String> paramList = new ArrayList<>();
+        ArrayList<String> paramList = new ArrayList<>();
 
-	String paramValue = null;
-	while ((paramValue = request.getParameter("param" + paramList.size())) != null) {
-	    paramList.add(paramValue);
-	}
+        String paramValue = null;
+        while ((paramValue = request.getParameter("param" + paramList.size())) != null) {
+            paramList.add(paramValue);
+        }
 
-	return paramList.toArray(String[]::new);
+        return paramList.toArray(String[]::new);
     }
 
     /**
      * Loads the html code from the classpath.
-     * 
+     *
      * @return
      * @throws Exception
      */
     protected String loadStartHTML() throws Exception {
-	StringBuilder htmlBuilder = new StringBuilder(8192);
-	Reader r = new InputStreamReader(getClass().getResourceAsStream("/StreamBase.html"), StandardCharsets.UTF_8);
-	int read;
-	while ((read = r.read()) != -1) {
-	    htmlBuilder.append((char) read);
-	}
-	return htmlBuilder.toString();
+        StringBuilder htmlBuilder = new StringBuilder(8192);
+        Reader r = new InputStreamReader(getClass().getResourceAsStream("/StreamBase.html"), StandardCharsets.UTF_8);
+        int read;
+        while ((read = r.read()) != -1) {
+            htmlBuilder.append((char) read);
+        }
+        return htmlBuilder.toString();
     }
 }

@@ -37,68 +37,56 @@ exception statement from your version. */
 
 package gnu.java.awt.peer.x;
 
+import java.lang.System.Logger;
+import java.lang.System.Logger.Level;
 import java.nio.charset.Charset;
 
 import sun.awt.FontConfiguration;
 import sun.font.SunFontManager;
 
-public class EscherFontConfiguration
-    extends FontConfiguration
-{
 
-  public EscherFontConfiguration(SunFontManager fm)
-  {
-    super(fm);
-    init();
-  }
+public class EscherFontConfiguration extends FontConfiguration {
 
-  @Override
-  protected Charset getDefaultFontCharset(String fontName)
-  {
-    // TODO Auto-generated method stub
-    System.err.println("IMPLEMENT ME: EscherFontConfiguration.getDefaultFontCharset");
-    return null;
-  }
+    private static final Logger logger = System.getLogger(EscherFontConfiguration.class.getName());
 
-  @Override
-  protected String getEncoding(String awtFontName,
-                               String characterSubsetName)
-  {
-    // TODO Auto-generated method stub
-    System.err.println("IMPLEMENT ME: EscherFontConfiguration.getEncoding");
-    return null;
-  }
+    public EscherFontConfiguration(SunFontManager fm) {
+        super(fm);
+        init();
+    }
 
-  @Override
-  protected String getFaceNameFromComponentFontName(String componentFontName)
-  {
-    // TODO Auto-generated method stub
-    //System.err.println("IMPLEMENT ME: EscherFontConfiguration.getFaceNameFromComponentFontName: " + componentFontName);
-    // MFontConfiguration also returns null here, so maybe this is ok.
-    return null;
-  }
+    @Override
+    protected Charset getDefaultFontCharset(String fontName) {
+        logger.log(Level.DEBUG, "IMPLEMENT ME: EscherFontConfiguration.getDefaultFontCharset");
+        return null;
+    }
 
-  @Override
-  public String getFallbackFamilyName(String fontName, String defaultFallback)
-  {
-    // TODO Auto-generated method stub
-    System.err.println("IMPLEMENT ME: EscherFontConfiguration.getFallbackFamilyName");
-    return null;
-  }
+    @Override
+    protected String getEncoding(String awtFontName, String characterSubsetName) {
+        logger.log(Level.DEBUG, "IMPLEMENT ME: EscherFontConfiguration.getEncoding");
+        return null;
+    }
 
-  @Override
-  protected String getFileNameFromComponentFontName(String componentFontName)
-  {
-    // TODO Auto-generated method stub
-    System.err.println("IMPLEMENT ME: EscherFontConfiguration.getFileNameFromComponentFontName: " + componentFontName);
-    return null;
-  }
+    @Override
+    protected String getFaceNameFromComponentFontName(String componentFontName) {
+        //logger.log(Level.DEBUG, "IMPLEMENT ME: EscherFontConfiguration.getFaceNameFromComponentFontName: " + componentFontName);
+        // MFontConfiguration also returns null here, so maybe this is ok.
+        return null;
+    }
 
-  @Override
-  protected void initReorderMap()
-  {
-    // TODO Auto-generated method stub
-    System.err.println("IMPLEMENT ME: EscherFontConfiguration.initReorderMap");
-  }
+    @Override
+    public String getFallbackFamilyName(String fontName, String defaultFallback) {
+        logger.log(Level.DEBUG, "IMPLEMENT ME: EscherFontConfiguration.getFallbackFamilyName");
+        return null;
+    }
 
+    @Override
+    protected String getFileNameFromComponentFontName(String componentFontName) {
+        logger.log(Level.DEBUG, "IMPLEMENT ME: EscherFontConfiguration.getFileNameFromComponentFontName: " + componentFontName);
+        return null;
+    }
+
+    @Override
+    protected void initReorderMap() {
+        logger.log(Level.DEBUG, "IMPLEMENT ME: EscherFontConfiguration.initReorderMap");
+    }
 }

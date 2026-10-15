@@ -25,20 +25,21 @@
 
 package net.java.openjdk.awt.peer.web;
 
-import java.awt.*;
-import java.awt.peer.*;
+import java.awt.Dimension;
+import java.awt.peer.SystemTrayPeer;
+
 
 /**
  * Rudimentary WebSystemTrayPeer Implementation for Caciocavallo-Web.
  * Required for AppContext.dispose(), so give it one.
- * 
+ *
  * @author Clemens Eisserer <linuxhippy@gmail.com>
  */
 public class WebSystemTrayPeer implements SystemTrayPeer {
 
     @Override
     public Dimension getTrayIconSize() {
-	return new Dimension(0, 0);
+        return new Dimension(0, 0);
     }
 
 }

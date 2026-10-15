@@ -25,7 +25,16 @@
 
 package net.java.openjdk.awt.peer.web;
 
-import java.awt.*;
+import java.awt.AWTException;
+import java.awt.Desktop;
+import java.awt.Frame;
+import java.awt.GraphicsConfiguration;
+import java.awt.GraphicsDevice;
+import java.awt.HeadlessException;
+import java.awt.PrintJob;
+import java.awt.SystemTray;
+import java.awt.TrayIcon;
+import java.awt.Window;
 import java.awt.datatransfer.Clipboard;
 import java.awt.dnd.DragGestureEvent;
 import java.awt.dnd.InvalidDnDOperationException;
@@ -34,29 +43,34 @@ import java.awt.font.TextAttribute;
 import java.awt.im.InputMethodHighlight;
 import java.awt.im.spi.InputMethodDescriptor;
 import java.awt.image.ColorModel;
-import java.awt.peer.*;
+import java.awt.peer.DesktopPeer;
+import java.awt.peer.FontPeer;
+import java.awt.peer.FramePeer;
+import java.awt.peer.RobotPeer;
+import java.awt.peer.SystemTrayPeer;
+import java.awt.peer.TrayIconPeer;
 import java.util.Map;
 import java.util.Properties;
-
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import net.java.openjdk.cacio.servlet.*;
-
-import sun.awt.*;
-import sun.awt.datatransfer.DataTransferer;
 import com.github.caciocavallosilano.cacio.peer.CacioToolkit;
 import com.github.caciocavallosilano.cacio.peer.PlatformWindowFactory;
+import net.java.openjdk.cacio.servlet.WebSessionManager;
+import sun.awt.LightweightFrame;
+import sun.awt.datatransfer.DataTransferer;
+
 
 /**
  * Toolkit implementation for Caciocavallo-Web
+ *
  * @author Clemens Eisserer <linuxhippy@gmail.com>
  * @author Mario Torre <neugens.limasoftware@gmail.com>
  */
 public class WebToolkit extends CacioToolkit {
 
     private static final Logger logger =
-        Logger.getLogger("net.java.openjdk.awt.peer.web.CacioToolkit");
+            Logger.getLogger("net.java.openjdk.awt.peer.web.CacioToolkit");
 
     private PlatformWindowFactory platformWindow;
 
@@ -71,12 +85,12 @@ public class WebToolkit extends CacioToolkit {
 
     @Override
     public synchronized PlatformWindowFactory getPlatformWindowFactory() {
-	WebSessionState state = WebSessionManager.getInstance().getCurrentState();
-        
-	WebWindowFactory factory;
-	if ((factory = state.getWindowFactory()) == null) {
-	    factory = new WebWindowFactory();
-	   state.setWindowFactory(factory);
+        WebSessionState state = WebSessionManager.getInstance().getCurrentState();
+
+        WebWindowFactory factory;
+        if ((factory = state.getWindowFactory()) == null) {
+            factory = new WebWindowFactory();
+            state.setWindowFactory(factory);
         }
         return factory;
     }
@@ -93,12 +107,12 @@ public class WebToolkit extends CacioToolkit {
 
     @Override
     public SystemTrayPeer createSystemTray(SystemTray target) {
-	return new WebSystemTrayPeer();
+        return new WebSystemTrayPeer();
     }
 
     @Override
     public boolean isTraySupported() {
-	return false;
+        return false;
     }
 
     @Override
@@ -111,15 +125,15 @@ public class WebToolkit extends CacioToolkit {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
-        protected int getScreenWidth() {
-        
+    protected int getScreenWidth() {
+
         GraphicsConfiguration config =
                 WebGraphicsConfiguration.getDefaultConfiguration();
         return config.getBounds().width;
     }
 
-        protected int getScreenHeight() {
-        
+    protected int getScreenHeight() {
+
         GraphicsConfiguration config =
                 WebGraphicsConfiguration.getDefaultConfiguration();
         return config.getBounds().height;
@@ -132,12 +146,12 @@ public class WebToolkit extends CacioToolkit {
 
     @Override
     public void grab(Window w) {
-	System.out.println("Grabbing not implemented: grab");
+        System.out.println("Grabbing not implemented: grab");
     }
 
     @Override
     public void ungrab(Window w) {
-	System.out.println("Grabbing not implemented: ungrab");
+        System.out.println("Grabbing not implemented: ungrab");
     }
 
     @Override
@@ -175,7 +189,7 @@ public class WebToolkit extends CacioToolkit {
     @Override
     public PrintJob getPrintJob(Frame frame, String jobtitle,
                                 Properties props) {
-        
+
         throw new UnsupportedOperationException("Not supported yet.");
     }
 

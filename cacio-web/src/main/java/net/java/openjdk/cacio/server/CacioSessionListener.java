@@ -25,21 +25,24 @@
 
 package net.java.openjdk.cacio.server;
 
-import javax.servlet.http.*;
+import javax.servlet.http.HttpSessionEvent;
+import javax.servlet.http.HttpSessionListener;
 
-import net.java.openjdk.cacio.servlet.*;
+import net.java.openjdk.cacio.servlet.WebSessionManager;
+
 
 /**
  * Session-Timeout listener, disposes the session which timed out.
- * 
+ *
  * @author Clemens Eisserer <linuxhippy@gmail.com>
  */
 public class CacioSessionListener implements HttpSessionListener {
+
     @Override
     public void sessionDestroyed(HttpSessionEvent ev) {
-	WebSessionManager.getInstance().disposeSession(ev.getSession());
+        WebSessionManager.getInstance().disposeSession(ev.getSession());
     }
-    
+
     @Override
     public void sessionCreated(HttpSessionEvent ev) {
     }

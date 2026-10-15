@@ -25,16 +25,18 @@
 
 package net.java.openjdk.awt.peer.web;
 
-import java.awt.event.*;
-import java.util.*;
+import java.awt.event.MouseEvent;
+import java.util.HashMap;
 
-import com.github.caciocavallosilano.cacio.peer.managed.*;
+import com.github.caciocavallosilano.cacio.peer.managed.EventData;
+
 
 /**
- * 
+ *
  * @author Clemens Eisserer <linuxhippy@gmail.com>
  */
 public class WebMouseStateTracker {
+
     final WebScreen screen;
 
     EventData lastMouseEvent = null;
@@ -42,45 +44,45 @@ public class WebMouseStateTracker {
     final HashMap<Integer, Boolean> pressedMap = new HashMap<>();
 
     public WebMouseStateTracker(WebScreen screen) {
-	this.screen = screen;
+        this.screen = screen;
     }
-    
+
     public void trackMouseWheelEvent(boolean up, int x, int y) {
-	EventData data = new EventData();
-	data.setX(x);
-	data.setY(y);
-	data.setId(MouseEvent.MOUSE_WHEEL);
-	data.setButton(up ? 4 : 5);
-	
-	screen.dispatchEvent(data);
+        EventData data = new EventData();
+        data.setX(x);
+        data.setY(y);
+        data.setId(MouseEvent.MOUSE_WHEEL);
+        data.setButton(up ? 4 : 5);
+
+        screen.dispatchEvent(data);
     }
 
     public void trackMouseMotionEvent(int x, int y) {
-	EventData data = new EventData();
-	data.setX(x);
-	data.setY(y);
+        EventData data = new EventData();
+        data.setX(x);
+        data.setY(y);
 
-	//TODO: Generalize for many buttons
-	Boolean pressedResult = pressedMap.get(MouseEvent.BUTTON1);
-	if (pressedResult != null && pressedResult) {
-	    data.setModifiers(lastMouseEvent.getModifiers());
-	    data.setId(MouseEvent.MOUSE_DRAGGED);
-	} else {
-	    data.setId(MouseEvent.MOUSE_MOVED);
-	}
+        //TODO: Generalize for many buttons
+        Boolean pressedResult = pressedMap.get(MouseEvent.BUTTON1);
+        if (pressedResult != null && pressedResult) {
+            data.setModifiers(lastMouseEvent.getModifiers());
+            data.setId(MouseEvent.MOUSE_DRAGGED);
+        } else {
+            data.setId(MouseEvent.MOUSE_MOVED);
+        }
 
-	screen.dispatchEvent(data);
+        screen.dispatchEvent(data);
     }
 
     public void trackMouseEvent(boolean down, int buttonMask, int x, int y) {
-	EventData data = new EventData();
-	data.setSource(screen);
-	data.setX(x);
-	data.setY(y);
-	data.setId(down ? MouseEvent.MOUSE_PRESSED : MouseEvent.MOUSE_RELEASED);
-	data.setButton(jsButtonMaskToJava(buttonMask));
-	data.setModifiers(jsButtonMaskToJavaMask(buttonMask));
-	data.setTime(System.currentTimeMillis());
+        EventData data = new EventData();
+        data.setSource(screen);
+        data.setX(x);
+        data.setY(y);
+        data.setId(down ? MouseEvent.MOUSE_PRESSED : MouseEvent.MOUSE_RELEASED);
+        data.setButton(jsButtonMaskToJava(buttonMask));
+        data.setModifiers(jsButtonMaskToJavaMask(buttonMask));
+        data.setTime(System.currentTimeMillis());
 
 //	if (lastClickedEvent != null && (System.currentTimeMillis() - lastClickedEvent.getTime()) <= 200) {
 //	    data.setClickCount(2);
@@ -88,20 +90,20 @@ public class WebMouseStateTracker {
 //	    data.setClickCount(1);
 //	}
 
-	screen.dispatchEvent(data);
+        screen.dispatchEvent(data);
 
-	switch (data.getId()) {
-	case MouseEvent.MOUSE_PRESSED:
-	    pressedMap.put(data.getButton(), Boolean.TRUE);
-	    break;
+        switch (data.getId()) {
+            case MouseEvent.MOUSE_PRESSED:
+                pressedMap.put(data.getButton(), Boolean.TRUE);
+                break;
 
-	case MouseEvent.MOUSE_RELEASED:
-	    pressedMap.put(data.getButton(), Boolean.FALSE);
-	    generateClickedEvent(data);
-	    break;
-	}
+            case MouseEvent.MOUSE_RELEASED:
+                pressedMap.put(data.getButton(), Boolean.FALSE);
+                generateClickedEvent(data);
+                break;
+        }
 
-	this.lastMouseEvent = data;
+        this.lastMouseEvent = data;
     }
 
     protected int jsButtonMaskToJava(int jsButtonMask) {
@@ -125,21 +127,21 @@ public class WebMouseStateTracker {
     }
 
     protected void generateClickedEvent(EventData origData) {
-	EventData synthData = new EventData();
-	synthData.setX(origData.getX());
-	synthData.setY(origData.getY());
-	synthData.setId(MouseEvent.MOUSE_CLICKED);
-	synthData.setModifiers(MouseEvent.BUTTON1);
-	synthData.setButton(MouseEvent.BUTTON1);
-	synthData.setSource(origData.getSource());
-	synthData.setTime(System.currentTimeMillis());
-	synthData.setClickCount(1);
+        EventData synthData = new EventData();
+        synthData.setX(origData.getX());
+        synthData.setY(origData.getY());
+        synthData.setId(MouseEvent.MOUSE_CLICKED);
+        synthData.setModifiers(MouseEvent.BUTTON1);
+        synthData.setButton(MouseEvent.BUTTON1);
+        synthData.setSource(origData.getSource());
+        synthData.setTime(System.currentTimeMillis());
+        synthData.setClickCount(1);
 
-	if (lastClickedEvent != null && (System.currentTimeMillis() - lastClickedEvent.getTime()) <= 200) {
-	    synthData.setClickCount(2);
-	}
-	screen.dispatchEvent(synthData);
+        if (lastClickedEvent != null && (System.currentTimeMillis() - lastClickedEvent.getTime()) <= 200) {
+            synthData.setClickCount(2);
+        }
+        screen.dispatchEvent(synthData);
 
-	lastClickedEvent = synthData;
+        lastClickedEvent = synthData;
     }
 }

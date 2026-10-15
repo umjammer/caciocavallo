@@ -25,25 +25,30 @@
 
 package net.java.openjdk.awt.peer.web;
 
-import java.awt.*;
+import java.awt.Dimension;
+import java.awt.EventQueue;
+import java.awt.Window;
+import java.awt.event.InvocationEvent;
+import java.lang.reflect.Method;
+import java.util.HashMap;
+import java.util.concurrent.locks.ReentrantLock;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
-import java.awt.event.*;
-import java.lang.reflect.*;
-import java.util.*;
-import java.util.concurrent.locks.*;
-import java.util.logging.*;
+import net.java.openjdk.cacio.servlet.transport.Transport;
+import sun.awt.AppContext;
+import sun.awt.SunToolkit;
 
-import net.java.openjdk.cacio.servlet.transport.*;
-import sun.awt.*;
 
 /**
  * WebSessionState holds, as its name implies, session-related state. It
  * provides access to the AWT "session" represented by AppContexts, from the
  * servlet session.
- * 
+ *
  * @author Clemens Eisserer <linuxhippy@gmail.com>
  */
 public class WebSessionState {
+
     private final Logger logger = Logger.getLogger(this.getClass().getName());
 
     final ReentrantLock sessionLock = new ReentrantLock();
@@ -64,149 +69,149 @@ public class WebSessionState {
     final HashMap<Integer, WebSessionState> subSessionMap;
 
     volatile boolean contextInitialized = false;
-    
+
     public WebSessionState(int subSessionID, HashMap<Integer, WebSessionState> subSessionMap) {
-	this.subSessionID = subSessionID;
-	this.subSessionMap = subSessionMap;
+        this.subSessionID = subSessionID;
+        this.subSessionMap = subSessionMap;
     }
 
     /**
      * Lock the session lock
      */
     public void lockSession() {
-	sessionLock.lock();
+        sessionLock.lock();
     }
 
     /**
      * Unlock the session lock
      */
     public void unlockSession() {
-	sessionLock.unlock();
+        sessionLock.unlock();
     }
 
     public WebGraphicsConfiguration getGraphicsConfiguration() {
-	return config;
+        return config;
     }
 
     /**
      * Set the GraphicsConfiguration, and initialize InputState trackers
-     * 
+     *
      * @param config
      */
     public void setGraphicsConfiguration(WebGraphicsConfiguration config) {
-	this.config = config;
-	eventManager = new WebEventManager(this);
+        this.config = config;
+        eventManager = new WebEventManager(this);
     }
 
 
     public int getSubSessionID() {
-	return subSessionID;
+        return subSessionID;
     }
 
     public AppContext getAppContext() {
-	return appContext;
+        return appContext;
     }
 
     public void setAppContext(AppContext appContext) {
-	this.appContext = appContext;
+        this.appContext = appContext;
     }
 
     public void dispose() {
-	if (appContext != null) {
-	    logSessionDispose();
-	    
-	    SunToolkit.postEvent(appContext, new InvocationEvent(this, () -> {
-            Window[] windowArray = Window.getWindows();
-            for(Window w : windowArray) {
-            w.dispose();
-            }
-        }));
-	    
-	    appContext.dispose();
-	}
-	screen = null;
-	windowFactory = null;
-	focusManager = null;
+        if (appContext != null) {
+            logSessionDispose();
+
+            SunToolkit.postEvent(appContext, new InvocationEvent(this, () -> {
+                Window[] windowArray = Window.getWindows();
+                for (Window w : windowArray) {
+                    w.dispose();
+                }
+            }));
+
+            appContext.dispose();
+        }
+        screen = null;
+        windowFactory = null;
+        focusManager = null;
     }
 
     private void logSessionDispose() {
-	EventQueue queue = (EventQueue) appContext.get(AppContext.EVENT_QUEUE_KEY);
-	if (queue != null) {
-	    try {
-		Method getDispatchThreadMethod = queue.getClass().getDeclaredMethod("getDispatchThread");
-		getDispatchThreadMethod.setAccessible(true);
-		Thread edt = (Thread) getDispatchThreadMethod.invoke(queue, new Object[0]);
-		if(edt != null) {
-		    logger.log(Level.INFO, "Shutting down: " + edt.getName());
-		}
-	    } catch (ReflectiveOperationException ex) {
-		logger.log(Level.WARNING, "Unable to reflectivly accessing the EventQueue's Dispatch Thread", ex);
-	    }
-	}
+        EventQueue queue = (EventQueue) appContext.get(AppContext.EVENT_QUEUE_KEY);
+        if (queue != null) {
+            try {
+                Method getDispatchThreadMethod = queue.getClass().getDeclaredMethod("getDispatchThread");
+                getDispatchThreadMethod.setAccessible(true);
+                Thread edt = (Thread) getDispatchThreadMethod.invoke(queue, new Object[0]);
+                if (edt != null) {
+                    logger.log(Level.INFO, "Shutting down: " + edt.getName());
+                }
+            } catch (ReflectiveOperationException ex) {
+                logger.log(Level.WARNING, "Unable to reflectivly accessing the EventQueue's Dispatch Thread", ex);
+            }
+        }
     }
 
     public String[] getCmdLineParams() {
-	return cmdLineParams;
+        return cmdLineParams;
     }
 
     public void setCmdLineParams(String[] cmdLineParams) {
-	this.cmdLineParams = cmdLineParams;
+        this.cmdLineParams = cmdLineParams;
     }
 
     public String getMainClsName() {
-	return mainClsName;
+        return mainClsName;
     }
 
     public void setMainClsName(String mainClsName) {
-	this.mainClsName = mainClsName;
+        this.mainClsName = mainClsName;
     }
 
     public Dimension getInitialScreenDimension() {
-	return initialScreenDimension;
+        return initialScreenDimension;
     }
 
     public void setInitialScreenDimension(Dimension initialScreenDimension) {
-	this.initialScreenDimension = initialScreenDimension;
+        this.initialScreenDimension = initialScreenDimension;
     }
 
     public Transport getBackend() {
-	return backend;
+        return backend;
     }
 
     public void setBackend(Transport backend) {
-	this.backend = backend;
+        this.backend = backend;
     }
 
     public int getCompressLevel() {
-	return compressLevel;
+        return compressLevel;
     }
 
     public void setCompressLevel(int compressLevel) {
-	this.compressLevel = compressLevel;
+        this.compressLevel = compressLevel;
     }
 
     public WebScreen getScreen() {
-	return screen;
+        return screen;
     }
 
     public void setScreen(WebScreen screen) {
-	this.screen = screen;
+        this.screen = screen;
     }
 
     public WebWindowFactory getWindowFactory() {
-	return windowFactory;
+        return windowFactory;
     }
 
     public void setWindowFactory(WebWindowFactory windowFactory) {
-	this.windowFactory = windowFactory;
+        this.windowFactory = windowFactory;
     }
 
     public WebFocusManager getFocusManager() {
-	return focusManager;
+        return focusManager;
     }
 
     public void setFocusManager(WebFocusManager focusManager) {
-	this.focusManager = focusManager;
+        this.focusManager = focusManager;
     }
 
     public WebEventManager getEventManager() {

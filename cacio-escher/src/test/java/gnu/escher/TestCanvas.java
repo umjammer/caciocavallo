@@ -6,6 +6,7 @@ import java.awt.Frame;
 import java.awt.Graphics;
 import java.awt.GridLayout;
 
+
 public class TestCanvas extends Canvas {
 
     /**

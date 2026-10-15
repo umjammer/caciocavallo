@@ -25,13 +25,16 @@
 
 package net.java.openjdk.cacio.servlet.transport;
 
-import java.io.*;
-import java.util.*;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.util.List;
+
 
 /**
  * Base-class for Transports sending data in a binary format, using XHR1/2 to
  * retrieve the data on the client-side.
- * 
+ *
  * @author Clemens Eisserer <linuxhippy@gmail.com>
  */
 public abstract class BinaryTransport extends Transport {
@@ -39,28 +42,28 @@ public abstract class BinaryTransport extends Transport {
     final byte[] emptyResponseData;
 
     public BinaryTransport() {
-	super("application/binary");
+        super("application/binary");
 
-	emptyResponseData = new byte[2];
-	emptyResponseData[0] = 0;
-	emptyResponseData[1] = 0;
+        emptyResponseData = new byte[2];
+        emptyResponseData[0] = 0;
+        emptyResponseData[1] = 0;
     }
 
     /**
      * Encodes the command-list
-     * 
+     *
      * @param cmdList
      * @return byte array containing the encoded values
      */
     protected byte[] encodeImageCmdStream(List<Integer> cmdList) {
-	ByteArrayOutputStream bos = new ByteArrayOutputStream(cmdList.size() * 2 + 2);
+        ByteArrayOutputStream bos = new ByteArrayOutputStream(cmdList.size() * 2 + 2);
 
-	writeJSShort(bos, cmdList.size());
-	for (int value : cmdList) {
-	    writeJSShort(bos, value);
-	}
+        writeJSShort(bos, cmdList.size());
+        for (int value : cmdList) {
+            writeJSShort(bos, value);
+        }
 
-	return bos.toByteArray();
+        return bos.toByteArray();
     }
 
     /**
@@ -68,22 +71,22 @@ public abstract class BinaryTransport extends Transport {
      * sign-representation so that it can be easier re-constructed on the
      * JavaScript side compared to simply writing those values byte-for-byte
      * out.
-     * 
+     *
      * @param bos
      * @param value
      */
     protected void writeJSShort(ByteArrayOutputStream bos, int value) {
-	int sign = value >= 0 ? 0 : 1;
-	int absValue = Math.abs(value);
+        int sign = value >= 0 ? 0 : 1;
+        int absValue = Math.abs(value);
 
-	int highByte = ((absValue & 32512) >> 8) + (sign << 7);
-	int lowByte = absValue & 0x000000FF;
+        int highByte = ((absValue & 32512) >> 8) + (sign << 7);
+        int lowByte = absValue & 0x000000FF;
 
-	bos.write(highByte);
-	bos.write(lowByte);
+        bos.write(highByte);
+        bos.write(lowByte);
     }
 
     protected void writeEmptyData(OutputStream os) throws IOException {
-	os.write(emptyResponseData);
+        os.write(emptyResponseData);
     }
 }

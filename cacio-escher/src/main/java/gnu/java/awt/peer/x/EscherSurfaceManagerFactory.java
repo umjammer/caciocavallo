@@ -38,18 +38,14 @@ exception statement from your version. */
 package gnu.java.awt.peer.x;
 
 import sun.awt.image.SunVolatileImage;
-import sun.awt.image.VolatileSurfaceManager;
 import sun.awt.image.SurfaceManager;
+import sun.awt.image.VolatileSurfaceManager;
 
-class EscherSurfaceManagerFactory
-    implements SurfaceManager.Factory
-{
 
-  @Override
-  public VolatileSurfaceManager createVolatileManager(SunVolatileImage image,
-                                                      Object context)
-  {
-    return new EscherVolatileSurfaceManager(image, context);
-  }
+class EscherSurfaceManagerFactory implements SurfaceManager.Factory {
 
+    @Override
+    public VolatileSurfaceManager createVolatileManager(SunVolatileImage image, Object context) {
+        return new EscherVolatileSurfaceManager(image, context);
+    }
 }

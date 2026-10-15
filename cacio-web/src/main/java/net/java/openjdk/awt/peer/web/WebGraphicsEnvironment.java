@@ -26,7 +26,9 @@
 package net.java.openjdk.awt.peer.web;
 
 import java.awt.GraphicsDevice;
+
 import sun.java2d.SunGraphicsEnvironment;
+
 
 /**
  * Graphics Environment implementation for caciocavallo-web.

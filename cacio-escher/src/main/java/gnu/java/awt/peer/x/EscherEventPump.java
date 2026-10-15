@@ -28,8 +28,13 @@ package gnu.java.awt.peer.x;
 import java.awt.Component;
 import java.awt.GraphicsEnvironment;
 import java.awt.event.MouseEvent;
+import java.lang.System.Logger;
+import java.lang.System.Logger.Level;
 import java.util.HashMap;
+import java.util.Map;
 
+import com.github.caciocavallosilano.cacio.peer.CacioComponent;
+import com.github.caciocavallosilano.cacio.peer.CacioEventPump;
 import gnu.x11.Display;
 import gnu.x11.event.ButtonPress;
 import gnu.x11.event.ButtonRelease;
@@ -37,12 +42,13 @@ import gnu.x11.event.Event;
 import gnu.x11.event.Expose;
 import gnu.x11.event.MotionNotify;
 import sun.awt.SunToolkit;
-import com.github.caciocavallosilano.cacio.peer.CacioComponent;
-import com.github.caciocavallosilano.cacio.peer.CacioEventPump;
+
 
 class EscherEventPump extends CacioEventPump<Event> {
 
-    private final HashMap<Long, EscherPlatformWindow> windowMap;
+    private static final Logger logger = System.getLogger(EscherEventPump.class.getName());
+
+    private final Map<Long, EscherPlatformWindow> windowMap;
 
     EscherEventPump() {
         windowMap = new HashMap<>();
@@ -58,7 +64,7 @@ class EscherEventPump extends CacioEventPump<Event> {
             SunToolkit.awtUnlock();
         }
         if (eventData == null) {
-            try { Thread.sleep(10); } catch (InterruptedException ex) { }
+            try { Thread.sleep(10); } catch (InterruptedException _) {}
         }
         return eventData;
     }
@@ -76,7 +82,7 @@ class EscherEventPump extends CacioEventPump<Event> {
                 EscherPlatformWindow w = windowMap.get((long) event.getWindowID());
                 CacioComponent source = w.getCacioComponent();
                 Component c = source.getAWTComponent();
-System.err.println("EscherEventPump::dispatchNativeEvent: exposing: " + c);
+                logger.log(Level.DEBUG, "EscherEventPump::dispatchNativeEvent: exposing: " + c);
                 postPaintEvent(source, 0, 0, c.getWidth(), c.getHeight());
                 break;
             }
@@ -92,7 +98,7 @@ System.err.println("EscherEventPump::dispatchNativeEvent: exposing: " + c);
                 EscherPlatformWindow w = windowMap.get((long) event.getEventWindowID());
                 CacioComponent source = w.getCacioComponent();
                 /* TODO: Fix mods. */
-System.err.println("EscherEventPump::dispatchNativeEvent: BUTTON_PRESS");
+                logger.log(Level.DEBUG, "EscherEventPump::dispatchNativeEvent: BUTTON_PRESS");
                 postMouseEvent(source, MouseEvent.MOUSE_PRESSED, System.currentTimeMillis(), MouseEvent.BUTTON1_DOWN_MASK, event.getEventX(), event.getEventY(), 0, false);
                 break;
             }
@@ -100,13 +106,13 @@ System.err.println("EscherEventPump::dispatchNativeEvent: BUTTON_PRESS");
                 ButtonRelease event = (ButtonRelease) nativeEvent;
                 EscherPlatformWindow w = windowMap.get((long) event.getEventWindowID());
                 CacioComponent source = w.getCacioComponent();
-                /* TODO: Fix mods. */
-System.err.println("EscherEventPump::dispatchNativeEvent: BUTTON_RELEASE");
+                // TODO: Fix mods.
+                logger.log(Level.DEBUG, "EscherEventPump::dispatchNativeEvent: BUTTON_RELEASE");
                 postMouseEvent(source, MouseEvent.MOUSE_RELEASED, System.currentTimeMillis(), 0, event.getEventX(), event.getEventY(), 0, false);
                 break;
             }
             default:
-System.err.println("EscherEventPump::dispatchNativeEvent: unhandled event type: " + nativeEvent.code());
+                logger.log(Level.DEBUG, "EscherEventPump::dispatchNativeEvent: unhandled event type: " + nativeEvent.code());
         }
     }
 

@@ -27,10 +27,12 @@ package sun.awt.peer.x11;
 
 import java.awt.GraphicsConfiguration;
 import java.awt.Transparency;
+
 import sun.awt.SunToolkit;
 import sun.awt.image.SunVolatileImage;
 import sun.awt.image.VolatileSurfaceManager;
 import sun.java2d.SurfaceData;
+
 
 class X11VolatileSurfaceManager extends VolatileSurfaceManager {
 
@@ -53,11 +55,11 @@ class X11VolatileSurfaceManager extends VolatileSurfaceManager {
         SunToolkit.awtLock();
         try {
             long drawable = initPixmap(X11GraphicsEnvironment.getDisplay(),
-                                       width, height);
+                    width, height);
             X11SurfaceData sd = new X11SurfaceData(X11SurfaceData.typeDefault,
-                                          gc.getColorModel(), width, height,
-                                          vImg.getGraphicsConfig(), vImg,
-                                          drawable);
+                    gc.getColorModel(), width, height,
+                    vImg.getGraphicsConfig(), vImg,
+                    drawable);
             return sd;
         } finally {
             SunToolkit.awtUnlock();

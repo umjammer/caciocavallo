@@ -37,15 +37,15 @@ exception statement from your version. */
 
 package gnu.java.awt.peer.x;
 
-import gnu.x11.Display;
-import gnu.x11.Screen;
-
 import java.awt.Dimension;
 import java.awt.GraphicsConfiguration;
 import java.awt.GraphicsDevice;
 import java.awt.Rectangle;
 import java.awt.geom.AffineTransform;
 import java.awt.image.ColorModel;
+
+import gnu.x11.Display;
+import gnu.x11.Screen;
 import sun.awt.image.SunVolatileImage;
 import sun.awt.image.SurfaceManager;
 import sun.awt.image.VolatileSurfaceManager;
@@ -54,119 +54,103 @@ import sun.java2d.loops.CompositeType;
 import sun.java2d.loops.RenderLoops;
 import sun.java2d.loops.SurfaceType;
 
-public class XGraphicsConfiguration
-    extends GraphicsConfiguration
-    implements SurfaceManager.Factory
-{
 
-  private final EscherSurfaceManagerFactory surfaceManagerFactory =
-      new EscherSurfaceManagerFactory();
+public class XGraphicsConfiguration extends GraphicsConfiguration
+        implements SurfaceManager.Factory {
 
-  @Override
-  public VolatileSurfaceManager createVolatileManager(SunVolatileImage image,
-                                                      Object context)
-  {
-    return surfaceManagerFactory.createVolatileManager(image, context);
-  }
+    private final EscherSurfaceManagerFactory surfaceManagerFactory = new EscherSurfaceManagerFactory();
 
-  static
-  {
-    System.setProperty("sun.java2d.volatilesurfacemanager",
-                       "gnu.java.awt.peer.x.EscherVolatileSurfaceManager");
-  }
-
-  XGraphicsDevice device;
-
-  private RenderLoops solidLoops;
-
-  XGraphicsConfiguration(XGraphicsDevice dev)
-  {
-    device = dev;
-  }
-
-  @Override
-  public GraphicsDevice getDevice()
-  {
-    return device;
-  }
-
-  @Override
-  public ColorModel getColorModel()
-  {
-    // TODO: Implement properly.
-    return ColorModel.getRGBdefault();
-  }
-
-  @Override
-  public ColorModel getColorModel(int transparency)
-  {
-    // TODO: Implement properly.
-    return ColorModel.getRGBdefault();
-  }
-
-  @Override
-  public AffineTransform getDefaultTransform()
-  {
-    return new AffineTransform();
-  }
-
-  @Override
-  public AffineTransform getNormalizingTransform()
-  {
-    // TODO: Implement this.
-    throw new UnsupportedOperationException("Not yet implemented.");
-  }
-
-  @Override
-  public Rectangle getBounds()
-  {
-    Display d = device.getDisplay();
-    Screen screen = d.getDefaultScreen();
-    
-    return new Rectangle(0, 0, screen.getWidth(), screen.getHeight()); 
-  }
-
-  /**
-   * Determines the size of the primary screen.
-   *
-   * @return the size of the primary screen
-   */
-  Dimension getSize()
-  {
-    // TODO: A GraphicsConfiguration should correspond to a Screen instance.
-    Display d = device.getDisplay();
-    Screen screen = d.getDefaultScreen();
-    int w = screen.getWidth();
-    int h = screen.getHeight();
-    return new Dimension(w, h);
-  }
-
-  /**
-   * Determines the resolution of the primary screen in pixel-per-inch.
-   *
-   * @return the resolution of the primary screen in pixel-per-inch
-   */
-  int getResolution()
-  {
-    Display d = device.getDisplay();
-    Screen screen = d.getDefaultScreen();
-    int w = screen.getWidth() * 254;
-    int h = screen.getHeight() * 254;
-    int wmm = screen.getWidthInMM() * 10;
-    int hmm = screen.getHeightInMM() * 10;
-    int xdpi = w / wmm;
-    int ydpi = h / hmm;
-    int dpi = (xdpi + ydpi) / 2;
-    return dpi;
-  }
-
-  synchronized RenderLoops getSolidLoops(SurfaceType stype)
-  {
-    if (solidLoops == null) {
-        solidLoops = SurfaceData.makeRenderLoops(SurfaceType.OpaqueColor,
-                                                 CompositeType.SrcNoEa,
-                                                 stype);
+    @Override
+    public VolatileSurfaceManager createVolatileManager(SunVolatileImage image, Object context) {
+        return surfaceManagerFactory.createVolatileManager(image, context);
     }
-    return solidLoops;
-}
+
+    static {
+        System.setProperty("sun.java2d.volatilesurfacemanager", "gnu.java.awt.peer.x.EscherVolatileSurfaceManager");
+    }
+
+    XGraphicsDevice device;
+
+    private RenderLoops solidLoops;
+
+    XGraphicsConfiguration(XGraphicsDevice dev) {
+        device = dev;
+    }
+
+    @Override
+    public GraphicsDevice getDevice() {
+        return device;
+    }
+
+    @Override
+    public ColorModel getColorModel() {
+        // TODO: Implement properly.
+        return ColorModel.getRGBdefault();
+    }
+
+    @Override
+    public ColorModel getColorModel(int transparency) {
+        // TODO: Implement properly.
+        return ColorModel.getRGBdefault();
+    }
+
+    @Override
+    public AffineTransform getDefaultTransform() {
+        return new AffineTransform();
+    }
+
+    @Override
+    public AffineTransform getNormalizingTransform() {
+        // TODO: Implement this.
+        throw new UnsupportedOperationException("Not yet implemented.");
+    }
+
+    @Override
+    public Rectangle getBounds() {
+        Display d = device.getDisplay();
+        Screen screen = d.getDefaultScreen();
+
+        return new Rectangle(0, 0, screen.getWidth(), screen.getHeight());
+    }
+
+    /**
+     * Determines the size of the primary screen.
+     *
+     * @return the size of the primary screen
+     */
+    Dimension getSize() {
+        // TODO: A GraphicsConfiguration should correspond to a Screen instance.
+        Display d = device.getDisplay();
+        Screen screen = d.getDefaultScreen();
+        int w = screen.getWidth();
+        int h = screen.getHeight();
+        return new Dimension(w, h);
+    }
+
+    /**
+     * Determines the resolution of the primary screen in pixel-per-inch.
+     *
+     * @return the resolution of the primary screen in pixel-per-inch
+     */
+    int getResolution() {
+        Display d = device.getDisplay();
+        Screen screen = d.getDefaultScreen();
+        int w = screen.getWidth() * 254;
+        int h = screen.getHeight() * 254;
+        int wmm = screen.getWidthInMM() * 10;
+        int hmm = screen.getHeightInMM() * 10;
+        int xdpi = w / wmm;
+        int ydpi = h / hmm;
+        int dpi = (xdpi + ydpi) / 2;
+        return dpi;
+    }
+
+    synchronized RenderLoops getSolidLoops(SurfaceType stype) {
+        if (solidLoops == null) {
+            solidLoops = SurfaceData.makeRenderLoops(SurfaceType.OpaqueColor,
+                    CompositeType.SrcNoEa,
+                    stype);
+        }
+        return solidLoops;
+    }
 }

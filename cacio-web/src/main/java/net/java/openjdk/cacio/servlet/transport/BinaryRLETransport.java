@@ -25,28 +25,34 @@
 
 package net.java.openjdk.cacio.servlet.transport;
 
-import java.awt.image.*;
-import java.io.*;
-import java.util.*;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.util.List;
 
-import net.java.openjdk.awt.peer.web.*;
-import net.java.openjdk.cacio.servlet.imgformat.*;
+import net.java.openjdk.awt.peer.web.BlitScreenUpdate;
+import net.java.openjdk.awt.peer.web.ScreenUpdate;
+import net.java.openjdk.awt.peer.web.TreeImagePacker;
+import net.java.openjdk.awt.peer.web.WebRect;
+import net.java.openjdk.cacio.servlet.imgformat.RLEImageEncoder;
+
 
 /**
- * 
+ *
  * Transport using run-length encoding, data is transmitted in binary format.
  * This is the preferred backend for high-performance CPUs when bandwidth is not
  * constrained, like in corporate networks using desktop PCs because RLE
  * encoding puts only light load on the server, compared to PNG.
- * 
+ * <p>
  * XHR2 is preferred, for compatibility a slow XHR1 based workarround exists.
- * 
+ * <p>
  * Javascript counterpart: XHR2RLETransport.js, XHR1RLETransport.js,
  * RLEImageDecoder.js
- * 
+ *
  * @author Clemens Eisserer <linuxhippy@gmail.com>
  */
 public class BinaryRLETransport extends BinaryTransport {
+
     RLEImageEncoder rleEncoder;
     byte[] cmdStreamData;
 
@@ -55,64 +61,64 @@ public class BinaryRLETransport extends BinaryTransport {
 
     @Override
     public void prepareUpdate(List<ScreenUpdate> pendingUpdateList, TreeImagePacker packer, List<Integer> cmdList) {
-	dataAvailable = true;
-	cmdStreamData = encodeImageCmdStream(cmdList);
+        dataAvailable = true;
+        cmdStreamData = encodeImageCmdStream(cmdList);
 
-	WebRect packedRegionBox = packer.getBoundingBox();
-	if (packedRegionBox.getWidth() == 0 || packedRegionBox.getHeight() == 0) {
-	    return;
-	}
+        WebRect packedRegionBox = packer.getBoundingBox();
+        if (packedRegionBox.getWidth() == 0 || packedRegionBox.getHeight() == 0) {
+            return;
+        }
 
-	rleEncoder = new RLEImageEncoder();
-	// Fast-Path: If there is only a single BlitScreenUpdate, encode
-	// directly from the SurfaceData and avoid an additional blit
-	BlitScreenUpdate singleUpdate = getLonelyBlitScreenUpdate(pendingUpdateList);
-	if (singleUpdate != null) {
-	    WebRect updateArea = singleUpdate.getUpdateArea();
-	    rleEncoder.encodeImageToStream(singleUpdate.getImage(), singleUpdate.getSrcX(), singleUpdate.getSrcY(), singleUpdate.getSrcX()
-		    + updateArea.getWidth(), singleUpdate.getSrcY() + updateArea.getHeight());
-	} else {
-	    BufferedImage packedImage = new BufferedImage(packedRegionBox.getWidth(), packedRegionBox.getHeight(), BufferedImage.TYPE_INT_RGB);
-	    copyUpdatesToPackedImage(pendingUpdateList, packedImage, 0);
-	    rleEncoder.encodeImageToStream(packedImage, 0, 0, packedImage.getWidth(), packedImage.getHeight());
-	}
+        rleEncoder = new RLEImageEncoder();
+        // Fast-Path: If there is only a single BlitScreenUpdate, encode
+        // directly from the SurfaceData and avoid an additional blit
+        BlitScreenUpdate singleUpdate = getLonelyBlitScreenUpdate(pendingUpdateList);
+        if (singleUpdate != null) {
+            WebRect updateArea = singleUpdate.getUpdateArea();
+            rleEncoder.encodeImageToStream(singleUpdate.getImage(), singleUpdate.getSrcX(), singleUpdate.getSrcY(), singleUpdate.getSrcX()
+                    + updateArea.getWidth(), singleUpdate.getSrcY() + updateArea.getHeight());
+        } else {
+            BufferedImage packedImage = new BufferedImage(packedRegionBox.getWidth(), packedRegionBox.getHeight(), BufferedImage.TYPE_INT_RGB);
+            copyUpdatesToPackedImage(pendingUpdateList, packedImage, 0);
+            rleEncoder.encodeImageToStream(packedImage, 0, 0, packedImage.getWidth(), packedImage.getHeight());
+        }
     }
 
     @Override
     public void writeToStream(OutputStream os) throws IOException {
-	if (dataAvailable) {
-	    os.write(cmdStreamData);
+        if (dataAvailable) {
+            os.write(cmdStreamData);
 
-	    if (rleEncoder != null) {
-		rleEncoder.writeTo(os);
-		rleEncoder = null;
-	    }
-	} else {
-	    writeEmptyData(os);
-	}
+            if (rleEncoder != null) {
+                rleEncoder.writeTo(os);
+                rleEncoder = null;
+            }
+        } else {
+            writeEmptyData(os);
+        }
     }
 
     /**
      * Returns the one and only BlitScreenUpdate of a list, or null if the List
      * has more than one BlitScreenCommands
-     * 
+     *
      * @param updateList
      * @return
      */
     protected BlitScreenUpdate getLonelyBlitScreenUpdate(List<ScreenUpdate> updateList) {
-	BlitScreenUpdate lonelyUpdate = null;
+        BlitScreenUpdate lonelyUpdate = null;
 
-	for (ScreenUpdate update : updateList) {
-	    if (update instanceof BlitScreenUpdate) {
-		// If there is more than one BlitScreenUpdate, bail out
-		if (lonelyUpdate != null) {
-		    lonelyUpdate = null;
-		    break;
-		}
-		lonelyUpdate = (BlitScreenUpdate) update;
-	    }
-	}
+        for (ScreenUpdate update : updateList) {
+            if (update instanceof BlitScreenUpdate) {
+                // If there is more than one BlitScreenUpdate, bail out
+                if (lonelyUpdate != null) {
+                    lonelyUpdate = null;
+                    break;
+                }
+                lonelyUpdate = (BlitScreenUpdate) update;
+            }
+        }
 
-	return lonelyUpdate;
+        return lonelyUpdate;
     }
 }

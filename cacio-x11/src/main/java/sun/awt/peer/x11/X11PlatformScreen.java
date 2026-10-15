@@ -42,6 +42,7 @@ import com.github.caciocavallosilano.cacio.peer.managed.FullScreenWindowFactory;
 import com.github.caciocavallosilano.cacio.peer.managed.PlatformScreen;
 import sun.java2d.SunGraphics2D;
 
+
 class X11PlatformScreen implements PlatformScreen, CacioEventSource {
 
     static {
@@ -68,7 +69,7 @@ class X11PlatformScreen implements PlatformScreen, CacioEventSource {
         this.width = dim.width;
         this.height = dim.height;
         window = nativeInitScreen(X11GraphicsEnvironment.getDisplay(),
-                                  width, height);
+                width, height);
     }
 
     @Override
@@ -89,9 +90,9 @@ class X11PlatformScreen implements PlatformScreen, CacioEventSource {
     private X11SurfaceData getSurfaceData() {
         if (surfaceData == null) {
             surfaceData = new X11SurfaceData(X11SurfaceData.typeDefault,
-                                             getColorModel(), width, height,
-                                             getGraphicsConfiguration(), this,
-                                             window);
+                    getColorModel(), width, height,
+                    getGraphicsConfiguration(), this,
+                    window);
         }
         return surfaceData;
     }
@@ -119,7 +120,10 @@ class X11PlatformScreen implements PlatformScreen, CacioEventSource {
         eventData.clear();
         nativeGetEvent(X11GraphicsEnvironment.getDisplay(), eventData);
         if (eventData.getId() == 0) {
-            try { Thread.sleep(100); } catch (Exception ex) {}
+            try {
+                Thread.sleep(100);
+            } catch (Exception ex) {
+            }
         }
         eventData.setSource(this);
         return eventData;

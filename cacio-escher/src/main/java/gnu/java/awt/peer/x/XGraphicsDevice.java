@@ -37,14 +37,17 @@ exception statement from your version. */
 
 package gnu.java.awt.peer.x;
 
-import gnu.x11.Display;
-import gnu.x11.EscherServerConnectionException;
-
 import java.awt.AWTError;
 import java.awt.GraphicsConfiguration;
 import java.awt.GraphicsDevice;
+import java.lang.System.Logger;
+import java.lang.System.Logger.Level;
 import java.lang.reflect.Constructor;
 import java.net.Socket;
+
+import gnu.x11.Display;
+import gnu.x11.EscherServerConnectionException;
+
 
 /**
  * This class represents an X Display. The actual connection is established
@@ -52,171 +55,153 @@ import java.net.Socket;
  *
  * @author Roman Kennke (kennke@aicas.com)
  */
-public class XGraphicsDevice
-  extends GraphicsDevice
-{
+public class XGraphicsDevice extends GraphicsDevice {
 
-  private XGraphicsConfiguration defaultConfiguration;
+    private static final Logger logger = System.getLogger(XGraphicsDevice.class.getName());
 
-  /**
-   * The X display associated with the XGraphicsDevice. This is established
-   * when {@link #getDisplay} is first called.
-   */
-  private Display display;
+    private XGraphicsConfiguration defaultConfiguration;
 
-  static class DisplayName {
-      String hostname;
-      final int displayNumber;
-      final int screenNumber;
-      public DisplayName(String dn) {
-          String[] pair = dn.split(":");
-          this.hostname = pair[0];
-          this.displayNumber = pair[1].indexOf('.') != -1 ? Integer.valueOf(pair[1].substring(0, pair[1].indexOf('.'))) : Integer.valueOf(pair[1]);
-          this.screenNumber = pair[1].indexOf('.') != -1 ? Integer.parseInt(pair[1].substring(pair[1].lastIndexOf('.'))) : -1;
-      }
-      public String getIDString() { 
-          return ":" + displayNumber + (screenNumber != -1 ? "." + screenNumber : "");
-      }
-  }
+    /**
+     * The X display associated with the XGraphicsDevice. This is established
+     * when {@link #getDisplay} is first called.
+     */
+    private Display display;
 
-  /**
-   * The display name from which the display will be initialized.
-   */
-  private final DisplayName displayName;
+    static class DisplayName {
 
-  /**
-   * The event pump for this X Display.
-   */
-  private XEventSource eventSource;
-   
-  /**
-   * Creates a new XGraphicsDevice.
-   */
-  XGraphicsDevice(String dn)
-  {
-      displayName = new DisplayName(dn); 
-  }
+        String hostname;
+        final int displayNumber;
+        final int screenNumber;
 
-  @Override
-  public int getType()
-  {
-    return TYPE_RASTER_SCREEN;
-  }
+        public DisplayName(String dn) {
+            String[] pair = dn.split(":");
+            this.hostname = pair[0];
+            this.displayNumber = pair[1].indexOf('.') != -1 ? Integer.valueOf(pair[1].substring(0, pair[1].indexOf('.'))) : Integer.valueOf(pair[1]);
+            this.screenNumber = pair[1].indexOf('.') != -1 ? Integer.parseInt(pair[1].substring(pair[1].lastIndexOf('.'))) : -1;
+        }
 
-  @Override
-  public String getIDstring()
-  {
-    return displayName.getIDString();
-  }
+        public String getIDString() {
+            return ":" + displayNumber + (screenNumber != -1 ? "." + screenNumber : "");
+        }
+    }
 
-  @Override
-  public GraphicsConfiguration[] getConfigurations()
-  {
-    // TODO: Implement this.
-    throw new UnsupportedOperationException("Not yet implemented.");
-  }
+    /**
+     * The display name from which the display will be initialized.
+     */
+    private final DisplayName displayName;
 
-  @Override
-  public GraphicsConfiguration getDefaultConfiguration()
-  {
-    if (defaultConfiguration == null)
-      defaultConfiguration = new XGraphicsConfiguration(this);
-    return defaultConfiguration;
-  }
+    /**
+     * The event pump for this X Display.
+     */
+    private XEventSource eventSource;
 
-  /**
-   * Returns the X Display associated with this XGraphicsDevice.
-   * This establishes the connection to the X server on the first invocation.
-   *
-   * @return the X Display associated with this XGraphicsDevice
-   */
-  Display getDisplay()
-  {
-    if (display == null)
-      {
-        if (displayName.hostname.isEmpty())
-            displayName.hostname = "localhost";
+    /**
+     * Creates a new XGraphicsDevice.
+     */
+    XGraphicsDevice(String dn) {
+        displayName = new DisplayName(dn);
+    }
 
-        try
-          {
-            if (EscherToolkit.DEBUG)
-              System.err.println("connecting to : " + displayName);
-            // Try to connect via unix domain sockets when host == localhost.
-            if ((displayName.hostname.equals("localhost")
-                || displayName.hostname.isEmpty())
-                && System.getProperty("gnu.xawt.no_local_sockets") == null)
-              {
-                Socket socket = createLocalSocket();
-                if (socket != null)
-                  {
-                    display = new Display(socket, "localhost",
-                                          displayName.displayNumber,
-                                          displayName.screenNumber);
-                  }
-              }
+    @Override
+    public int getType() {
+        return TYPE_RASTER_SCREEN;
+    }
 
-          }
-        catch (EscherServerConnectionException ex)
-          {
-            /* do noting here */
-          }
+    @Override
+    public String getIDstring() {
+        return displayName.getIDString();
+    }
 
-        try
-          {
-            // The following happens when we are configured to use plain sockets,
-            // when the connection is probably remote or when we couldn't load
-            // the LocalSocket class stuff.
-            if (display == null)
-                display = new Display(displayName.hostname, displayName.displayNumber, displayName.screenNumber);
-          }
-        catch (EscherServerConnectionException ex)
-          {
-            // time to throw the real exception
-            AWTError awtErr = new AWTError("Cannot connect to X Server: "
-                                         + displayName);
-            awtErr.initCause(ex);
-            throw awtErr;
-          }
+    @Override
+    public GraphicsConfiguration[] getConfigurations() {
+        // TODO: Implement this.
+        throw new UnsupportedOperationException("Not yet implemented.");
+    }
 
-        eventSource = new XEventSource(display);
-      }
-    return display;
-  }
+    @Override
+    public GraphicsConfiguration getDefaultConfiguration() {
+        if (defaultConfiguration == null)
+            defaultConfiguration = new XGraphicsConfiguration(this);
+        return defaultConfiguration;
+    }
 
-  XEventSource getEventSource()
-  {
-      return eventSource;
-  }
+    /**
+     * Returns the X Display associated with this XGraphicsDevice.
+     * This establishes the connection to the X server on the first invocation.
+     *
+     * @return the X Display associated with this XGraphicsDevice
+     */
+    Display getDisplay() {
+        if (display == null) {
+            if (displayName.hostname.isEmpty())
+                displayName.hostname = "localhost";
 
-  /**
-   * Tries to load the LocalSocket class and initiate a connection to the 
-   * local X server.
-   */
-  private Socket createLocalSocket()
-  {
-    Socket socket = null;
-    try
-      {
-        // TODO: Is this 100% ok?
-        String sockPath = "/tmp/.X11-unix/X" + displayName.displayNumber;
-        Class<?> localSocketAddressClass =
-          Class.forName("gnu.java.net.local.LocalSocketAddress");
-        Constructor<?> localSocketAddressConstr =
-          localSocketAddressClass.getConstructor(String.class);
-        Object addr =
-          localSocketAddressConstr.newInstance(sockPath);
-        Class<?> localSocketClass =
-          Class.forName("gnu.java.net.local.LocalSocket");
-        Constructor<?> localSocketConstructor =
-          localSocketClass.getConstructor(localSocketAddressClass);
-        Object localSocket =
-          localSocketConstructor.newInstance(addr);
-        socket = (Socket) localSocket;
-      }
-    catch (Exception ex)
-      {
-        // Whatever goes wrong here, we return null.
-      }
-    return socket;
-  }
+            try {
+                logger.log(Level.DEBUG, "connecting to : " + displayName);
+                // Try to connect via unix domain sockets when host == localhost.
+                if ((displayName.hostname.equals("localhost")
+                        || displayName.hostname.isEmpty())
+                        && System.getProperty("gnu.xawt.no_local_sockets") == null) {
+                    Socket socket = createLocalSocket();
+                    if (socket != null) {
+                        display = new Display(socket, "localhost",
+                                displayName.displayNumber,
+                                displayName.screenNumber);
+                    }
+                }
+
+            } catch (EscherServerConnectionException ex) {
+                /* do noting here */
+            }
+
+            try {
+                // The following happens when we are configured to use plain sockets,
+                // when the connection is probably remote or when we couldn't load
+                // the LocalSocket class stuff.
+                if (display == null)
+                    display = new Display(displayName.hostname, displayName.displayNumber, displayName.screenNumber);
+            } catch (EscherServerConnectionException ex) {
+                // time to throw the real exception
+                AWTError awtErr = new AWTError("Cannot connect to X Server: "
+                        + displayName);
+                awtErr.initCause(ex);
+                throw awtErr;
+            }
+
+            eventSource = new XEventSource(display);
+        }
+        return display;
+    }
+
+    XEventSource getEventSource() {
+        return eventSource;
+    }
+
+    /**
+     * Tries to load the LocalSocket class and initiate a connection to the
+     * local X server.
+     */
+    private Socket createLocalSocket() {
+        Socket socket = null;
+        try {
+            // TODO: Is this 100% ok?
+            String sockPath = "/tmp/.X11-unix/X" + displayName.displayNumber;
+            Class<?> localSocketAddressClass =
+                    Class.forName("gnu.java.net.local.LocalSocketAddress");
+            Constructor<?> localSocketAddressConstr =
+                    localSocketAddressClass.getConstructor(String.class);
+            Object addr =
+                    localSocketAddressConstr.newInstance(sockPath);
+            Class<?> localSocketClass =
+                    Class.forName("gnu.java.net.local.LocalSocket");
+            Constructor<?> localSocketConstructor =
+                    localSocketClass.getConstructor(localSocketAddressClass);
+            Object localSocket =
+                    localSocketConstructor.newInstance(addr);
+            socket = (Socket) localSocket;
+        } catch (Exception ex) {
+            // Whatever goes wrong here, we return null.
+        }
+        return socket;
+    }
 }

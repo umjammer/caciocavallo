@@ -25,14 +25,20 @@
 
 package net.java.openjdk.cacio.servlet;
 
-import java.io.*;
-import javax.servlet.*;
-import javax.servlet.http.*;
+import java.io.BufferedInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 
 /**
  * Servlet for loading Resources located on the classpath.
  * Useful when deploying resources which are packed in jar-files.
- * 
+ *
  * @author Clemens Eisserer <linuxhippy@gmail.com>
  */
 public class ResourceLoaderServlet extends HttpServlet {
@@ -44,15 +50,15 @@ public class ResourceLoaderServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-	String resourceName = request.getParameter("res");
-	resourceName = '/' + resourceName.replace('_', '/');
-	
-	OutputStream os = response.getOutputStream();
-	InputStream is = new BufferedInputStream(getClass().getResourceAsStream(resourceName));
-	int read;
-	while((read = is.read()) != -1) {
-	    os.write(read);
-	}
+        String resourceName = request.getParameter("res");
+        resourceName = '/' + resourceName.replace('_', '/');
+
+        OutputStream os = response.getOutputStream();
+        InputStream is = new BufferedInputStream(getClass().getResourceAsStream(resourceName));
+        int read;
+        while ((read = is.read()) != -1) {
+            os.write(read);
+        }
     }
 }
 

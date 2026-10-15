@@ -25,14 +25,16 @@
 
 package net.java.openjdk.cacio.servlet;
 
-import java.lang.ref.*;
-import java.util.*;
-import java.util.logging.*;
+import java.lang.ref.WeakReference;
+import java.util.HashMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 
-import javax.servlet.http.*;
+import net.java.openjdk.awt.peer.web.WebSessionState;
+import sun.awt.AppContext;
 
-import net.java.openjdk.awt.peer.web.*;
-import sun.awt.*;
 
 /**
  * Session-Manager with sub-session functionality. Browser often assign the same
@@ -41,7 +43,7 @@ import sun.awt.*;
  * isolated sessions should be represented by separated Sessions. This has been
  * implemented by "subsessions". Additionally to the http-session-cookie, each
  * existing instance gets its own subsession-id.
- * 
+ *
  * @author Clemens Eisserer <linuxhippy@gmail.com>
  */
 public abstract class WebSessionManager {
@@ -53,33 +55,33 @@ public abstract class WebSessionManager {
     private static final WebSessionManager instance;
 
     static {
-	WebSessionManager sessionMan = null;
+        WebSessionManager sessionMan = null;
 
-	String sessionManagerClsName = System.getProperty("CacioSessionManager");
-	if(sessionManagerClsName != null) {
-	    try {
-		sessionMan = (WebSessionManager) Class.forName(sessionManagerClsName).getDeclaredConstructor().newInstance();
-	    } catch (Exception ex) {
-		logger.log(Level.WARNING, "Specified SessionManager "+sessionManagerClsName+" could not be loaded, falling back to default", ex);
-	    }
-	}
+        String sessionManagerClsName = System.getProperty("CacioSessionManager");
+        if (sessionManagerClsName != null) {
+            try {
+                sessionMan = (WebSessionManager) Class.forName(sessionManagerClsName).getDeclaredConstructor().newInstance();
+            } catch (Exception ex) {
+                logger.log(Level.WARNING, "Specified SessionManager " + sessionManagerClsName + " could not be loaded, falling back to default", ex);
+            }
+        }
 
-	if(sessionMan == null) {
-	    sessionMan = new WebSessionManagerImpl();
-	}
+        if (sessionMan == null) {
+            sessionMan = new WebSessionManagerImpl();
+        }
 
-	instance = sessionMan;
+        instance = sessionMan;
     }
 
     final ThreadLocal<WeakReference<WebSessionState>> threadStateHolder = new ThreadLocal<>();
 
     public static WebSessionManager getInstance() {
-	return instance;
+        return instance;
     }
 
     /**
      * Register at the current HttpSession, and issue a new subsession-id.
-     * 
+     *
      * @param session
      * @return the WebSessionState generated for the current subsession
      */
@@ -88,47 +90,47 @@ public abstract class WebSessionManager {
     /**
      * Builds links between AppContext and WebSessionState, so that the
      * AppContext can be accessed by using WebSessionState and vice-versa.
-     * 
+     *
      * @param context
      * @param state
      */
     public void registerAppContext(AppContext context, WebSessionState state) {
-	state.setAppContext(context);
-	AppContext.getAppContext().put(SESSION_KEY, state);
-	registerSessionAtCurrentThread(state);
+        state.setAppContext(context);
+        AppContext.getAppContext().put(SESSION_KEY, state);
+        registerSessionAtCurrentThread(state);
     }
 
     /**
      * Returns the WebSessionState of the currently active AppContext. This is
      * called from AWT threads, where the only way to get to the WebSessionState
      * is through AppContext.
-     * 
+     *
      * @return the WebSessionState
      */
     public WebSessionState getCurrentStateAWT() {
-	return (WebSessionState) AppContext.getAppContext().get(SESSION_KEY);
+        return (WebSessionState) AppContext.getAppContext().get(SESSION_KEY);
     }
 
     /**
      * Can be called if a method is called by the servlet-thread as well as by
      * AWT/App threads.
-     * 
+     *
      * @return
      */
     public WebSessionState getCurrentState() {
-	WebSessionState state = getCurrentStateAWT();
+        WebSessionState state = getCurrentStateAWT();
 
-	if (state == null) {
-	    state = threadStateHolder.get().get();
-	}
+        if (state == null) {
+            state = threadStateHolder.get().get();
+        }
 
-	return state;
+        return state;
     }
 
     /**
      * Returns the WebSessionState of the HttpSessiont. This is called from
      * servlet threads.
-     * 
+     *
      * @param session
      * @param subSessionID
      * @return the WebSessionState
@@ -138,26 +140,26 @@ public abstract class WebSessionManager {
     /**
      * Registers the state for the current thread. Has to be called before
      * calling into cacio-web from a servlet!
-     * 
+     *
      * @param state
      */
     public void registerSessionAtCurrentThread(WebSessionState state) {
-	threadStateHolder.set(new WeakReference<>(state));
+        threadStateHolder.set(new WeakReference<>(state));
     }
 
     /**
      * Disposes the session, as well as the assiciated AppContext. This will
      * also shut down the applications contained in that AppContext as well as
      * all its threads.
-     * 
+     *
      * @param session
      */
     public abstract void disposeSession(HttpSession session);
 
     public synchronized void disposeSessionState(HttpSession session, WebSessionState state) {
-	HashMap<Integer, WebSessionState> subSessionMap = state.getSubSessionMap();
-	subSessionMap.remove(state.getSubSessionID());
-	state.dispose();
+        HashMap<Integer, WebSessionState> subSessionMap = state.getSubSessionMap();
+        subSessionMap.remove(state.getSubSessionID());
+        state.dispose();
     }
 
     public abstract WebSessionState getSessionState(HttpServletRequest request);

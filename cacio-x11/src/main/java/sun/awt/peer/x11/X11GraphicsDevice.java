@@ -28,6 +28,7 @@ package sun.awt.peer.x11;
 import java.awt.GraphicsConfiguration;
 import java.awt.GraphicsDevice;
 
+
 public class X11GraphicsDevice extends GraphicsDevice {
 
     private X11GraphicsConfiguration defaultConfig;
@@ -45,7 +46,7 @@ public class X11GraphicsDevice extends GraphicsDevice {
 
     @Override
     public GraphicsConfiguration[] getConfigurations() {
-        return new GraphicsConfiguration[] { getDefaultConfiguration() };
+        return new GraphicsConfiguration[] {getDefaultConfiguration()};
     }
 
     @Override

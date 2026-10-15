@@ -30,6 +30,7 @@ import java.awt.GraphicsEnvironment;
 
 import sun.java2d.SunGraphicsEnvironment;
 
+
 public class X11GraphicsEnvironment extends SunGraphicsEnvironment {
 
     private final long display;

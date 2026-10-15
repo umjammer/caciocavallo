@@ -31,13 +31,13 @@ import com.github.caciocavallosilano.cacio.peer.PlatformToplevelWindow;
 import com.github.caciocavallosilano.cacio.peer.PlatformWindow;
 import com.github.caciocavallosilano.cacio.peer.PlatformWindowFactory;
 
+
 class EscherPlatformWindowFactory implements PlatformWindowFactory {
 
     private EscherEventPump eventPump;
 
     @Override
-    public PlatformWindow createPlatformWindow(CacioComponent cacioComponent,
-                                               PlatformWindow parent) {
+    public PlatformWindow createPlatformWindow(CacioComponent cacioComponent, PlatformWindow parent) {
         return new EscherPlatformWindow(cacioComponent, parent);
     }
 
@@ -47,8 +47,7 @@ class EscherPlatformWindowFactory implements PlatformWindowFactory {
     }
 
     @Override
-    public PlatformWindow createPlatformToplevelWindow(CacioComponent component,
-            PlatformWindow owner) {
+    public PlatformWindow createPlatformToplevelWindow(CacioComponent component, PlatformWindow owner) {
         return new EscherPlatformWindow(component, null);
     }
 

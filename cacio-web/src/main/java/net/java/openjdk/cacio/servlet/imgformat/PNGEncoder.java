@@ -25,39 +25,43 @@
 
 package net.java.openjdk.cacio.servlet.imgformat;
 
-import java.awt.image.*;
-import java.util.logging.*;
+import java.awt.image.BufferedImage;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 
 /**
  * Generic PNGEncoder interface, to allow Caciocavallo-Web to use different png
  * encoders without hard-coded dependencies. For now tries to loads the
  * "PngEncoderKeypoint" by default and if not available, falls back to an
  * ImageIO based implementation.
- * 
+ *
  * @author Clemens Eisserer <linuxhippy@gmail.com>
  */
 public abstract class PNGEncoder {
+
     private static final Logger logger = Logger.getLogger(PNGEncoder.class.getName());
-    
+
     private static PNGEncoder instance;
 
     public static synchronized PNGEncoder getInstance() {
-	if (instance == null) {
-	    PNGEncoderKeypoint keypointEncoder = new PNGEncoderKeypoint();
-	    if (keypointEncoder.isAvailable()) {
-		instance = keypointEncoder;
-	    } else {
-		instance = new PNGEncoderImageIO();
-		logger.log(Level.INFO, "Keypoint PNG-Encoder not found, falling back to ImageIO.");
-	    }
+        if (instance == null) {
+            PNGEncoderKeypoint keypointEncoder = new PNGEncoderKeypoint();
+            if (keypointEncoder.isAvailable()) {
+                instance = keypointEncoder;
+            } else {
+                instance = new PNGEncoderImageIO();
+                logger.log(Level.INFO, "Keypoint PNG-Encoder not found, falling back to ImageIO.");
+            }
 
-	}
+        }
 
-	return instance;
+        return instance;
     }
 
     /**
      * Encodes the passed BufferedImage to png-format.
+     *
      * @param img
      * @param compression
      * @return

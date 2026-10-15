@@ -25,57 +25,66 @@
 
 package net.java.openjdk.awt.peer.web;
 
-import java.awt.*;
-import com.github.caciocavallosilano.cacio.peer.*;
-import com.github.caciocavallosilano.cacio.peer.managed.*;
+import java.awt.GraphicsConfiguration;
+
+import com.github.caciocavallosilano.cacio.peer.CacioComponent;
+import com.github.caciocavallosilano.cacio.peer.CacioEventPump;
+import com.github.caciocavallosilano.cacio.peer.managed.EventData;
+import com.github.caciocavallosilano.cacio.peer.managed.FullScreenWindowFactory;
+import com.github.caciocavallosilano.cacio.peer.managed.PlatformScreen;
+import com.github.caciocavallosilano.cacio.peer.managed.PlatformScreenSelector;
+import com.github.caciocavallosilano.cacio.peer.managed.ScreenManagedWindowContainer;
+
 
 /**
  * FullScreenWindowFactory for Caciocavallo-Web.
- * 
+ * <p>
  * This differs from the "usual" FullScreenWindowFactory implementations, by
  * tricking Caciocavallo to not start an event-pump-thread. As Caciocavallo-Web
  * gets events pushed by a servlet-thread, instead of pulling it from a possibly
  * blocking event source, there is no need for a seperate thread.
- * 
+ *
  * @author Clemens Eisserer <linuxhippy@gmail.com>
  */
 public class WebWindowFactory extends FullScreenWindowFactory {
 
     public WebWindowFactory() {
-	super(new SessionScreenSelector(), null);
+        super(new SessionScreenSelector(), null);
     }
 
     @Override
     public CacioEventPump<?> createEventPump() {
-	return new WebDummyEventPump();
+        return new WebDummyEventPump();
     }
 
     public void repaintScreen(PlatformScreen screen) {
-	ScreenManagedWindowContainer smwc = getScreenManagedWindowContainer(screen);
-	smwc.repaint(0, 0, screen.getBounds().width, screen.getBounds().height);
+        ScreenManagedWindowContainer smwc = getScreenManagedWindowContainer(screen);
+        smwc.repaint(0, 0, screen.getBounds().width, screen.getBounds().height);
     }
 
     private static final class SessionScreenSelector implements PlatformScreenSelector {
-	@Override
-	public PlatformScreen getPlatformScreen(GraphicsConfiguration config) {
-	    return ((WebGraphicsConfiguration) config).getScreen();
-	}
 
-    /* @see com.github.caciocavallosilano.cacio.peer.managed.PlatformScreenSelector#getPlatformScreen(com.github.caciocavallosilano.cacio.peer.CacioComponent) */
-    @Override
-    public PlatformScreen getPlatformScreen(CacioComponent comp) {
-        // TODO Auto-generated method stub
-        return null;
-    }
+        @Override
+        public PlatformScreen getPlatformScreen(GraphicsConfiguration config) {
+            return ((WebGraphicsConfiguration) config).getScreen();
+        }
+
+        /* @see com.github.caciocavallosilano.cacio.peer.managed.PlatformScreenSelector#getPlatformScreen(com.github.caciocavallosilano.cacio.peer.CacioComponent) */
+        @Override
+        public PlatformScreen getPlatformScreen(CacioComponent comp) {
+            // TODO Auto-generated method stub
+            return null;
+        }
     }
 }
 
 /**
  * Dummy EventPump.
- * 
+ *
  * @author Clemens Eisserer <linuxhippy@gmail.com>
  */
 class WebDummyEventPump extends CacioEventPump<EventData> {
+
     /**
      * Do not start an event-pump thread at all, by overriding Thread.start()
      * with a no-op method
@@ -86,7 +95,7 @@ class WebDummyEventPump extends CacioEventPump<EventData> {
 
     @Override
     protected EventData fetchNativeEvent() {
-	return null;
+        return null;
     }
 
     @Override
