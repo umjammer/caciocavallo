@@ -32,6 +32,7 @@ import java.lang.System.Logger;
 import java.lang.System.Logger.Level;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Locale;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -61,9 +62,15 @@ public class SessionInitializeServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String className = request.getParameter("cls");
         String format = request.getParameter("format");
-        format = (format != null && !format.trim().isEmpty()) ? format.toLowerCase() : "rle";
+        format = (format != null && !format.trim().isEmpty()) ? format.toLowerCase(Locale.ROOT) : "rle";
+        if (!"rle".equals(format) && !"png".equals(format)) {
+            format = "rle";
+        }
 
         String subSessionStr = request.getParameter("ssid");
+        if (subSessionStr != null && !subSessionStr.matches("\\d+")) {
+            subSessionStr = null;
+        }
         if (subSessionStr == null) {
             HttpSession session = request.getSession();
             System.out.println("Starter-Session: " + session.getId());
