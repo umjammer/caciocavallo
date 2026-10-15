@@ -64,15 +64,15 @@ public class XGraphicsDevice
    */
   private Display display;
 
-  class DisplayName {
+  static class DisplayName {
       String hostname;
-      int displayNumber;
-      int screenNumber;
+      final int displayNumber;
+      final int screenNumber;
       public DisplayName(String dn) {
           String[] pair = dn.split(":");
           this.hostname = pair[0];
           this.displayNumber = pair[1].indexOf('.') != -1 ? Integer.valueOf(pair[1].substring(0, pair[1].indexOf('.'))) : Integer.valueOf(pair[1]);
-          this.screenNumber = pair[1].indexOf('.') != -1 ? Integer.valueOf(pair[1].substring(pair[1].lastIndexOf('.'))) : -1;
+          this.screenNumber = pair[1].indexOf('.') != -1 ? Integer.parseInt(pair[1].substring(pair[1].lastIndexOf('.'))) : -1;
       }
       public String getIDString() { 
           return ":" + displayNumber + (screenNumber != -1 ? "." + screenNumber : "");
@@ -82,7 +82,7 @@ public class XGraphicsDevice
   /**
    * The display name from which the display will be initialized.
    */
-  private DisplayName displayName;
+  private final DisplayName displayName;
 
   /**
    * The event pump for this X Display.
@@ -97,22 +97,26 @@ public class XGraphicsDevice
       displayName = new DisplayName(dn); 
   }
 
+  @Override
   public int getType()
   {
     return TYPE_RASTER_SCREEN;
   }
 
+  @Override
   public String getIDstring()
   {
     return displayName.getIDString();
   }
 
+  @Override
   public GraphicsConfiguration[] getConfigurations()
   {
     // TODO: Implement this.
     throw new UnsupportedOperationException("Not yet implemented.");
   }
 
+  @Override
   public GraphicsConfiguration getDefaultConfiguration()
   {
     if (defaultConfiguration == null)
@@ -130,7 +134,7 @@ public class XGraphicsDevice
   {
     if (display == null)
       {
-        if (displayName.hostname.equals(""))
+        if (displayName.hostname.isEmpty())
             displayName.hostname = "localhost";
 
         try
@@ -139,7 +143,7 @@ public class XGraphicsDevice
               System.err.println("connecting to : " + displayName);
             // Try to connect via unix domain sockets when host == localhost.
             if ((displayName.hostname.equals("localhost")
-                || displayName.hostname.equals(""))
+                || displayName.hostname.isEmpty())
                 && System.getProperty("gnu.xawt.no_local_sockets") == null)
               {
                 Socket socket = createLocalSocket();

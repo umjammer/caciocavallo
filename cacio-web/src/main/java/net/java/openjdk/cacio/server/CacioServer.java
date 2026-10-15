@@ -96,7 +96,7 @@ public class CacioServer {
 	System.setProperty("cacio.focusmgr", "net.java.openjdk.awt.peer.web.WebFocusManager");
     }
 
-    public static void main(String[] args) throws Exception {
+    static void main(String[] args) throws Exception {
 	int port = Integer.getInteger("cacio.web.port", 8080);
 	int maxThreads = Integer.getInteger("cacio.threads", 125);
 	new CacioServer(port, maxThreads);

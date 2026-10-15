@@ -26,6 +26,9 @@
 package net.java.openjdk.cacio.servlet;
 
 import java.io.*;
+import java.lang.System.Logger;
+import java.lang.System.Logger.Level;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import javax.servlet.ServletException;
 import javax.servlet.http.*;
@@ -39,6 +42,8 @@ import net.java.openjdk.awt.peer.web.*;
  */
 public class SessionInitializeServlet extends HttpServlet {
 
+    private static final Logger logger = System.getLogger(SessionInitializeServlet.class.getName());
+
     String startHtml = null;
 
     public SessionInitializeServlet() throws Exception {
@@ -49,7 +54,7 @@ public class SessionInitializeServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 	String className = request.getParameter("cls");
 	String format = request.getParameter("format");
-	format = (format != null && format.trim().length() > 0) ? format.toLowerCase() : "rle";
+	format = (format != null && !format.trim().isEmpty()) ? format.toLowerCase() : "rle";
 
 	String subSessionStr = request.getParameter("ssid");
 	if (subSessionStr == null) {
@@ -65,7 +70,7 @@ public class SessionInitializeServlet extends HttpServlet {
 	}
 
 	response.setContentType("text/html");
-	String ssidStartHtml = startHtml.replaceAll("SSID", String.valueOf(subSessionStr));
+	String ssidStartHtml = startHtml.replaceAll("SSID", subSessionStr);
 	ssidStartHtml = ssidStartHtml.replaceAll("IMGFORMAT", "\"" + format + "\"");
 	response.getWriter().write(ssidStartHtml);
     }
@@ -86,7 +91,7 @@ public class SessionInitializeServlet extends HttpServlet {
 	    try {
 		cLevel = Integer.parseInt(cLevelStr);
 	    } catch (Exception ex) {
-		ex.printStackTrace();
+            logger.log(Level.ERROR, ex.getMessage(), ex);
 	    }
 	}
 	return cLevel;
@@ -106,7 +111,7 @@ public class SessionInitializeServlet extends HttpServlet {
 	    paramList.add(paramValue);
 	}
 
-	return paramList.toArray(new String[paramList.size()]);
+	return paramList.toArray(String[]::new);
     }
 
     /**
@@ -117,7 +122,7 @@ public class SessionInitializeServlet extends HttpServlet {
      */
     protected String loadStartHTML() throws Exception {
 	StringBuilder htmlBuilder = new StringBuilder(8192);
-	Reader r = new InputStreamReader(getClass().getResourceAsStream("/StreamBase.html"), "UTF-8");
+	Reader r = new InputStreamReader(getClass().getResourceAsStream("/StreamBase.html"), StandardCharsets.UTF_8);
 	int read;
 	while ((read = r.read()) != -1) {
 	    htmlBuilder.append((char) read);

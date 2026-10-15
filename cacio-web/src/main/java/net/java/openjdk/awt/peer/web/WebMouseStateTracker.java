@@ -39,7 +39,7 @@ public class WebMouseStateTracker {
 
     EventData lastMouseEvent = null;
     EventData lastClickedEvent = null;
-    HashMap<Integer, Boolean> pressedMap = new HashMap<>();
+    final HashMap<Integer, Boolean> pressedMap = new HashMap<>();
 
     public WebMouseStateTracker(WebScreen screen) {
 	this.screen = screen;
@@ -105,31 +105,23 @@ public class WebMouseStateTracker {
     }
 
     protected int jsButtonMaskToJava(int jsButtonMask) {
-	switch (jsButtonMask) {
-	case 0:
-	    return MouseEvent.BUTTON1;
-	case 1:
-	    return MouseEvent.BUTTON2;
-	case 2:
-	case 3:
-	    return MouseEvent.BUTTON3;
-	}
+        return switch (jsButtonMask) {
+            case 0 -> MouseEvent.BUTTON1;
+            case 1 -> MouseEvent.BUTTON2;
+            case 2, 3 -> MouseEvent.BUTTON3;
+            default -> throw new RuntimeException("Should not reach");
+        };
 
-	throw new RuntimeException("Should not reach");
     }
 
     protected int jsButtonMaskToJavaMask(int jsButtonMask) {
-	switch (jsButtonMask) {
-	case 0:
-	    return MouseEvent.BUTTON1_MASK;
-	case 1:
-	    return MouseEvent.BUTTON2_MASK;
-	case 2:
-	case 3:
-	    return MouseEvent.BUTTON3_MASK;
-	}
+        return switch (jsButtonMask) {
+            case 0 -> MouseEvent.BUTTON1_MASK;
+            case 1 -> MouseEvent.BUTTON2_MASK;
+            case 2, 3 -> MouseEvent.BUTTON3_MASK;
+            default -> throw new RuntimeException("Should not reach");
+        };
 
-	throw new RuntimeException("Should not reach");
     }
 
     protected void generateClickedEvent(EventData origData) {

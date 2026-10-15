@@ -55,7 +55,8 @@ public class BlitScreenUpdate extends ScreenUpdate {
 
     int packedX, packedY;
     int srcX, srcY;
-    int originalSrcX, originalSrcY;
+    final int originalSrcX;
+    final int originalSrcY;
 
     BufferedImage image;
     boolean isEvacuated;
@@ -110,6 +111,7 @@ public class BlitScreenUpdate extends ScreenUpdate {
 	}
     }
 
+    @Override
     public void writeToCmdStream(List<Integer> cmdList) {
 	cmdList.add(0);
 	cmdList.add(updateArea.getX1());
@@ -138,6 +140,7 @@ public class BlitScreenUpdate extends ScreenUpdate {
 	return size;
     }
 
+    @Override
     public WebRect getSurfaceDataUpdateArea() {
 	return new WebRect(originalSrcX, originalSrcY, originalSrcX + updateArea.getWidth(), originalSrcY + updateArea.getHeight());
     }

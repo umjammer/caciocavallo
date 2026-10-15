@@ -84,34 +84,40 @@ public class XGraphicsConfiguration
     device = dev;
   }
 
+  @Override
   public GraphicsDevice getDevice()
   {
     return device;
   }
 
+  @Override
   public ColorModel getColorModel()
   {
     // TODO: Implement properly.
     return ColorModel.getRGBdefault();
   }
 
+  @Override
   public ColorModel getColorModel(int transparency)
   {
     // TODO: Implement properly.
     return ColorModel.getRGBdefault();
   }
 
+  @Override
   public AffineTransform getDefaultTransform()
   {
     return new AffineTransform();
   }
 
+  @Override
   public AffineTransform getNormalizingTransform()
   {
     // TODO: Implement this.
     throw new UnsupportedOperationException("Not yet implemented.");
   }
 
+  @Override
   public Rectangle getBounds()
   {
     Display d = device.getDisplay();

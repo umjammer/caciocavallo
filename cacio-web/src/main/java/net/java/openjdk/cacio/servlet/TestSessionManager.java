@@ -9,10 +9,11 @@ import net.java.openjdk.awt.peer.web.*;
 
 public class TestSessionManager extends WebSessionManager {
     
-    private Logger logger = Logger.getLogger(this.getClass().getName());
+    private final Logger logger = Logger.getLogger(this.getClass().getName());
     
-    HashMap<Integer, WebSessionState> idSessionMap = new HashMap<>();
+    final HashMap<Integer, WebSessionState> idSessionMap = new HashMap<>();
 
+    @Override
     public synchronized WebSessionState register(HttpSession session) {
 	int subSessionID = idSessionMap.size();
 	WebSessionState sessionState = new WebSessionState(subSessionID, idSessionMap);
@@ -21,6 +22,7 @@ public class TestSessionManager extends WebSessionManager {
 	return sessionState;
     }
     
+    @Override
     public synchronized WebSessionState getCurrentState(HttpSession session, int subSessionID) {
 	    WebSessionState state = idSessionMap.get(subSessionID);
 	    registerSessionAtCurrentThread(state);
@@ -28,6 +30,7 @@ public class TestSessionManager extends WebSessionManager {
 	    return state;
     }
     
+    @Override
     public synchronized void disposeSession(HttpSession session) {
     }
     
@@ -36,6 +39,7 @@ public class TestSessionManager extends WebSessionManager {
 	state.dispose();
     }
     
+    @Override
     public WebSessionState getSessionState(HttpServletRequest request) {
 	String subSessionID = request.getParameter("subsessionid");
 	return getCurrentState(null, Integer.parseInt(subSessionID));

@@ -39,6 +39,7 @@ public class EventReceiveServlet extends HttpServlet {
     public EventReceiveServlet() {
     }
 
+    @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 	String parameters = request.getParameter("events");
 	int eventID = Integer.parseInt(request.getParameter("eid"));

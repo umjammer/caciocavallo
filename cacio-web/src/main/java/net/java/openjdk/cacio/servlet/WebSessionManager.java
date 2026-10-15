@@ -37,15 +37,16 @@ import sun.awt.*;
 /**
  * Session-Manager with sub-session functionality. Browser often assign the same
  * session-cookie to different tabs, although for Caciocavallo-Web different
- * WebScreen instances running in different tabs are completly seperated and
- * isolated sessions should be represented by seperated Sessions. This has been
+ * WebScreen instances running in different tabs are completely separated and
+ * isolated sessions should be represented by separated Sessions. This has been
  * implemented by "subsessions". Additionally to the http-session-cookie, each
  * existing instance gets its own subsession-id.
  * 
  * @author Clemens Eisserer <linuxhippy@gmail.com>
  */
 public abstract class WebSessionManager {
-    private static Logger logger = Logger.getLogger(WebSessionManager.class.getName());
+
+    private static final Logger logger = Logger.getLogger(WebSessionManager.class.getName());
 
     static final String SESSION_KEY = "WEBSessionState";
 
@@ -53,16 +54,16 @@ public abstract class WebSessionManager {
 
     static {
 	WebSessionManager sessionMan = null;
-	
+
 	String sessionManagerClsName = System.getProperty("CacioSessionManager");
 	if(sessionManagerClsName != null) {
 	    try {
-		sessionMan = (WebSessionManager) Class.forName(sessionManagerClsName).newInstance();
+		sessionMan = (WebSessionManager) Class.forName(sessionManagerClsName).getDeclaredConstructor().newInstance();
 	    } catch (Exception ex) {
 		logger.log(Level.WARNING, "Specified SessionManager "+sessionManagerClsName+" could not be loaded, falling back to default", ex);
 	    }
 	}
-	
+
 	if(sessionMan == null) {
 	    sessionMan = new WebSessionManagerImpl();
 	}
@@ -70,7 +71,7 @@ public abstract class WebSessionManager {
 	instance = sessionMan;
     }
 
-    ThreadLocal<WeakReference<WebSessionState>> threadStateHolder = new ThreadLocal<>();
+    final ThreadLocal<WeakReference<WebSessionState>> threadStateHolder = new ThreadLocal<>();
 
     public static WebSessionManager getInstance() {
 	return instance;

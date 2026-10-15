@@ -54,15 +54,15 @@ class X11PlatformWindow implements PlatformToplevelWindow {
         initIDs();
     }
 
-    private long nativeWindow;
+    private final long nativeWindow;
 
-    private boolean toplevel;
+    private final boolean toplevel;
 
     private boolean visible;
 
     private X11SurfaceData surfaceData;
 
-    private CacioComponent cacioComponent;
+    private final CacioComponent cacioComponent;
 
     private X11PlatformWindow parent;
 
@@ -117,23 +117,28 @@ class X11PlatformWindow implements PlatformToplevelWindow {
         return cacioComponent;
     }
 
+    @Override
     public ColorModel getColorModel() {
         return getGraphicsConfiguration().getColorModel();
     }
 
+    @Override
     public GraphicsConfiguration getGraphicsConfiguration() {
         return X11GraphicsConfiguration.getDefaultGC();
     }
 
-    private Rectangle bounds = new Rectangle();
+    private final Rectangle bounds = new Rectangle();
+    @Override
     public Rectangle getBounds() {
         return new Rectangle(bounds);
     }
 
+    @Override
     public void dispose() {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
+    @Override
     public Graphics2D getGraphics(Color fg, Color bg, Font font) {
         SurfaceData sd = getSurfaceData();
         Graphics2D g2d = new SunGraphics2D(sd, fg, bg, font);
@@ -153,6 +158,7 @@ class X11PlatformWindow implements PlatformToplevelWindow {
         return surfaceData;
     }
 
+    @Override
     public void setBounds(int x, int y, int width, int height, int op) {
         bounds.x = x;
         bounds.y = y;
@@ -167,11 +173,13 @@ class X11PlatformWindow implements PlatformToplevelWindow {
         }
     }
 
+    @Override
     public Insets getInsets() {
         // TODO: Return correct insets...
         return new Insets(0, 0, 0, 0);
     }
 
+    @Override
     public Point getLocationOnScreen() {
         Point ownLoc = getLocation();
         if (parent != null) {
@@ -194,34 +202,42 @@ class X11PlatformWindow implements PlatformToplevelWindow {
         return p;
     }
 
+    @Override
     public boolean canDetermineObscurity() {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
+    @Override
     public boolean isObscured() {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
+    @Override
     public void applyShape(Region shape) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
+    @Override
     public boolean isReparentSuppored() {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
+    @Override
     public void reparent(ContainerPeer newContainer) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
+    @Override
     public boolean isRestackSupported() {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
+    @Override
     public void restack() {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
+    @Override
     public void setVisible(boolean b) {
         SunToolkit.awtLock();
         try {
@@ -249,42 +265,52 @@ class X11PlatformWindow implements PlatformToplevelWindow {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
+    @Override
     public void createBuffers(int numBuffers, BufferCapabilities caps) throws AWTException {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
+    @Override
     public void destroyBuffers() {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
+    @Override
     public void flip(int x1, int y1, int x2, int y2, FlipContents flipAction) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
+    @Override
     public Image getBackBuffer() {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
+    @Override
     public void requestFocus() {
         System.err.println("IMPLEMENT: X11PlatformWindow.requestFocus()");
     }
 
+    @Override
     public int getState() {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
+    @Override
     public void setState(int state) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
+    @Override
     public void setMaximizedBounds(Rectangle bounds) {
         System.err.println("TODO: Implement X11PlatformWindow.setMaximizedBounds()");
     }
 
+    @Override
     public void setResizable(boolean resizable) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
+    @Override
     public void setTitle(String title) {
         throw new UnsupportedOperationException("Not supported yet.");
     }

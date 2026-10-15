@@ -50,7 +50,7 @@ public class XDrawableDataBuffer
   extends DataBuffer
 {
 
-  private Drawable xDrawable;
+  private final Drawable xDrawable;
 
   XDrawableDataBuffer(Drawable d)
   {

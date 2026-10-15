@@ -41,7 +41,7 @@ import java.util.logging.*;
  */
 public class PNGEncoderKeypoint extends PNGEncoder {
 
-    private static Logger logger = Logger.getLogger(PNGEncoderKeypoint.class.getName());
+    private static final Logger logger = Logger.getLogger(PNGEncoderKeypoint.class.getName());
     
     private static Class<?> keypointEncoderCls;
     private static Constructor<?> keypointEncoderConstructor;
@@ -54,11 +54,11 @@ public class PNGEncoderKeypoint extends PNGEncoder {
     /**
      * Loads the keypoint png encoder using reflection.
      */
-    private void loadKeypointEncoder() {
+    private static void loadKeypointEncoder() {
 	try {
 	    keypointEncoderCls = Class.forName("com.keypoint.PngEncoderB");
-	    keypointEncoderConstructor = keypointEncoderCls.getConstructor(new Class[] { BufferedImage.class, boolean.class, int.class, int.class });
-	    keypointEncodeMethod = keypointEncoderCls.getMethod("pngEncode", new Class[0]);
+	    keypointEncoderConstructor = keypointEncoderCls.getConstructor(BufferedImage.class, boolean.class, int.class, int.class);
+	    keypointEncodeMethod = keypointEncoderCls.getMethod("pngEncode");
 	} catch (ReflectiveOperationException ex) {
 	    logger.log(Level.INFO, ex.getMessage());
 	}
@@ -77,7 +77,7 @@ public class PNGEncoderKeypoint extends PNGEncoder {
     @Override
     public byte[] encode(BufferedImage img, int compression) {
 	try {
-	    Object encoderInstance = keypointEncoderConstructor.newInstance(new Object[] { img, Boolean.FALSE, Integer.valueOf(0), compression });
+	    Object encoderInstance = keypointEncoderConstructor.newInstance(img, Boolean.FALSE, 0, compression);
 	    return (byte[]) keypointEncodeMethod.invoke(encoderInstance, new Object[0]);
 	} catch (ReflectiveOperationException ex) {
 	    logger.log(Level.SEVERE, "Error encoding png image", ex);

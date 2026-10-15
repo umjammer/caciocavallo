@@ -41,7 +41,7 @@ import sun.java2d.loops.SurfaceType;
  */
 class SDL2SurfaceData extends SurfaceData {
 
-    static SurfaceType typeDefault =
+    static final SurfaceType typeDefault =
             SurfaceType.IntRgb.deriveSubType("Cacio SDL default");
 
     static {

@@ -4,11 +4,11 @@ import java.util.*;
 
 public class WebEventManager {
 
-    WebMouseStateTracker mouseTracker;
-    WebKeyboardStateTracker keyboardTracker;
-    WebSessionState state;
+    final WebMouseStateTracker mouseTracker;
+    final WebKeyboardStateTracker keyboardTracker;
+    final WebSessionState state;
 
-    HashMap<Integer, String[]> eventIDMap = new HashMap<>();
+    final HashMap<Integer, String[]> eventIDMap = new HashMap<>();
     int highestDispatchedEventID = 0;
 
     public WebEventManager(WebSessionState state) {
@@ -23,7 +23,7 @@ public class WebEventManager {
 	try {
 	    String[] params = paramStr.split("_");
 
-	    if (eventID == -1 || (eventID == highestDispatchedEventID + 1 && eventIDMap.size() == 0)) {
+	    if (eventID == -1 || (eventID == highestDispatchedEventID + 1 && eventIDMap.isEmpty())) {
 		dispatchEvent(params);
 		highestDispatchedEventID = eventID;
 	    } else {
@@ -31,8 +31,8 @@ public class WebEventManager {
 
 		ArrayList<Integer> sortedEventIDList = new ArrayList<>(eventIDMap.keySet());
 		Collections.sort(sortedEventIDList);
-		int minID = sortedEventIDList.get(0);
-		int maxId = sortedEventIDList.get(sortedEventIDList.size() - 1);
+		int minID = sortedEventIDList.getFirst();
+		int maxId = sortedEventIDList.getLast();
 
 		if (minID == highestDispatchedEventID + 1 && (maxId - minID) == (sortedEventIDList.size() - 1)) {
 		    for (int curEvId : sortedEventIDList) {
@@ -49,12 +49,11 @@ public class WebEventManager {
     }
 
     protected void dispatchEvent(String[] params) {
-	LinkedList<String> eventDataList = new LinkedList<>();
-	eventDataList.addAll(Arrays.asList(params));
+        LinkedList<String> eventDataList = new LinkedList<>(Arrays.asList(params));
 
-	while (eventDataList.size() > 0) {
+	while (!eventDataList.isEmpty()) {
 	    String command = eventDataList.removeFirst();
-	    if (command.length() > 0) {
+	    if (!command.isEmpty()) {
 
 		if (command.equals("M")) {
 		    processMouseEvent(eventDataList);

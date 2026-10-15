@@ -77,11 +77,13 @@ public class EscherRenderer
     // Nothing to do here.
   }
 
+  @Override
   public void drawArc(SunGraphics2D arg0, int arg1, int arg2, int arg3, int arg4, int arg5, int arg6)
   {
     throw new UnsupportedOperationException();
   }
 
+  @Override
   public void drawLine(SunGraphics2D sg2d, int x1, int y1, int x2, int y2)
   {
     SunToolkit.awtLock();
@@ -100,21 +102,25 @@ public class EscherRenderer
       }
   }
 
+  @Override
   public void drawOval(SunGraphics2D arg0, int arg1, int arg2, int arg3, int arg4)
   {
     throw new UnsupportedOperationException();
   }
 
+  @Override
   public void drawPolygon(SunGraphics2D arg0, int[] arg1, int[] arg2, int arg3)
   {
     throw new UnsupportedOperationException();
   }
 
+  @Override
   public void drawPolyline(SunGraphics2D arg0, int[] arg1, int[] arg2, int arg3)
   {
     throw new UnsupportedOperationException();
   }
 
+  @Override
   public void drawRect(SunGraphics2D sg2d, int x, int y, int w, int h)
   {
     SunToolkit.awtLock();
@@ -131,26 +137,31 @@ public class EscherRenderer
       }
   }
 
+  @Override
   public void drawRoundRect(SunGraphics2D arg0, int arg1, int arg2, int arg3, int arg4, int arg5, int arg6)
   {
     throw new UnsupportedOperationException();
   }
 
+  @Override
   public void fillArc(SunGraphics2D arg0, int arg1, int arg2, int arg3, int arg4, int arg5, int arg6)
   {
     throw new UnsupportedOperationException();
   }
 
+  @Override
   public void fillOval(SunGraphics2D arg0, int arg1, int arg2, int arg3, int arg4)
   {
     throw new UnsupportedOperationException();
   }
 
+  @Override
   public void fillPolygon(SunGraphics2D arg0, int[] arg1, int[] arg2, int arg3)
   {
     throw new UnsupportedOperationException();
   }
 
+  @Override
   public void fillRect(SunGraphics2D sg2d, int x, int y, int w, int h)
   {
     SunToolkit.awtLock();
@@ -164,21 +175,22 @@ public class EscherRenderer
       }
   }
 
+  @Override
   public void fillRoundRect(SunGraphics2D arg0, int arg1, int arg2, int arg3, int arg4, int arg5, int arg6)
   {
     throw new UnsupportedOperationException();
   }
 
+  @Override
   public void draw(SunGraphics2D sg2d, Shape s)
   {
     if (sg2d.strokeState == SunGraphics2D.STROKE_THIN)
       {
         // Delegate to drawPolygon() if possible...
-        if (s instanceof Polygon &&
+        if (s instanceof Polygon p &&
             sg2d.transformState < SunGraphics2D.TRANSFORM_TRANSLATESCALE)
           {
-            Polygon p = (Polygon) s;
-            drawPolygon(sg2d, p.xpoints, p.ypoints, p.npoints);
+              drawPolygon(sg2d, p.xpoints, p.ypoints, p.npoints);
             return;
           }
 
@@ -209,23 +221,21 @@ public class EscherRenderer
   }
   }
 
+  @Override
   public void fill(SunGraphics2D sg2d, Shape s)
   {
     if (sg2d.strokeState == SunGraphics2D.STROKE_THIN)
       {
         // Delegate to fillPolygon() if possible...
-        if (s instanceof Polygon &&
+        if (s instanceof Polygon p &&
             sg2d.transformState < SunGraphics2D.TRANSFORM_TRANSLATESCALE)
           {
-            Polygon p = (Polygon) s;
-            fillPolygon(sg2d, p.xpoints, p.ypoints, p.npoints);
-            return;
+              fillPolygon(sg2d, p.xpoints, p.ypoints, p.npoints);
           }
         else
           {
             // Otherwise we will use fillPath() for high-quality fills.
             doPath(sg2d, s, true);
-            return;
           }
       }
     else
@@ -274,13 +284,13 @@ public class EscherRenderer
       }
   }
 
-  private void fillSpans(SunGraphics2D sg2d, ShapeSpanIterator ssi,
-                         int transX, int transY)
+  private static void fillSpans(SunGraphics2D sg2d, ShapeSpanIterator ssi,
+                                int transX, int transY)
   {
     System.err.println("IMPLEMENT: EscherRenderer.fillSpans()");
   }
 
-  private void doPath(SunGraphics2D sg2d, Shape s, boolean isFill)
+  private static void doPath(SunGraphics2D sg2d, Shape s, boolean isFill)
   {
     SunToolkit.awtLock();
     try
@@ -291,7 +301,7 @@ public class EscherRenderer
             Path2D.Float p2df = new Path2D.Float(s, sg2d.transform);
             ssi.setOutputArea(sg2d.clipRegion);
             ssi.appendPath(p2df.getPathIterator(null));
-            int spanbox[] = new int[4];
+            int[] spanbox = new int[4];
             while (ssi.nextSpan(spanbox))
               {
                 int x = spanbox[0];
@@ -318,7 +328,7 @@ public class EscherRenderer
   {
   }
 
-  private void xFillRect(SunGraphics2D sg2d, int x, int y, int w, int h)
+  private static void xFillRect(SunGraphics2D sg2d, int x, int y, int w, int h)
   {
     XDrawableSurfaceData xdsf = (XDrawableSurfaceData) sg2d.surfaceData;
     GC gc = xdsf.getRenderGC(sg2d);

@@ -40,8 +40,9 @@ import sun.java2d.pipe.*;
  */
 public class CopyAreaScreenUpdate extends ScreenUpdate {
 
-    int dx, dy;
-    Region clip;
+    final int dx;
+    final int dy;
+    final Region clip;
 
     /**
      * 
@@ -78,6 +79,7 @@ public class CopyAreaScreenUpdate extends ScreenUpdate {
 	cmdList.add(clip.getHeight());
     }
 
+    @Override
     public WebRect getSurfaceDataUpdateArea() {
 	WebRect updateArea = getUpdateArea();
 	return new WebRect(updateArea.getX1() + dx, updateArea.getY1() + dy, updateArea.getX2() + dx, updateArea.getY2() + dy);

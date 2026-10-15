@@ -36,6 +36,7 @@ public class X11PlatformWindowFactory implements PlatformWindowFactory {
 
     private X11EventPump eventPump;
 
+    @Override
     public PlatformWindow createPlatformWindow(CacioComponent component, PlatformWindow parent) {
         Component awtC = component.getAWTComponent();
         return new X11PlatformWindow(getEventPump(), component, (X11PlatformWindow) parent,
@@ -43,12 +44,14 @@ public class X11PlatformWindowFactory implements PlatformWindowFactory {
                                      awtC.getHeight());
     }
 
+    @Override
     public PlatformToplevelWindow createPlatformToplevelWindow(CacioComponent component) {
         Component awtC = component.getAWTComponent();
         return new X11PlatformWindow(getEventPump(), component, awtC.getX(), awtC.getY(), awtC.getWidth(),
                                      awtC.getHeight());
     }
 
+    @Override
     public CacioEventPump<?> createEventPump() {
         return getEventPump();
     }

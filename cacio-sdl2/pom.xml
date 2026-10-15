@@ -46,7 +46,7 @@
           <plugin>
             <groupId>org.codehaus.mojo</groupId>
             <artifactId>exec-maven-plugin</artifactId>
-            <version>3.5.0</version>
+            <version>3.6.4</version>
             <executions>
               <execution>
                 <!--
@@ -211,13 +211,13 @@
     <dependency>
       <groupId>net.bytebuddy</groupId>
       <artifactId>byte-buddy</artifactId>
-      <version>1.17.0</version>
+      <version>1.18.15-jdk5</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>net.bytebuddy</groupId>
       <artifactId>byte-buddy-agent</artifactId>
-      <version>1.17.0</version>
+      <version>1.18.15-jdk5</version>
       <scope>test</scope>
     </dependency>
 

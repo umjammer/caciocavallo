@@ -49,7 +49,7 @@ import sun.java2d.pipe.*;
  */
 public class WebSurfaceData extends SurfaceData {
 
-    static SurfaceType typeDefault = SurfaceType.IntRgb.deriveSubType("Cacio Web default");
+    static final SurfaceType typeDefault = SurfaceType.IntRgb.deriveSubType("Cacio Web default");
 
     static {
 	initIDs();
@@ -59,9 +59,9 @@ public class WebSurfaceData extends SurfaceData {
     SurfaceData imgBufferSD;
     Graphics2D bufferGraphics;
 
-    private Rectangle bounds;
-    private GraphicsConfiguration configuration;
-    private Object destination;
+    private final Rectangle bounds;
+    private final GraphicsConfiguration configuration;
+    private final Object destination;
     int[] data;
 
     GridDamageTracker damageTracker;
@@ -118,9 +118,9 @@ public class WebSurfaceData extends SurfaceData {
 	return destination;
     }
 
-    private native final void initOps(int[] data, int width, int height, int stride);
+    private native void initOps(int[] data, int width, int height, int stride);
 
-    private static final native void initIDs();
+    private static native void initIDs();
 
     /**
      * Locks the surface, by locking the screen-lock
@@ -150,15 +150,15 @@ public class WebSurfaceData extends SurfaceData {
      */
     public final void addDirtyRectAndUnlock(int x1, int x2, int y1, int y2) {
 	try {
-	    x1 = (x1 > 0) ? x1 : 0;
-	    y1 = (y1 > 0) ? y1 : 0;
-	    x1 = (x1 < bounds.width) ? x1 : bounds.width;
-	    y1 = (y1 < bounds.height) ? y1 : bounds.height;
+	    x1 = Math.max(x1, 0);
+	    y1 = Math.max(y1, 0);
+	    x1 = Math.min(x1, bounds.width);
+	    y1 = Math.min(y1, bounds.height);
 
-	    x2 = (x2 > x1) ? x2 : x1;
-	    y2 = (y2 > y1) ? y2 : y1;
-	    x2 = (x2 < bounds.width) ? x2 : bounds.width;
-	    y2 = (y2 < bounds.height) ? y2 : bounds.height;
+	    x2 = Math.max(x2, x1);
+	    y2 = Math.max(y2, y1);
+	    x2 = Math.min(x2, bounds.width);
+	    y2 = Math.min(y2, bounds.height);
 
 	    WebRect rect = new WebRect(x1, y1, x2, y2);
 	    damageTracker.trackDamageRect(rect);
@@ -224,7 +224,7 @@ public class WebSurfaceData extends SurfaceData {
     public List<ScreenUpdate> fetchPendingSurfaceUpdates() {
 	addPendingUpdates(damageTracker.groupDamagedAreas(imgBuffer));
 
-	if (surfaceUpdateList.size() > 0) {
+	if (!surfaceUpdateList.isEmpty()) {
 	    mergeMultipleScreenUpdates();
 
 	    List<ScreenUpdate> pendingUpdateList = surfaceUpdateList;

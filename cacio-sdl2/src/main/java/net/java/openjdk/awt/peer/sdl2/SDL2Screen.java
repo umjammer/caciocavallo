@@ -61,7 +61,7 @@ class SDL2Screen implements PlatformScreen, CacioEventSource {
         height = dim.height;
     }
 
-    private long nativeSDLdata;
+    private final long nativeSDLdata;
     private EventData eventData;
     private SDL2SurfaceData surfaceData;
 

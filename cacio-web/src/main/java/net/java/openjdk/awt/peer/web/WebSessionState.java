@@ -44,15 +44,15 @@ import sun.awt.*;
  * @author Clemens Eisserer <linuxhippy@gmail.com>
  */
 public class WebSessionState {
-    private Logger logger = Logger.getLogger(this.getClass().getName());
+    private final Logger logger = Logger.getLogger(this.getClass().getName());
 
-    ReentrantLock sessionLock = new ReentrantLock();
+    final ReentrantLock sessionLock = new ReentrantLock();
     volatile WebEventManager eventManager;
     volatile WebGraphicsConfiguration config;
     volatile WebScreen screen;
     WebWindowFactory windowFactory;
     WebFocusManager focusManager;
-    int subSessionID;
+    final int subSessionID;
 
     String[] cmdLineParams;
     String mainClsName;
@@ -61,7 +61,7 @@ public class WebSessionState {
     int compressLevel;
 
     AppContext appContext;
-    HashMap<Integer, WebSessionState> subSessionMap;
+    final HashMap<Integer, WebSessionState> subSessionMap;
 
     volatile boolean contextInitialized = false;
     
@@ -115,14 +115,12 @@ public class WebSessionState {
 	if (appContext != null) {
 	    logSessionDispose();
 	    
-	    SunToolkit.postEvent(appContext, new InvocationEvent(this, new Runnable() {
-		public void run() {
-		    Window[] windowArray = Window.getWindows();
-		    for(Window w : windowArray) {
-			w.dispose();
-		    }
-		}
-	    }));
+	    SunToolkit.postEvent(appContext, new InvocationEvent(this, () -> {
+            Window[] windowArray = Window.getWindows();
+            for(Window w : windowArray) {
+            w.dispose();
+            }
+        }));
 	    
 	    appContext.dispose();
 	}
@@ -135,7 +133,7 @@ public class WebSessionState {
 	EventQueue queue = (EventQueue) appContext.get(AppContext.EVENT_QUEUE_KEY);
 	if (queue != null) {
 	    try {
-		Method getDispatchThreadMethod = queue.getClass().getDeclaredMethod("getDispatchThread", new Class[0]);
+		Method getDispatchThreadMethod = queue.getClass().getDeclaredMethod("getDispatchThread");
 		getDispatchThreadMethod.setAccessible(true);
 		Thread edt = (Thread) getDispatchThreadMethod.invoke(queue, new Object[0]);
 		if(edt != null) {

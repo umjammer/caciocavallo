@@ -11,7 +11,7 @@ public class TestCanvas extends Canvas {
     /**
      * @param args
      */
-    public static void main(String[] args) {
+    static void main(String[] args) {
         Frame f = new Frame();
         f.setLayout(new GridLayout(1, 2));
         f.add(new TestCanvas());
@@ -20,6 +20,7 @@ public class TestCanvas extends Canvas {
         f.setVisible(true);
     }
 
+    @Override
     public void paint(Graphics g) {
         System.out.println("Painting the canvas thingy...");
         g.setColor(Color.RED);

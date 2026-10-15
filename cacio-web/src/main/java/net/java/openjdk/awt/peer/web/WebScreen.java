@@ -29,6 +29,8 @@ import java.awt.*;
 import java.awt.geom.*;
 import java.awt.image.*;
 import java.io.*;
+import java.lang.System.Logger;
+import java.lang.System.Logger.Level;
 import java.util.*;
 import java.util.List;
 import java.util.concurrent.*;
@@ -52,15 +54,17 @@ import sun.java2d.*;
  */
 public class WebScreen implements PlatformScreen {
 
+    private static final Logger logger = System.getLogger(WebScreen.class.getName());
+
     private int width;
     private int height;
 
-    WebGraphicsConfiguration config;
+    final WebGraphicsConfiguration config;
 
-    ReentrantLock screenLock;
-    Condition screenCondition;
+    final ReentrantLock screenLock;
+    final Condition screenCondition;
 
-    ArrayList<ScreenUpdate> pendingUpdateList;
+    final ArrayList<ScreenUpdate> pendingUpdateList;
     Transport encoder;
 
     private EventData eventData;
@@ -81,11 +85,12 @@ public class WebScreen implements PlatformScreen {
 	pendingUpdateList = new ArrayList<>();
     }
 
+    @Override
     public Graphics2D getClippedGraphics(Color fg, Color bg, Font font, List<Rectangle> clipRects) {
 
 	WebSurfaceData data = getSurfaceData();
 	Graphics2D g2d = new SunGraphics2D(data, fg, bg, font);
-	if (clipRects != null && clipRects.size() > 0) {
+	if (clipRects != null && !clipRects.isEmpty()) {
 	    Area a = new Area(getBounds());
 	    for (Rectangle clip : clipRects) {
 		a.subtract(new Area(clip));
@@ -95,14 +100,17 @@ public class WebScreen implements PlatformScreen {
 	return g2d;
     }
 
+    @Override
     public ColorModel getColorModel() {
 	return getGraphicsConfiguration().getColorModel();
     }
 
+    @Override
     public GraphicsConfiguration getGraphicsConfiguration() {
 	return config;
     }
 
+    @Override
     public Rectangle getBounds() {
 	return new Rectangle(0, 0, width, height);
     }
@@ -141,7 +149,7 @@ public class WebScreen implements PlatformScreen {
 	return surfaceData;
     }
 
-    private native final long nativeInitScreen(int width, int height);
+    private native long nativeInitScreen(int width, int height);
 
     public WebGraphicsConfiguration getConfig() {
 	return config;
@@ -185,7 +193,7 @@ public class WebScreen implements PlatformScreen {
     }
 
     /**
-     * Signall a possible waiting thread
+     * Signally a possible waiting thread
      */
     public final void signalScreen() {
 	screenCondition.signal();
@@ -196,13 +204,11 @@ public class WebScreen implements PlatformScreen {
      * updates are available - Waits up to timeout seconds, of no updates are
      * available.
      * 
-     * @param response
-     *            - the HttpServletResponse the updates will be written to
      * @param timeout
      * @throws IOException
      */
     public Transport pollForScreenUpdates(int timeout) throws IOException {
-	
+
 	boolean updatesWritten = false;
 	try {
 	    lockScreen();
@@ -226,7 +232,7 @@ public class WebScreen implements PlatformScreen {
 			lockScreen();
 		    }
 		} catch (InterruptedException e) {
-		    e.printStackTrace();
+            logger.log(Level.ERROR, e.getMessage(), e);
 		}
 
 		updatesWritten = prepareScreenUpdates();
@@ -243,8 +249,6 @@ public class WebScreen implements PlatformScreen {
      * If ScreenUpdates are pending, preserve/encode pending them,
      * so the ScreenLock can be released and rendering can continue.
      * 
-     * @param os
-     *            the OUtputStream the pending updates are written to
      * @return true if updates have been written, false if no updates were
      *         pending.
      * @throws IOException
@@ -264,7 +268,7 @@ public class WebScreen implements PlatformScreen {
 		pendingUpdateList.addAll(screenUpdates);
 	    }
 
-	    if (pendingUpdateList.size() > 0) {
+	    if (!pendingUpdateList.isEmpty()) {
 		ArrayList<Integer> cmdList = new ArrayList<>(pendingUpdateList.size() * 7);
 
 		// Refactor

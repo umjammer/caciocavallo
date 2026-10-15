@@ -94,7 +94,7 @@ public class BlitClipHelper {
                                     sx, sy, dx, dy, w, h);
         } else {
             SpanIterator si = clip.getSpanIterator();
-            int spanbox[] = new int[4];
+            int[] spanbox = new int[4];
             while (si.nextSpan(spanbox)) {
                 int cx = spanbox[0];
                 int cy = spanbox[1];

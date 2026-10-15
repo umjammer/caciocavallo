@@ -69,6 +69,7 @@ class X11Blit extends Blit implements BlitClipHelper.Blitter {
         }
     }
 
+    @Override
     public void doBlit(SurfaceData src, SurfaceData dst, Composite comp,
                        int sx, int sy, int dx, int dy, int w, int h) {
         nativeBlit(X11GraphicsEnvironment.getDisplay(), src, dst,

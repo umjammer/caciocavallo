@@ -54,12 +54,12 @@ class EscherTextRenderer
     Drawable xd = xdsd.getDrawable();
     GC gc = xdsd.getRenderGC(sg2d);
     int numglyphs = gl.getNumGlyphs();
-    int strbounds[] = gl.getBounds(numglyphs);
+    int[] strbounds = gl.getBounds(numglyphs);
     for (int gi = 0; gi < numglyphs; gi++)
       {
         gl.setGlyphIndex(gi);
-        int metrics[] = gl.getMetrics();
-        byte bits[] = gl.getGrayBits();
+        int[] metrics = gl.getMetrics();
+        byte[] bits = gl.getGrayBits();
         int glyphx = metrics[0];
         int glyphy = metrics[1];
         int glyphw = metrics[2];
@@ -78,7 +78,7 @@ class EscherTextRenderer
       }
   }
 
-  private void drawPixel(Drawable xd, GC gc, int alpha, int dx, int dy)
+  private static void drawPixel(Drawable xd, GC gc, int alpha, int dx, int dy)
   {
     if (alpha == 0xffffffff)
       xd.point(gc, dx, dy);

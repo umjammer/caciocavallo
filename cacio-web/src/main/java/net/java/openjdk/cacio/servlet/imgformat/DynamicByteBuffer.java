@@ -39,7 +39,7 @@ import java.util.*;
 public class DynamicByteBuffer {
     final int bufferSize;
 
-    ArrayList<byte[]> bufferList = new ArrayList<>();
+    final ArrayList<byte[]> bufferList = new ArrayList<>();
 
     int curBufferPos = 0;
     byte[] curBuffer;
@@ -64,9 +64,9 @@ public class DynamicByteBuffer {
     }
     
     public final void write(byte[] b) {
-	for(int i=0; i < b.length; i++) {
-	    write(b[i]);
-	}
+        for (byte value : b) {
+            write(value);
+        }
     }
 
     /**

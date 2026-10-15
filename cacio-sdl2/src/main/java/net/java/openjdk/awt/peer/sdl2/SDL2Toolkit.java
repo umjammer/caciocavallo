@@ -32,7 +32,6 @@ import java.awt.GraphicsConfiguration;
 import java.awt.GraphicsDevice;
 import java.awt.HeadlessException;
 import java.awt.PrintJob;
-import java.awt.Robot;
 import java.awt.SystemTray;
 import java.awt.TrayIcon;
 import java.awt.Window;
@@ -69,7 +68,7 @@ import com.github.caciocavallosilano.cacio.peer.managed.FullScreenWindowFactory;
  */
 public class SDL2Toolkit extends CacioToolkit {
 
-    private static Logger logger =
+    private static final Logger logger =
         Logger.getLogger("net.java.openjdk.awt.peer.sdl.CacioToolkit");
 
     /*

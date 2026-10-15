@@ -79,8 +79,8 @@ public class SDL2Blit extends Blit implements BlitClipHelper.Blitter {
         nativeBlit(src, dst, sx, sy, dx, dy, w, h);
     }
     
-    private native final void nativeBlit(SurfaceData src, SurfaceData dst,
-                                         int sx, int sy, int dx, int dy,
-                                         int w, int h);
+    private native void nativeBlit(SurfaceData src, SurfaceData dst,
+                                   int sx, int sy, int dx, int dy,
+                                   int w, int h);
 
 }

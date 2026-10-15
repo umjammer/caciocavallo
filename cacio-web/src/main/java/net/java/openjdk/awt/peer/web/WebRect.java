@@ -107,11 +107,11 @@ public class WebRect {
      * @return
      */
     public WebRect union(List<WebRect> rectList) {
-	if (rectList.size() == 0) {
+	if (rectList.isEmpty()) {
 	    return null;
 	}
 
-	WebRect unionRect = new WebRect(rectList.get(0));
+	WebRect unionRect = new WebRect(rectList.getFirst());
 	for (WebRect rect : rectList) {
 	    unionRect.union(rect);
 	}

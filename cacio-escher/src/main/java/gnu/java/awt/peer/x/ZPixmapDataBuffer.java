@@ -56,12 +56,11 @@ class ZPixmapDataBuffer
   /**
    * The backing ZPixmap.
    */
-  private ZPixmap zpixmap;
+  private final ZPixmap zpixmap;
 
   /**
    * Creates a new ZPixmapDataBuffer with a specified width and height.
    *
-   * @param d the X display
    * @param w the width
    * @param h the height
    */

@@ -26,6 +26,8 @@
 package net.java.openjdk.cacio.servlet.benchmark;
 
 import java.io.*;
+import java.lang.System.Logger;
+import java.lang.System.Logger.Level;
 
 import javax.servlet.*;
 import javax.servlet.http.*;
@@ -38,7 +40,9 @@ import javax.servlet.http.*;
  */
 public class ImgBenchServlet extends HttpServlet {
 
-    byte[] imgData;
+    private static final Logger logger = System.getLogger(ImgBenchServlet.class.getName());
+
+    final byte[] imgData;
 
     public ImgBenchServlet() {
 	imgData = loadFileInArray("150.rle");
@@ -57,7 +61,7 @@ public class ImgBenchServlet extends HttpServlet {
 	    fin.close();
 	    return bos.toByteArray();
 	} catch (IOException ex) {
-	    ex.printStackTrace();
+        logger.log(Level.ERROR, ex.getMessage(), ex);
 	}
 
 	return null;

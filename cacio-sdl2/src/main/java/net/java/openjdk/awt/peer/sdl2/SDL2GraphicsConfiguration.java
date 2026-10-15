@@ -56,7 +56,7 @@ class SDL2GraphicsConfiguration extends GraphicsConfiguration
         return surfaceManagerFactory.createVolatileManager(image, context);
     }
 
-    private SDL2GraphicsDevice device;
+    private final SDL2GraphicsDevice device;
 
     SDL2GraphicsConfiguration(SDL2GraphicsDevice device) {
         this.device = device;

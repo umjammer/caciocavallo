@@ -54,7 +54,7 @@ public class WebGraphicsConfiguration extends GraphicsConfiguration
     }
 
 
-    private WebGraphicsDevice device;
+    private final WebGraphicsDevice device;
     private WeakReference<WebScreen> screenRef;
 
     public WebGraphicsConfiguration() {

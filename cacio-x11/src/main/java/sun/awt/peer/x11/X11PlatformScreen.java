@@ -50,9 +50,10 @@ class X11PlatformScreen implements PlatformScreen, CacioEventSource {
 
     private X11SurfaceData surfaceData;
 
-    private int width, height;
+    private final int width;
+    private final int height;
 
-    private long window;
+    private final long window;
 
     private EventData eventData;
 
@@ -75,7 +76,7 @@ class X11PlatformScreen implements PlatformScreen, CacioEventSource {
                                          List<Rectangle> clipRects) {
         X11SurfaceData sd = getSurfaceData();
         Graphics2D g2d = new SunGraphics2D(sd, fg, bg, font);
-        if (clipRects != null && clipRects.size() > 0) {
+        if (clipRects != null && !clipRects.isEmpty()) {
             Area a = new Area(getBounds());
             for (Rectangle clip : clipRects) {
                 a.subtract(new Area(clip));
@@ -95,18 +96,22 @@ class X11PlatformScreen implements PlatformScreen, CacioEventSource {
         return surfaceData;
     }
 
+    @Override
     public ColorModel getColorModel() {
         return getGraphicsConfiguration().getColorModel();
     }
 
+    @Override
     public GraphicsConfiguration getGraphicsConfiguration() {
         return X11GraphicsConfiguration.getDefaultGC();
     }
 
+    @Override
     public Rectangle getBounds() {
         return new Rectangle(0, 0, width, height);
     }
 
+    @Override
     public EventData getNextEvent() {
         if (eventData == null) {
             eventData = new EventData();

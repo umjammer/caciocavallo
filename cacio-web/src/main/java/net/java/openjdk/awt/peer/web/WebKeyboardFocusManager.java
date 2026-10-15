@@ -45,6 +45,7 @@ public class WebKeyboardFocusManager extends DefaultKeyboardFocusManager {
     private Window focusedWindow;
     private Window activeWindow;
     
+    @Override
     public Component getFocusOwner() {
         synchronized (KeyboardFocusManager.class) {
             if (focusOwner == null) {
@@ -55,6 +56,7 @@ public class WebKeyboardFocusManager extends DefaultKeyboardFocusManager {
         }
     }
 
+    @Override
     protected Component getGlobalFocusOwner() throws SecurityException {
         synchronized (KeyboardFocusManager.class) {
             if (this == getCurrentKeyboardFocusManager()) {
@@ -68,6 +70,7 @@ public class WebKeyboardFocusManager extends DefaultKeyboardFocusManager {
         }
     }
 
+    @Override
     protected void setGlobalFocusOwner(Component focusOwner) {
         Component oldFocusOwner = null;
         boolean shouldFire = false;
@@ -110,6 +113,7 @@ public class WebKeyboardFocusManager extends DefaultKeyboardFocusManager {
         }
     }
 
+    @Override
     protected Component getGlobalPermanentFocusOwner()
             throws SecurityException
         {
@@ -125,6 +129,7 @@ public class WebKeyboardFocusManager extends DefaultKeyboardFocusManager {
             }
         }
 
+    @Override
     public Component getPermanentFocusOwner() {
         synchronized (KeyboardFocusManager.class) {
             if (permanentFocusOwner == null) {
@@ -135,6 +140,7 @@ public class WebKeyboardFocusManager extends DefaultKeyboardFocusManager {
         }
     }
 
+    @Override
     protected void setGlobalPermanentFocusOwner(Component permanentFocusOwner)
     {
         Component oldPermanentFocusOwner = null;
@@ -168,6 +174,7 @@ public class WebKeyboardFocusManager extends DefaultKeyboardFocusManager {
                                permanentFocusOwner);
         }
     }
+    @Override
     public Window getFocusedWindow() {
         synchronized (KeyboardFocusManager.class) {
             if (focusedWindow == null) {
@@ -178,6 +185,7 @@ public class WebKeyboardFocusManager extends DefaultKeyboardFocusManager {
         }
     }
 
+    @Override
     protected Window getGlobalFocusedWindow() throws SecurityException {
         synchronized (KeyboardFocusManager.class) {
             if (this == getCurrentKeyboardFocusManager()) {
@@ -191,6 +199,7 @@ public class WebKeyboardFocusManager extends DefaultKeyboardFocusManager {
         }
     }
 
+    @Override
     protected void setGlobalFocusedWindow(Window focusedWindow) {
         Window oldFocusedWindow = null;
         boolean shouldFire = false;
@@ -218,6 +227,7 @@ public class WebKeyboardFocusManager extends DefaultKeyboardFocusManager {
         }
     }
 
+    @Override
     public Window getActiveWindow() {
         synchronized (KeyboardFocusManager.class) {
             if (activeWindow == null) {
@@ -246,6 +256,7 @@ public class WebKeyboardFocusManager extends DefaultKeyboardFocusManager {
      * @throws SecurityException if this KeyboardFocusManager is not the
      *         current KeyboardFocusManager for the calling thread's context
      */
+    @Override
     protected Window getGlobalActiveWindow() throws SecurityException {
         synchronized (KeyboardFocusManager.class) {
             if (this == getCurrentKeyboardFocusManager()) {
@@ -281,6 +292,7 @@ public class WebKeyboardFocusManager extends DefaultKeyboardFocusManager {
      * @beaninfo
      *       bound: true
      */
+    @Override
     protected void setGlobalActiveWindow(Window activeWindow) {
         Window oldActiveWindow;
         synchronized (KeyboardFocusManager.class) {

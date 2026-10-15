@@ -37,7 +37,7 @@ import java.util.logging.*;
  * @author Clemens Eisserer <linuxhippy@gmail.com>
  */
 public abstract class PNGEncoder {
-    private static Logger logger = Logger.getLogger(PNGEncoder.class.getName());
+    private static final Logger logger = Logger.getLogger(PNGEncoder.class.getName());
     
     private static PNGEncoder instance;
 

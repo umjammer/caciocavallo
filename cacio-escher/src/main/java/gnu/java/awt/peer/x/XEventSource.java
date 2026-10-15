@@ -63,8 +63,6 @@ import gnu.x11.event.EventCode;
 import gnu.x11.event.Expose;
 import gnu.x11.event.FocusIn;
 import gnu.x11.event.Input;
-import gnu.x11.event.KeyPress;
-import gnu.x11.event.KeyRelease;
 import gnu.x11.event.MotionNotify;
 import gnu.x11.event.PropertyNotify;
 import com.github.caciocavallosilano.cacio.peer.CacioComponent;
@@ -83,13 +81,13 @@ public class XEventSource implements CacioEventSource
   /**
    * The X Display from which we fetch and pump up events.
    */
-  private Display display;
+  private final Display display;
 
   /**
    * Maps X Windows to AWT Windows to be able to correctly determine the
    * event targets.
    */
-  private HashMap<Integer,CacioComponent> windows;
+  private final HashMap<Integer,CacioComponent> windows;
 
   /**
    * Indicates if we are currently inside a drag operation. This is
@@ -106,7 +104,7 @@ public class XEventSource implements CacioEventSource
   /**
    * Events waiting to be dispatched.
    */
-  private LinkedList<EventData> waitingEvents;
+  private final LinkedList<EventData> waitingEvents;
 
   /**
    * Creates a new XEventPump for the specified X Display.
@@ -125,7 +123,7 @@ public class XEventSource implements CacioEventSource
   @Override
   public EventData getNextEvent() {
  
-      if (waitingEvents.size() > 0) {
+      if (!waitingEvents.isEmpty()) {
           return waitingEvents.removeFirst();
       }
 
@@ -140,23 +138,23 @@ public class XEventSource implements CacioEventSource
    * event pump can correctly determine the event targets.
    *
    * @param xWindow the X Window
-   * @param awtWindow the AWT Window
+   * @param cacioComponent the AWT Window
    */
   void registerWindow(gnu.x11.Window xWindow, CacioComponent cacioComponent)
   {
     if (EscherToolkit.DEBUG)
       System.err.println("registering window id: " + xWindow.id());
-    windows.put(new Integer(xWindow.id()), cacioComponent);
+    windows.put(xWindow.id(), cacioComponent);
   }
 
   void unregisterWindow(gnu.x11.Window xWindow)
   {
-    windows.remove(new Integer(xWindow.id()));
+    windows.remove(xWindow.id());
   }
 
   private void handleButtonPress(ButtonPress event)
   {
-    Integer key = new Integer(event.getEventWindowID());
+    Integer key = event.getEventWindowID();
     CacioComponent cacioComponent = windows.get(key);
 
     // Create and post the mouse event.
@@ -182,7 +180,7 @@ public class XEventSource implements CacioEventSource
 
   private void handleButtonRelease(ButtonRelease event)
   {
-    Integer key = new Integer(event.getEventWindowID());
+    Integer key = event.getEventWindowID();
     CacioComponent cacioComponent = windows.get(key);
     Component awtComp = cacioComponent.getAWTComponent();
 
@@ -207,7 +205,7 @@ public class XEventSource implements CacioEventSource
 
   private void handleMotionNotify(MotionNotify event)
   {
-    Integer key = new Integer(event.getEventWindowID());
+    Integer key = event.getEventWindowID();
     CacioComponent cacioComponent = windows.get(key);
     Component awtComponent = cacioComponent.getAWTComponent();
 
@@ -284,7 +282,7 @@ public class XEventSource implements CacioEventSource
 
   private void handleConfigureNotify(ConfigureNotify event)
   {
-    Integer key = new Integer(event.getWindowID());
+    Integer key = event.getWindowID();
     CacioComponent cacioComponent = windows.get(key);
 
     if (EscherToolkit.DEBUG)
@@ -293,7 +291,7 @@ public class XEventSource implements CacioEventSource
     // Detect and report size changes.
     clearWindow(cacioComponent, event.x(), event.y(), event.width(), event.height());
 
-    if (waitingEvents.size() > 0) {
+    if (!waitingEvents.isEmpty()) {
         data = waitingEvents.removeFirst();
     }
   }
@@ -302,7 +300,7 @@ public class XEventSource implements CacioEventSource
   // and/or check timing (timing is generated for PropertyChange)?
   private void handleExpose(Expose event)
   {
-    Integer key = new Integer(event.getWindowID());
+    Integer key = event.getWindowID();
     CacioComponent cacioComponent = windows.get(key);
     Component awtComponent = cacioComponent.getAWTComponent();
 
@@ -328,7 +326,7 @@ public class XEventSource implements CacioEventSource
     if (EscherToolkit.DEBUG)
       System.err.println("DestroyNotify event: " + destroyNotify);
 
-    Integer key = new Integer(destroyNotify.getEventWindowID());
+    Integer key = destroyNotify.getEventWindowID();
     CacioComponent cacioComponent = windows.get(key);
     Component awtComp = cacioComponent.getAWTComponent();
     if (awtComp instanceof Window) {
@@ -347,7 +345,7 @@ public class XEventSource implements CacioEventSource
         if (EscherToolkit.DEBUG)
           System.err.println("ClientMessage is a delete_window event");
 
-        Integer key = new Integer(clientMessage.getWindowID());
+        Integer key = clientMessage.getWindowID();
         CacioComponent cacioComponent = windows.get(key);
         Component awtComp = cacioComponent.getAWTComponent();
         if (awtComp instanceof Window) {
@@ -383,7 +381,7 @@ public class XEventSource implements CacioEventSource
       break;
     case KEY_PRESS:
     case KEY_RELEASE:
-      key = new Integer(((Input) xEvent).getEventWindowID());
+      key = ((Input) xEvent).getEventWindowID();
       cacioComponent = windows.get(key);
       handleKeyEvent(xEvent, cacioComponent);
       break;
@@ -394,7 +392,7 @@ public class XEventSource implements CacioEventSource
       this.handleClientMessage((ClientMessage) xEvent);
       break;
     case PROPERTY_NOTIFY:
-      key = new Integer (((PropertyNotify) xEvent).getWindowID());
+      key = ((PropertyNotify) xEvent).getWindowID();
       cacioComponent = windows.get(key);
       Component awtComponent = cacioComponent.getAWTComponent();
       if (awtComponent instanceof Window) {
@@ -415,7 +413,7 @@ public class XEventSource implements CacioEventSource
   }
 
   private void handleFocusEvent(FocusIn focusEvent) {
-      Integer key = new Integer(focusEvent.getEventWindowID());
+      Integer key = focusEvent.getEventWindowID();
       CacioComponent cacioComponent = windows.get(key);
       Component awtComponent = cacioComponent.getAWTComponent();
       java.awt.event.FocusEvent fe =
@@ -428,7 +426,7 @@ public class XEventSource implements CacioEventSource
    * Handles key events from X.
    *
    * @param xEvent the X event
-   * @param awtWindow the AWT window to which the event gets posted
+   * @param cacioComponent the AWT window to which the event gets posted
    */
   private void handleKeyEvent(Event xEvent, CacioComponent cacioComponent)
   {
@@ -488,23 +486,18 @@ public class XEventSource implements CacioEventSource
    */
   static int buttonToModifier(int button)
   {
-    switch (KeyMask.getButton(button))
-    {
-      case BUTTON1:
-        return MouseEvent.BUTTON1_DOWN_MASK | MouseEvent.BUTTON1_MASK;
-      case BUTTON2:
-        return MouseEvent.BUTTON2_DOWN_MASK | MouseEvent.BUTTON2_MASK;
-      case BUTTON3:
-        return MouseEvent.BUTTON3_DOWN_MASK | MouseEvent.BUTTON3_MASK;
-      default:
-    }
+      return switch (KeyMask.getButton(button)) {
+          case BUTTON1 -> MouseEvent.BUTTON1_DOWN_MASK | MouseEvent.BUTTON1_MASK;
+          case BUTTON2 -> MouseEvent.BUTTON2_DOWN_MASK | MouseEvent.BUTTON2_MASK;
+          case BUTTON3 -> MouseEvent.BUTTON3_DOWN_MASK | MouseEvent.BUTTON3_MASK;
+          default -> 0;
+      };
 
-    return 0;
   }
 
   private static final Insets EMPTY_INSETS = new Insets(0, 0, 0, 0);
 
-  private Insets getComponentInsets(CacioComponent cacioComp) {
+  private static Insets getComponentInsets(CacioComponent cacioComp) {
       Insets insets;
       Component awtComp = cacioComp.getAWTComponent();
       if (awtComp instanceof Container) {

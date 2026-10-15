@@ -37,9 +37,10 @@ import sun.awt.AWTAccessor;
 
 public class TestPanel {
 
-    public static void main(String[] args) {
+    static void main(String[] args) {
         Frame f = new Frame();
         f.addWindowListener(new WindowAdapter() {
+            @Override
             public void windowClosing(WindowEvent e) {
                 System.exit(0);
             }

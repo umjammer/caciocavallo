@@ -51,7 +51,7 @@ class X11GraphicsConfiguration extends GraphicsConfiguration
 
 
 
-    private X11GraphicsDevice device;
+    private final X11GraphicsDevice device;
 
     X11GraphicsConfiguration(X11GraphicsDevice dev) {
         device = dev;

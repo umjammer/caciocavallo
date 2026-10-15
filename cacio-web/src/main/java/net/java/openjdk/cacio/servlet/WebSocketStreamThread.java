@@ -1,6 +1,8 @@
 package net.java.openjdk.cacio.servlet;
 
 import java.io.IOException;
+import java.lang.System.Logger;
+import java.lang.System.Logger.Level;
 
 import javax.servlet.http.HttpSession;
 
@@ -16,6 +18,9 @@ import net.java.openjdk.cacio.servlet.transport.Transport;
 
 @WebSocket
 public class WebSocketStreamThread extends Thread {
+
+    private static final Logger logger = System.getLogger(WebSocketStreamThread.class.getName());
+
     WebSessionState state;
     private Session session;
     final WebSessionManager sessionManager;
@@ -33,12 +38,14 @@ public class WebSocketStreamThread extends Thread {
         // at least the wrapped class should have a getter method for original.
         this.state = WebSessionManager.getInstance().getSessionState(new UpgradeHttpServletRequest(null) {
             // depends on getSessionState() implementation uses only two methods bellow.
+            @Override
             public HttpSession getSession(boolean create) {
                 // casting depends on UpgradeRequest implementation is only ServletUpgradeRequest.
                 return (HttpSession) session.getUpgradeRequest().getSession();
             }
+            @Override
             public String getParameter(String name) {
-                return session.getUpgradeRequest().getParameterMap().get(name).get(0);
+                return session.getUpgradeRequest().getParameterMap().get(name).getFirst();
             }
         });
         start();
@@ -57,6 +64,7 @@ public class WebSocketStreamThread extends Thread {
         close = true;
     }
 
+    @Override
     public void run() {
         try {
             sessionManager.registerSessionAtCurrentThread(state);
@@ -69,7 +77,7 @@ public class WebSocketStreamThread extends Thread {
                 }
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.log(Level.ERROR, e.getMessage(), e);
             close = true;
         }
 

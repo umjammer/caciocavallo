@@ -65,7 +65,7 @@ import sun.java2d.pipe.Region;
 
 class EscherPlatformWindow implements PlatformToplevelWindow {
 
-    private static int standardSelect =
+    private static final int standardSelect =
                         Event.EventMask.BUTTON_PRESS_MASK.getMask()
                         | Event.EventMask.BUTTON_RELEASE_MASK.getMask() | Event.EventMask.POINTER_MOTION_MASK.getMask()
                         // | Event.RESIZE_REDIRECT_MASK.getMask() //
@@ -80,17 +80,17 @@ class EscherPlatformWindow implements PlatformToplevelWindow {
     /**
      * The corresponding CacioCavallo component.
      */
-    private CacioComponent cacioComponent;
+    private final CacioComponent cacioComponent;
 
     /**
      * The X window.
      */
-    Window xwindow;
+    final Window xwindow;
 
     /**
      * The surface data object for this window.
      */
-    private SurfaceData surfaceData;
+    private final SurfaceData surfaceData;
 
     /**
      * The frame insets. These get updated in {@link #show()}.
@@ -149,11 +149,9 @@ class EscherPlatformWindow implements PlatformToplevelWindow {
         awtComp.setFont(new Font(Font.DIALOG, Font.PLAIN, 12));
 
         boolean undecorated;
-        if (awtComp instanceof Frame) {
-            Frame f = (Frame) awtComp;
+        if (awtComp instanceof Frame f) {
             undecorated = f.isUndecorated();
-        } else if (awtComp instanceof Dialog) {
-            Dialog d = (Dialog) awtComp;
+        } else if (awtComp instanceof Dialog d) {
             undecorated = d.isUndecorated();
         } else {
             // Everything else is undecorated by default.
@@ -298,8 +296,7 @@ class EscherPlatformWindow implements PlatformToplevelWindow {
       xwindow.map();
       EventQueue eq = Toolkit.getDefaultToolkit().getSystemEventQueue();
       Component awtComponent = cacioComponent.getAWTComponent();
-      if (awtComponent instanceof java.awt.Window) {
-          java.awt.Window w = (java.awt.Window) awtComponent;
+      if (awtComponent instanceof java.awt.Window w) {
           eq.postEvent(new WindowEvent(w, WindowEvent.WINDOW_OPENED));
       }
       eq.postEvent(new PaintEvent(awtComponent, PaintEvent.PAINT,

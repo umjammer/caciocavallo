@@ -118,7 +118,7 @@ public class XGraphicsEnvironment
               }
           }
         devices = deviceList.toArray
-                                      (new XGraphicsDevice[deviceList.size()]);
+                                      (XGraphicsDevice[]::new);
       }
     catch (FileNotFoundException ex)
       {
@@ -137,7 +137,7 @@ public class XGraphicsEnvironment
    * is no configuration for the default.
    * @throws EscherServerConnectionException 
    */
-  private XGraphicsDevice initDefaultDevice()
+  private static XGraphicsDevice initDefaultDevice()
   {
     String display = System.getenv("DISPLAY");
     if (display == null)

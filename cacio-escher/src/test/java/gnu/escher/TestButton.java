@@ -11,7 +11,7 @@ import javax.swing.JFrame;
  */
 public class TestButton
 {
-  public static void main(String[] args)
+  static void main(String[] args)
   {
     //JFrame.setDefaultLookAndFeelDecorated(true);
     JFrame f = new JFrame();

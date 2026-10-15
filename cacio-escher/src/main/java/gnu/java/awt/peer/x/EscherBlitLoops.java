@@ -85,6 +85,7 @@ class EscherBlitLoops
           dstType);
   }
 
+  @Override
   public void Blit(SurfaceData src, SurfaceData dst,
                    Composite comp, Region clip,
                    int sx, int sy,
@@ -107,9 +108,9 @@ class EscherBlitLoops
     SunToolkit.awtUnlock();
   }
 
-  private void  blitBufImg(BufImgSurfaceData src, SurfaceData dst,
-                           Composite comp, Region clip, int sx, int sy, int dx,
-                           int dy, int w, int h)
+  private static void  blitBufImg(BufImgSurfaceData src, SurfaceData dst,
+                                  Composite comp, Region clip, int sx, int sy, int dx,
+                                  int dy, int w, int h)
   {
     
     BufferedImage bufImg = (BufferedImage) src.getDestination();

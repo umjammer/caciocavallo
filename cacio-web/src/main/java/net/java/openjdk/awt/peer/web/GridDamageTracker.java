@@ -40,11 +40,11 @@ import java.util.*;
  * @author Clemens Eisserer <linuxhippy@gmail.com>
  */
 public class GridDamageTracker {
-    public static int GRID_SIZE = 32;
+    public static final int GRID_SIZE = 32;
 
-    DamageGridCell[][] grid;
+    final DamageGridCell[][] grid;
     BufferedImage combinedAreas;
-    ArrayList<WebRect> rectList;
+    final ArrayList<WebRect> rectList;
 
     /**
      * Constructs a GridDamageTracker with the specified size in pixel.
@@ -94,14 +94,7 @@ public class GridDamageTracker {
      * resulting areas as BlitScreenUpdates. After a call to groupDamagedAreas
      * the internal state is reset, and all tracked areas are discarded.
      * 
-     * @param imgBuffer
-     *            The BufferedImage instance backing the WebSurfaceData
-     * @param packingForced
-     *            If forcePacking is false, a single BlitScreenUpdate may be
-     *            issued which allows for some fast-paths in later processing
-     *            steps. If however, "breaker"-ScreenUpdates are queued, those
-     *            optimizations aren't possible anyway, so avoid that
-     *            optimization.
+     * @param imgBuffer The BufferedImage instance backing the WebSurfaceData
      * @return The resulting BlitScreenUpdates, or null if no updates are
      *         available.
      */
@@ -117,7 +110,7 @@ public class GridDamageTracker {
 				.getHeight(), imgBuffer));
 		    }
 	    }
-	    
+
 	    reset();
 	    return screenUpdateList;
 	}
@@ -129,7 +122,7 @@ public class GridDamageTracker {
      * @return a union rectangle covering all tracked areas.
      */
     private WebRect getUnionRectangle() {
-	if (rectList.size() == 0) {
+	if (rectList.isEmpty()) {
 	    return null;
 	}
 
@@ -140,11 +133,11 @@ public class GridDamageTracker {
      * Resets the internal state, and discards all tracked areas.
      */
     public void reset() {
-	for (int y = 0; y < grid.length; y++) {
-	    for (int x = 0; x < grid[0].length; x++) {
-		grid[y][x].reset();
-	    }
-	}
+        for (DamageGridCell[] damageGridCells : grid) {
+            for (int x = 0; x < grid[0].length; x++) {
+                damageGridCells[x].reset();
+            }
+        }
 
 	rectList.clear();
     }
@@ -213,7 +206,7 @@ public class GridDamageTracker {
      * @param mergeLimit
      *            The maximum amount of merging in x-direction
      */
-    private void mergeCellsHorizontal(WebRect[][] unions, int mergeLimit) {
+    private static void mergeCellsHorizontal(WebRect[][] unions, int mergeLimit) {
 	for (int y = 0; y < unions.length; y++) {
 	    for (int x = 0; x < unions[0].length - 1; x++) {
 		WebRect cellRect = unions[y][x];
@@ -242,7 +235,7 @@ public class GridDamageTracker {
      * @param unions
      * @param mergeLimit
      */
-    private void mergeCellsVertical(WebRect[][] unions, int mergeLimit) {
+    private static void mergeCellsVertical(WebRect[][] unions, int mergeLimit) {
 	for (int x = 0; x < unions[0].length; x++) {
 	    for (int y = 0; y < unions.length - 1; y++) {
 		WebRect cellRect = unions[y][x];
@@ -272,7 +265,8 @@ public class GridDamageTracker {
  * @author Clemens Eisserer <linuxhippy@gmail.com>
  */
 class DamageGridCell {
-    int x, y;
+    final int x;
+    final int y;
     WebRect cellRect;
 
     /**

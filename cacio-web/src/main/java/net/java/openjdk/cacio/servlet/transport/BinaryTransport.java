@@ -36,7 +36,7 @@ import java.util.*;
  */
 public abstract class BinaryTransport extends Transport {
 
-    byte[] emptyResponseData;
+    final byte[] emptyResponseData;
 
     public BinaryTransport() {
 	super("application/binary");

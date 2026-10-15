@@ -50,8 +50,8 @@ import net.java.openjdk.cacio.servlet.imgformat.*;
  */
 public class ImageTransport extends Transport {
 
-    byte[] emptyImgData;
-    int compressionLevel;
+    final byte[] emptyImgData;
+    final int compressionLevel;
 
     BufferedImage packedImage;
 

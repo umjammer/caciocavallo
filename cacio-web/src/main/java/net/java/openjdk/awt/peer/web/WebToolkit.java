@@ -55,7 +55,7 @@ import com.github.caciocavallosilano.cacio.peer.PlatformWindowFactory;
  */
 public class WebToolkit extends CacioToolkit {
 
-    private static Logger logger =
+    private static final Logger logger =
         Logger.getLogger("net.java.openjdk.awt.peer.web.CacioToolkit");
 
     private PlatformWindowFactory platformWindow;
@@ -194,6 +194,7 @@ public class WebToolkit extends CacioToolkit {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
+    @Override
     public InputMethodDescriptor getInputMethodAdapterDescriptor() throws AWTException {
         return null;
     }

@@ -53,7 +53,7 @@ public class TreeImagePacker {
      */
     public void insertScreenUpdateList(List<ScreenUpdate> updateList) {
 	List<BlitScreenUpdate> bltUpdateList = filterBlitScreenUpdates(updateList);
-	Collections.sort(bltUpdateList, new ScreenUpdateComperator());
+	bltUpdateList.sort(new ScreenUpdateComperator());
 
 	int maxWidth = getMaxWidth(bltUpdateList);
 	int maxHeight = getMaxHeight(bltUpdateList);

@@ -48,7 +48,7 @@ public abstract class Transport {
     public static final String FORMAT_PNG_XHR = "png";
     public static final String FORMAT_RLE = "rle";
 
-    String contentType;
+    final String contentType;
     boolean dataAvailable = false;
 
     public Transport(String contentType) {
@@ -66,10 +66,9 @@ public abstract class Transport {
 	Graphics g = packedImage.getGraphics();
 
 	for (ScreenUpdate update : updateList) {
-	    if (update instanceof BlitScreenUpdate) {
-		BlitScreenUpdate bsUpdate = (BlitScreenUpdate) update;
+	    if (update instanceof BlitScreenUpdate bsUpdate) {
 
-		int width = bsUpdate.getUpdateArea().getWidth();
+            int width = bsUpdate.getUpdateArea().getWidth();
 		int height = bsUpdate.getUpdateArea().getHeight();
 
 		g.drawImage(bsUpdate.getImage(), bsUpdate.getPackedX(), bsUpdate.getPackedY() + packedAreaHeight, bsUpdate.getPackedX() + width,

@@ -46,7 +46,7 @@ import net.java.openjdk.cacio.servlet.imgformat.*;
  * @author Clemens Eisserer <linuxhippy@gmail.com>
  */
 public class BinaryPngTransport extends BinaryTransport {
-    int compressionLevel;
+    final int compressionLevel;
 
     byte[] cmdStreamData;
     BufferedImage packedImage;

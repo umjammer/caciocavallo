@@ -85,10 +85,11 @@ class XDrawableSurfaceData
 
     private static class LazyPipe extends ValidatePipe
   {
+    @Override
     public boolean validate(SunGraphics2D sg2d)
     {
       XDrawableSurfaceData xdsd = (XDrawableSurfaceData) sg2d.surfaceData;
-        if (! xdsd.isDrawableValid())
+        if (! XDrawableSurfaceData.isDrawableValid())
           {
             return false;
           }
@@ -100,17 +101,17 @@ class XDrawableSurfaceData
   private EscherRenderer primitivePipe;
   private PixelToShapeConverter complexPipe;
   private EscherTextRenderer textPipe;
-  private LazyPipe lazyPipe;
+  private final LazyPipe lazyPipe;
 
-  private RenderLoops solidLoops;
+  private final RenderLoops solidLoops;
 
   private GC xgc;
-  private Drawable xDrawable;
+  private final Drawable xDrawable;
 
   /**
    * The graphics configuration for that surface.
    */
-  private XGraphicsConfiguration graphicsConfig;
+  private final XGraphicsConfiguration graphicsConfig;
 
   XDrawableSurfaceData(XGraphicsConfiguration gc, Drawable xd,
                        SurfaceType type, ColorModel cm)
@@ -164,6 +165,7 @@ class XDrawableSurfaceData
     throw new UnsupportedOperationException();
   }
 
+  @Override
   public void validatePipe(SunGraphics2D sg2d) {
     if (sg2d.antialiasHint != SunHints.INTVAL_ANTIALIAS_ON
         && sg2d.paintState <= SunGraphics2D.PAINT_ALPHACOLOR
@@ -270,6 +272,7 @@ class XDrawableSurfaceData
       }
   }
 
+  @Override
   public RenderLoops getRenderLoops(SunGraphics2D sg2d)
   {
     if (sg2d.paintState <= SunGraphics2D.PAINT_ALPHACOLOR &&
@@ -280,7 +283,7 @@ class XDrawableSurfaceData
     return super.getRenderLoops(sg2d);
   }
 
-  private boolean isDrawableValid()
+  private static boolean isDrawableValid()
   {
     return true;
   }
@@ -304,6 +307,7 @@ class XDrawableSurfaceData
     }
   }
 
+  @Override
   public void invalidate()
   {
     super.invalidate();

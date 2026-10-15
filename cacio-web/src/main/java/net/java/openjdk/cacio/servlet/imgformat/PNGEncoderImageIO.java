@@ -27,6 +27,8 @@ package net.java.openjdk.cacio.servlet.imgformat;
 
 import java.awt.image.*;
 import java.io.*;
+import java.lang.System.Logger;
+import java.lang.System.Logger.Level;
 import javax.imageio.*;
 
 /**
@@ -35,7 +37,9 @@ import javax.imageio.*;
  * @author Clemens Eisserer <linuxhippy@gmail.com>
  */
 public class PNGEncoderImageIO extends PNGEncoder {    
-   
+
+    private static final Logger logger = System.getLogger(PNGEncoderImageIO.class.getName());
+
     /**
      * @see PNGEncoder
      */
@@ -46,7 +50,7 @@ public class PNGEncoderImageIO extends PNGEncoder {
 	try {
 	    ImageIO.write(img, "PNG", bos);
 	} catch (IOException e) {
-	    e.printStackTrace();
+        logger.log(Level.ERROR, e.getMessage(), e);
 	}
 	
 	return bos.toByteArray();

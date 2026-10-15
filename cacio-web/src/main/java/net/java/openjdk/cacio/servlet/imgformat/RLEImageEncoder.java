@@ -27,6 +27,9 @@ package net.java.openjdk.cacio.servlet.imgformat;
 
 import java.awt.image.*;
 import java.io.*;
+import java.lang.System.Logger;
+import java.lang.System.Logger.Level;
+
 
 /**
  * Run-Length encoder for images.
@@ -34,6 +37,8 @@ import java.io.*;
  * @author Clemens Eisserer <linuxhippy@gmail.com>
  */
 public class RLEImageEncoder {
+
+    private static final Logger logger = System.getLogger(RLEImageEncoder.class.getName());
 
     byte[] sizeInfoBuffer;
     DynamicByteBuffer runBuffer;
@@ -50,7 +55,6 @@ public class RLEImageEncoder {
      * @param y1
      * @param x2
      * @param y2
-     * @param os
      * @throws IOException
      */
     public void encodeImageToStream(BufferedImage img, int x1, int y1, int x2, int y2) {
@@ -72,7 +76,7 @@ public class RLEImageEncoder {
 
 	    sizeInfoBuffer = bos.toByteArray();
 	} catch (IOException e) {
-	    e.printStackTrace();
+        logger.log(Level.ERROR, e.getMessage(), e);
 	}
     }
 
@@ -104,7 +108,7 @@ public class RLEImageEncoder {
      * @param dataBuffer
      *            pixel-data is saved to this DataBuffer.
      */
-    private void encodeImageData(BufferedImage img, int x1, int y1, int x2, int y2, DynamicByteBuffer runBuffer, DynamicByteBuffer dataBuffer) {
+    private static void encodeImageData(BufferedImage img, int x1, int y1, int x2, int y2, DynamicByteBuffer runBuffer, DynamicByteBuffer dataBuffer) {
 	int[] imgData = ((DataBufferInt) img.getRaster().getDataBuffer()).getData();
 	int imgStride = ((SinglePixelPackedSampleModel) img.getSampleModel()).getScanlineStride();
 
@@ -182,7 +186,7 @@ public class RLEImageEncoder {
      * @param dataStream
      * @param pixel
      */
-    private void writePixel(DynamicByteBuffer dataStream, int pixel) {
+    private static void writePixel(DynamicByteBuffer dataStream, int pixel) {
 	byte r = (byte) ((pixel & 0x00FF0000) >> 16);
 	byte g = (byte) ((pixel & 0x0000FF00) >> 8);
 	byte b = (byte) (pixel & 0x000000FF);
@@ -198,7 +202,7 @@ public class RLEImageEncoder {
      * @param runStream
      * @param noRunCnt
      */
-    private void endNoRun(DynamicByteBuffer runStream, int noRunCnt) {
+    private static void endNoRun(DynamicByteBuffer runStream, int noRunCnt) {
 	runStream.write((byte) (128 + noRunCnt));
     }
 
@@ -208,7 +212,7 @@ public class RLEImageEncoder {
      * @param runStream
      * @param runCnt
      */
-    private void endRun(DynamicByteBuffer runStream, int runCnt) {
+    private static void endRun(DynamicByteBuffer runStream, int runCnt) {
 	runStream.write((byte) runCnt);
     }
 }

@@ -53,10 +53,10 @@ import net.java.openjdk.cacio.servlet.imgformat.*;
  * @author Clemens Eisserer <linuxhippy@gmail.com>
  */
 public class Base64PngTransport extends Transport {
-    private static byte[] emptyResponseData = "0".getBytes();
-    private static String emptyResponseString = "0";
+    private static final byte[] emptyResponseData = "0".getBytes();
+    private static final String emptyResponseString = "0";
 
-    int compressionLevel;
+    final int compressionLevel;
 
     String cmdString;
     BufferedImage packedImage;
@@ -76,10 +76,10 @@ public class Base64PngTransport extends Transport {
     protected String encodeImageCmdStream(List<Integer> cmdList) {
 	StringBuilder cmdBuilder = new StringBuilder(cmdList.size() * 4);
 	cmdBuilder.append(cmdList.size());
-	for (int i = 0; i < cmdList.size(); i++) {
-	    cmdBuilder.append(':');
-	    cmdBuilder.append(cmdList.get(i));
-	}
+        for (Integer integer : cmdList) {
+            cmdBuilder.append(':');
+            cmdBuilder.append(integer);
+        }
 
 	// Delimeter for following image data
 	cmdBuilder.append(':');
@@ -99,6 +99,7 @@ public class Base64PngTransport extends Transport {
 	}
     }
 
+    @Override
     public String asString() {
 	if (dataAvailable) {
 	    return cmdString + new String(getEncodedImageData());

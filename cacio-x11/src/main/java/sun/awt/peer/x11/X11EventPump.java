@@ -38,9 +38,9 @@ class X11EventPump extends CacioEventPump<X11EventData> {
         initIDs();
     }
 
-    private X11EventData eventData;
+    private final X11EventData eventData;
 
-    private HashMap<Long,X11PlatformWindow> windowMap;
+    private final HashMap<Long,X11PlatformWindow> windowMap;
 
     private static native void initIDs();
 
@@ -74,7 +74,7 @@ class X11EventPump extends CacioEventPump<X11EventData> {
             case X11EventData.MAP_NOTIFY:
                 break;
             case X11EventData.EXPOSE: {
-                X11PlatformWindow w = windowMap.get(Long.valueOf(nativeEvent.getWindow()));
+                X11PlatformWindow w = windowMap.get(nativeEvent.getWindow());
                 CacioComponent source = w.getCacioComponent();
                 Component c = source.getAWTComponent();
                 System.err.println("X11EventPump::dispatchNativeEvent: exposing: " + c);
@@ -82,14 +82,14 @@ class X11EventPump extends CacioEventPump<X11EventData> {
                 break;
             }
             case X11EventData.MOTION: {
-                X11PlatformWindow w = windowMap.get(Long.valueOf(nativeEvent.getWindow()));
+                X11PlatformWindow w = windowMap.get(nativeEvent.getWindow());
                 CacioComponent source = w.getCacioComponent();
                 Component c = source.getAWTComponent();
                 postMouseEvent(source, MouseEvent.MOUSE_MOVED, System.currentTimeMillis(), 0, nativeEvent.getX(), nativeEvent.getY(), 0, false);
                 break;
             }
             case X11EventData.BUTTON_PRESS: {
-                X11PlatformWindow w = windowMap.get(Long.valueOf(nativeEvent.getWindow()));
+                X11PlatformWindow w = windowMap.get(nativeEvent.getWindow());
                 CacioComponent source = w.getCacioComponent();
                 Component c = source.getAWTComponent();
                 /* TODO: Fix mods. */
@@ -98,7 +98,7 @@ class X11EventPump extends CacioEventPump<X11EventData> {
                 break;
             }
             case X11EventData.BUTTON_RELEASE: {
-                X11PlatformWindow w = windowMap.get(Long.valueOf(nativeEvent.getWindow()));
+                X11PlatformWindow w = windowMap.get(nativeEvent.getWindow());
                 CacioComponent source = w.getCacioComponent();
                 Component c = source.getAWTComponent();
                 /* TODO: Fix mods. */
@@ -112,10 +112,10 @@ class X11EventPump extends CacioEventPump<X11EventData> {
     }
 
     void registerWindow(long windowId, X11PlatformWindow w) {
-        windowMap.put(Long.valueOf(windowId), w);
+        windowMap.put(windowId, w);
     }
 
     void deregisterWindow(long windowId) {
-        windowMap.remove(Long.valueOf(windowId));
+        windowMap.remove(windowId);
     }
 }

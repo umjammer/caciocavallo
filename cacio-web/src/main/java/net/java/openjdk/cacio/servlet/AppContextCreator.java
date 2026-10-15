@@ -26,6 +26,8 @@
 package net.java.openjdk.cacio.servlet;
 
 import java.awt.KeyboardFocusManager;
+import java.lang.System.Logger;
+import java.lang.System.Logger.Level;
 import java.lang.reflect.*;
 import java.util.*;
 
@@ -41,11 +43,14 @@ import sun.awt.*;
  */
 public class AppContextCreator {
 
-    public void startAppInNewAppContext(final WebSessionState sessionState) {
+    private static final Logger logger = System.getLogger(AppContextCreator.class.getName());
 
-	ThreadGroup appGroup = new ThreadGroup("AppThreadGroup " + String.valueOf(new Random().nextLong()));
+    public void startAppInNewAppContext(WebSessionState sessionState) {
+
+	ThreadGroup appGroup = new ThreadGroup("AppThreadGroup " + new Random().nextLong());
 	Thread t = new Thread(appGroup, "AppInitThread") {
-	    public void run() {
+	    @Override
+        public void run() {
 		AppContext appContext = SunToolkit.createNewAppContext();
 
 //		RepaintManager mgr = new RepaintManager();
@@ -66,7 +71,7 @@ public class AppContextCreator {
 		    
 		    sessionState.setContextInitialized(true);
 		} catch (Exception ex) {
-		    ex.printStackTrace();
+		    logger.log(Level.ERROR, ex.getMessage(), ex);
 		} finally {
 		    sessionState.unlockSession();
 		}
@@ -79,7 +84,7 @@ public class AppContextCreator {
 	    // Wait for initialization to finish
 	    t.join();
 	} catch (InterruptedException e) {
-	    e.printStackTrace();
+        logger.log(Level.ERROR, e.getMessage(), e);
 	}
     }
 }

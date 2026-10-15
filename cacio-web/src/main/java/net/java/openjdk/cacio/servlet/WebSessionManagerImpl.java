@@ -9,8 +9,9 @@ import net.java.openjdk.awt.peer.web.*;
 
 public class WebSessionManagerImpl extends WebSessionManager {
     
-    private Logger logger = Logger.getLogger(this.getClass().getName());
+    private final Logger logger = Logger.getLogger(this.getClass().getName());
 
+    @Override
     public synchronized WebSessionState register(HttpSession session) {
 	HashMap<Integer, WebSessionState> subSessionMap = (HashMap<Integer, WebSessionState>) session.getAttribute(SESSION_KEY);
 
@@ -26,6 +27,7 @@ public class WebSessionManagerImpl extends WebSessionManager {
 	return sessionState;
     }
     
+    @Override
     public synchronized WebSessionState getCurrentState(HttpSession session, int subSessionID) {
 	HashMap<Integer, WebSessionState> subSessionMap = (HashMap<Integer, WebSessionState>) session.getAttribute(SESSION_KEY);
 	if (subSessionMap != null) {
@@ -37,6 +39,7 @@ public class WebSessionManagerImpl extends WebSessionManager {
 	return null;
     }
     
+    @Override
     public synchronized void disposeSession(HttpSession session) {
 	HashMap<Integer, WebSessionState> subSessionMap = (HashMap<Integer, WebSessionState>) session.getAttribute(SESSION_KEY);
 	if (subSessionMap != null) {
@@ -59,6 +62,7 @@ public class WebSessionManagerImpl extends WebSessionManager {
 	}
     }
     
+    @Override
     public WebSessionState getSessionState(HttpServletRequest request) {
 	HttpSession session = request.getSession(false);
 	String subSessionID = request.getParameter("subsessionid");
