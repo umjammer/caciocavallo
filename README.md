@@ -7,7 +7,17 @@
 
 Portable GUI backends for OpenJDK
 
+| name    | status | comment |
+|---------|:------:|---------|
+| sdl2    |   ✅️   |         |
+| eschher |        |         |
+| web     |        |         |
+| x11     |        |         |
+
+
 ## Install
+
+- [maven](https://jitpack.io/#umjammer/caciocavallo)
 
 ## Usage
 
@@ -21,15 +31,17 @@ $ mvn -Dcacio.managed.background=#000000 \
 
 ## References
 
-* https://github.com/CaciocavalloSilano/caciocavallo
+* https://github.com/CaciocavalloSilano/caciocavallo ... [vavi patched](https://github.com/umjammer/caciocavallo-silano) 🎯
 * https://github.com/libsdl4j/libsdl4j
 * https://jainja.thenesis.org/
 
 ## TODO
 
+- others
+
 ---
 
-# [Original]()
+# [Original](https://web.archive.org/web/20211204191824/http://openjdk.java.net/projects/caciocavallo/)
  
  Portable GUI backends for OpenJDK
 

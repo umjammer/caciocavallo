@@ -69,21 +69,9 @@
   </repositories>
 
   <properties>
-    <!--
-      cacio-shared, built from the sibling checkout of
-      CaciocavalloSilano/caciocavallo:
-        mvn -t <toolchains.xml> -pl cacio-shared-jdk25 -am -DskipTests install
-      That checkout carries the window-decoration fixes cacio-sdl2 needs
-      (FullScreenWindowFactory.getScreenBackground(), the mouse grab, and
-      moving/resizing a decorated window). Once those are published, switch
-      back to jitpack with:
-        -Dcacio.groupId=com.github.CaciocavalloSilano.caciocavallo
-        -Dcacio.artifactId=cacio-shared
-        -Dcacio.version=<jitpack build>
-    -->
-    <cacio.groupId>com.github.caciocavallosilano</cacio.groupId>
+    <cacio.groupId>com.github.umjammer.caciocavallo-silano</cacio.groupId>
     <cacio.artifactId>cacio-shared-jdk25</cacio.artifactId>
-    <cacio.version>2.1-SNAPSHOT</cacio.version>
+    <cacio.version>2.1.0</cacio.version>
   </properties>
 
   <build>
@@ -91,7 +79,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-javadoc-plugin</artifactId>
-        <version>3.1.0</version>
+        <version>3.12.0</version>
         <executions>
           <execution>
             <id>attach-javadocs</id>
@@ -122,7 +110,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-source-plugin</artifactId>
-        <version>3.0.0</version>
+        <version>3.4.0</version>
         <executions>
           <execution>
             <id>attach-sources</id>
@@ -138,7 +126,7 @@
         <plugin>
           <groupId>org.sonatype.plugins</groupId>
           <artifactId>nexus-staging-maven-plugin</artifactId>
-          <version>1.6.3</version>
+          <version>1.7.0</version>
           <extensions>true</extensions>
           <configuration>
             <serverId>ossrh</serverId>
@@ -149,7 +137,7 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-compiler-plugin</artifactId>
-          <version>3.12.1</version>
+          <version>3.16.0</version>
           <configuration>
             <source>25</source>
             <target>25</target>
@@ -171,7 +159,7 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-surefire-plugin</artifactId>
-          <version>3.2.5</version>
+          <version>3.6.0</version>
           <configuration>
             <systemPropertyVariables>
               <java.awt.headless>false</java.awt.headless>
