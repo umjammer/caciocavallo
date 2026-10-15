@@ -4,7 +4,7 @@
   <parent>
     <groupId>net.java.openjdk.cacio</groupId>
     <artifactId>cacio</artifactId>
-    <version>1.10-SNAPSHOT</version>
+    <version>1.10.0</version>
   </parent>
 
   <artifactId>cacio-sdl2</artifactId>
