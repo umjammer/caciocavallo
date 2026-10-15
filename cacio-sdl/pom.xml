@@ -17,15 +17,11 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
-        <configuration>
-          <source>1.8</source>
-          <target>1.8</target>
-          <compilerArgument>-XDignore.symbol.file=true</compilerArgument>
-        </configuration>
       </plugin>
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>native-maven-plugin</artifactId>
+        <version>1.0-alpha-11</version>
         <extensions>true</extensions>
         <configuration>
           <javahClassNames>
@@ -63,7 +59,6 @@
               -L${java.home}/lib -lawt -ljava
             </linkerStartOption>
           </linkerStartOptions>
-          <linkerFinalName></linkerFinalName>
           <linkerEndOptions>
             <linkerEndOption>-o ${project.build.directory}/libcacio-sdl.dylib</linkerEndOption>
           </linkerEndOptions>
@@ -85,9 +80,9 @@
 
   <dependencies>
     <dependency>
-      <groupId>net.java.openjdk.cacio</groupId>
-      <artifactId>cacio-shared</artifactId>
-      <version>${project.version}</version>
+      <groupId>${cacio.groupId}</groupId>
+      <artifactId>${cacio.artifactId}</artifactId>
+      <version>${cacio.version}</version>
     </dependency>
 
     <dependency>

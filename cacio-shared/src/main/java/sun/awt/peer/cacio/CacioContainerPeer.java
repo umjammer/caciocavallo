@@ -117,7 +117,7 @@ abstract class CacioContainerPeer<AWTComponentType extends Component, SwingCompo
         for (int i = 0; i < count; i++) {
             Component comp = c.getComponent(i);
             if (AWTAccessor.getComponentAccessor().getFont(comp) == null) {
-                ComponentPeer peer = comp.getPeer();
+                ComponentPeer peer = AWTAccessor.getComponentAccessor().getPeer(comp);
                 if (peer instanceof CacioComponentPeer) {
                     CacioComponentPeer ccp = (CacioComponentPeer) peer;
                     if (ccp.getFont() != font) {
@@ -138,7 +138,7 @@ abstract class CacioContainerPeer<AWTComponentType extends Component, SwingCompo
         for (int i = 0; i < count; i++) {
             Component comp = c.getComponent(i);
             if (AWTAccessor.getComponentAccessor().getForeground(comp) == null) {
-                ComponentPeer peer = comp.getPeer();
+                ComponentPeer peer = AWTAccessor.getComponentAccessor().getPeer(comp);
                 if (peer instanceof CacioComponentPeer) {
                     CacioComponentPeer ccp = (CacioComponentPeer) peer;
                     if (ccp.getForeground() != fg) {
@@ -160,7 +160,7 @@ abstract class CacioContainerPeer<AWTComponentType extends Component, SwingCompo
         for (int i = 0; i < count; i++) {
             Component comp = c.getComponent(i);
             if (AWTAccessor.getComponentAccessor().getBackground(comp) == null) {
-                ComponentPeer peer = comp.getPeer();
+                ComponentPeer peer = AWTAccessor.getComponentAccessor().getPeer(comp);
                 if (peer instanceof CacioComponentPeer) {
                     CacioComponentPeer ccp = (CacioComponentPeer) peer;
                     if (ccp.getBackground() != bg) {
@@ -192,7 +192,7 @@ abstract class CacioContainerPeer<AWTComponentType extends Component, SwingCompo
         for (int i = 0; i < count; i++) {
             Component comp = c.getComponent(i);
             if ((! enable) || AWTAccessor.getComponentAccessor().isEnabled(comp)) {
-                ComponentPeer peer = comp.getPeer();
+                ComponentPeer peer = AWTAccessor.getComponentAccessor().getPeer(comp);
                 if (peer instanceof CacioComponentPeer) {
                     CacioComponentPeer ccp = (CacioComponentPeer) peer;
                     if (ccp.isEnabled() != enable) {

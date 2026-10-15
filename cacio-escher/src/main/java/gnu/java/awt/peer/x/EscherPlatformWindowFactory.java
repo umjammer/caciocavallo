@@ -25,19 +25,19 @@
 
 package gnu.java.awt.peer.x;
 
-import sun.awt.peer.cacio.CacioComponent;
-import sun.awt.peer.cacio.CacioEventPump;
-import sun.awt.peer.cacio.PlatformToplevelWindow;
-import sun.awt.peer.cacio.PlatformWindow;
-import sun.awt.peer.cacio.PlatformWindowFactory;
+import com.github.caciocavallosilano.cacio.peer.CacioComponent;
+import com.github.caciocavallosilano.cacio.peer.CacioEventPump;
+import com.github.caciocavallosilano.cacio.peer.PlatformToplevelWindow;
+import com.github.caciocavallosilano.cacio.peer.PlatformWindow;
+import com.github.caciocavallosilano.cacio.peer.PlatformWindowFactory;
+
 
 class EscherPlatformWindowFactory implements PlatformWindowFactory {
 
     private EscherEventPump eventPump;
 
     @Override
-    public PlatformWindow createPlatformWindow(CacioComponent cacioComponent,
-                                               PlatformWindow parent) {
+    public PlatformWindow createPlatformWindow(CacioComponent cacioComponent, PlatformWindow parent) {
         return new EscherPlatformWindow(cacioComponent, parent);
     }
 
@@ -47,8 +47,7 @@ class EscherPlatformWindowFactory implements PlatformWindowFactory {
     }
 
     @Override
-    public PlatformWindow createPlatformToplevelWindow(CacioComponent component,
-            PlatformWindow owner) {
+    public PlatformWindow createPlatformToplevelWindow(CacioComponent component, PlatformWindow owner) {
         return new EscherPlatformWindow(component, null);
     }
 

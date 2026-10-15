@@ -24,7 +24,6 @@
  */
 
 
-
 import java.awt.Button;
 import java.awt.Color;
 import java.awt.Font;
@@ -35,11 +34,13 @@ import java.awt.event.WindowEvent;
 
 import sun.awt.AWTAccessor;
 
+
 public class TestPanel {
 
-    public static void main(String[] args) {
+    static void main(String[] args) {
         Frame f = new Frame();
         f.addWindowListener(new WindowAdapter() {
+            @Override
             public void windowClosing(WindowEvent e) {
                 System.exit(0);
             }

@@ -29,9 +29,10 @@ import sun.awt.image.SunVolatileImage;
 import sun.awt.image.VolatileSurfaceManager;
 import sun.java2d.SurfaceData;
 
+
 /**
  * WebVolatileSurfaceManagerImplementation for Caciocavallo-Web.
- * 
+ *
  * @author Clemens Eisserer <linuxhippy@gmail.com>
  */
 class WebVolativeSurfaceManager extends VolatileSurfaceManager {
@@ -43,11 +44,11 @@ class WebVolativeSurfaceManager extends VolatileSurfaceManager {
 
     @Override
     protected boolean isAccelerationEnabled() {
-       return false;
+        return false;
     }
 
     @Override
     protected SurfaceData initAcceleratedSurface() {
-	return null;
+        return null;
     }
 }

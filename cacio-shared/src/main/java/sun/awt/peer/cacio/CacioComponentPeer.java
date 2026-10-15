@@ -57,8 +57,9 @@ import java.awt.peer.ContainerPeer;
 
 import javax.swing.*;
 
+import java.awt.event.FocusEvent.Cause;
+
 import sun.awt.SunToolkit;
-import sun.awt.CausedFocusEvent.Cause;
 import sun.awt.AWTAccessor;
 import sun.awt.ConstrainableGraphics;
 import sun.awt.PaintEventDispatcher;
@@ -176,7 +177,8 @@ class CacioComponentPeer<AWTComponentType extends Component,
                 parentComp = parentComp.getParent();
             } else {
                 CacioComponentPeer parentPeer =
-                    (CacioComponentPeer) parentComp.getPeer();
+                    (CacioComponentPeer) AWTAccessor.getComponentAccessor()
+                        .getPeer(parentComp);
                 parent = parentPeer.platformWindow;
             }
         }
@@ -640,7 +642,8 @@ class CacioComponentPeer<AWTComponentType extends Component,
         if (parentsEnabled) {
             Container parent = c.getParent();
             if (parent != null) {
-                ComponentPeer peer = parent.getPeer();
+                ComponentPeer peer =
+                    AWTAccessor.getComponentAccessor().getPeer(parent);
                 if (peer instanceof CacioComponentPeer) {
                     parentsEnabled =
                             ((CacioComponentPeer) peer).isParentsEnabled();

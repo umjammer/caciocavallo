@@ -2,3 +2,5 @@
 netbeans
 .hgtags
 .hg_off
+AGENTS.md
+tmp/

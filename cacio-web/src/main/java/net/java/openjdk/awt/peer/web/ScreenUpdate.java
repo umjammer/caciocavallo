@@ -25,64 +25,65 @@
 
 package net.java.openjdk.awt.peer.web;
 
-import java.util.*;
+import java.util.List;
+
 
 /**
  * A ScreenUpdate represents a change of the WebSurfaceData, which is sent to
  * the browser.
- * 
+ *
  * @author Clemens Eisserer <linuxhippy@gmail.com>
  */
 public abstract class ScreenUpdate {
+
     WebRect updateArea;
 
     /**
-     * @param updateArea
-     *            the area modified by the ScreenUpdate-Operation
+     * @param updateArea the area modified by the ScreenUpdate-Operation
      */
     public ScreenUpdate(WebRect updateArea) {
-	this.updateArea = updateArea;
+        this.updateArea = updateArea;
     }
 
     public WebRect getUpdateArea() {
-	return updateArea;
+        return updateArea;
     }
 
     public void setUpdateArea(WebRect updateArea) {
-	this.updateArea = updateArea;
+        this.updateArea = updateArea;
     }
 
     /**
      * @param pendingUpdates
      * @return a bounding box, which spans over all ScreenUpdates contained in
-     *         the list.
+     * the list.
      */
     public static WebRect getScreenUpdateBoundingBox(List<ScreenUpdate> pendingUpdates) {
-	WebRect unionRectangle = null;
+        WebRect unionRectangle = null;
 
-	for (ScreenUpdate update : pendingUpdates) {
-	    WebRect updateArea = update.getSurfaceDataUpdateArea();
+        for (ScreenUpdate update : pendingUpdates) {
+            WebRect updateArea = update.getSurfaceDataUpdateArea();
 
-	    if (unionRectangle == null) {
-		unionRectangle = updateArea;
-	    } else {
-		unionRectangle.union(updateArea);
-	    }
-	}
+            if (unionRectangle == null) {
+                unionRectangle = updateArea;
+            } else {
+                unionRectangle.union(updateArea);
+            }
+        }
 
-	return unionRectangle != null ? unionRectangle : new WebRect();
+        return unionRectangle != null ? unionRectangle : new WebRect();
     }
 
     /**
      * @return The updated area of the SurfaceData. Will not be affected by
-     *         evacuating.
+     * evacuating.
      */
     public abstract WebRect getSurfaceDataUpdateArea();
 
     /**
      * Appends the coordinates and commands of the current ScreenUpdate to the
      * cmdList, which will later be serialized and sent to the browser.
-     * 
+     *
      * @param cmdList
      */
     public abstract void writeToCmdStream(List<Integer> cmdList);

@@ -29,11 +29,12 @@ package net.java.openjdk.awt.peer.web;
 import java.awt.GraphicsConfiguration;
 import java.awt.GraphicsDevice;
 
-import net.java.openjdk.cacio.servlet.*;
+import net.java.openjdk.cacio.servlet.WebSessionManager;
+
 
 /**
  * GraphicsDevice implementation for caciocavallo-web.
- * 
+ *
  * @author Clemens Eisserer <linuxhippy@gmail.com>
  * @author Mario Torre <neugens.limasoftware@gmail.com>
  */
@@ -41,33 +42,33 @@ class WebGraphicsDevice extends GraphicsDevice {
 
     @Override
     public int getType() {
-	return GraphicsDevice.TYPE_RASTER_SCREEN;
+        return GraphicsDevice.TYPE_RASTER_SCREEN;
     }
 
     @Override
     public String getIDstring() {
-	return "Web Cacio Device";
+        return "Web Cacio Device";
     }
 
     @Override
     public GraphicsConfiguration[] getConfigurations() {
-	return new GraphicsConfiguration[] { getDefaultConfiguration() };
+        return new GraphicsConfiguration[] {getDefaultConfiguration()};
     }
 
     @Override
     public synchronized GraphicsConfiguration getDefaultConfiguration() {
-	WebSessionState state = WebSessionManager.getInstance().getCurrentStateAWT();
+        WebSessionState state = WebSessionManager.getInstance().getCurrentStateAWT();
 
-	if (state == null) {
-	    //Create a dummy WebGraphicsConfiguration for 
-	    //the strike cache disposer, which is not in our threadgroup.
-	    return new WebGraphicsConfiguration();
-	}
+        if (state == null) {
+            //Create a dummy WebGraphicsConfiguration for
+            //the strike cache disposer, which is not in our threadgroup.
+            return new WebGraphicsConfiguration();
+        }
 
-	if (state.getGraphicsConfiguration() == null) {
-	    state.setGraphicsConfiguration(new WebGraphicsConfiguration(this));
-	}
-	return state.getGraphicsConfiguration();
+        if (state.getGraphicsConfiguration() == null) {
+            state.setGraphicsConfiguration(new WebGraphicsConfiguration(this));
+        }
+        return state.getGraphicsConfiguration();
     }
 
 }

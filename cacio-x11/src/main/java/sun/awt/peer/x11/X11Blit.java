@@ -26,8 +26,8 @@
 package sun.awt.peer.x11;
 
 import java.awt.Composite;
+
 import sun.awt.SunToolkit;
-import sun.awt.peer.cacio.BlitClipHelper;
 import sun.java2d.SurfaceData;
 import sun.java2d.loops.Blit;
 import sun.java2d.loops.CompositeType;
@@ -36,12 +36,13 @@ import sun.java2d.loops.GraphicsPrimitiveMgr;
 import sun.java2d.loops.SurfaceType;
 import sun.java2d.pipe.Region;
 
+
 class X11Blit extends Blit implements BlitClipHelper.Blitter {
 
     static void register() {
         GraphicsPrimitive[] prims = {
 
-            new X11Blit(X11SurfaceData.typeDefault, X11SurfaceData.typeDefault, false),
+                new X11Blit(X11SurfaceData.typeDefault, X11SurfaceData.typeDefault, false),
         };
         GraphicsPrimitiveMgr.register(prims);
     }
@@ -53,8 +54,8 @@ class X11Blit extends Blit implements BlitClipHelper.Blitter {
 
     X11Blit(SurfaceType srcType, SurfaceType dstType, boolean over) {
         super(srcType,
-              over ? CompositeType.SrcOverNoEa : CompositeType.SrcNoEa,
-              dstType);
+                over ? CompositeType.SrcOverNoEa : CompositeType.SrcNoEa,
+                dstType);
     }
 
     @Override
@@ -64,15 +65,16 @@ class X11Blit extends Blit implements BlitClipHelper.Blitter {
         SunToolkit.awtLock();
         try {
             BlitClipHelper.blitWithAnyClip(this, src, dst, comp, clip, sx, sy,
-                                           dx, dy, w, h);
+                    dx, dy, w, h);
         } finally {
             SunToolkit.awtUnlock();
         }
     }
 
+    @Override
     public void doBlit(SurfaceData src, SurfaceData dst, Composite comp,
                        int sx, int sy, int dx, int dy, int w, int h) {
         nativeBlit(X11GraphicsEnvironment.getDisplay(), src, dst,
-                   sx, sy, dx, dy, w, h);
+                sx, sy, dx, dy, w, h);
     }
 }

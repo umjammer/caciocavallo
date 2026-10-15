@@ -25,62 +25,67 @@
 
 package net.java.openjdk.cacio.servlet.transport;
 
-import java.awt.image.*;
-import java.io.*;
-import java.util.*;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.util.List;
 
-import net.java.openjdk.awt.peer.web.*;
-import net.java.openjdk.cacio.servlet.imgformat.*;
+import net.java.openjdk.awt.peer.web.ScreenUpdate;
+import net.java.openjdk.awt.peer.web.TreeImagePacker;
+import net.java.openjdk.awt.peer.web.WebRect;
+import net.java.openjdk.cacio.servlet.imgformat.PNGEncoder;
+
 
 /**
  * Transport sending binary data, with png used for image-encoding.
- * 
+ * <p>
  * Because browsers don't provide a way to feed binary data into an image, the
  * client has to generate a base64 encoded data-URI.
- * 
+ * <p>
  * Useful for systems where bandwith is limited, but the client has a powerful
  * CPU.
- * 
+ * <p>
  * Javascript counterpart: XHR2PngTransport.js
- * 
+ *
  * @author Clemens Eisserer <linuxhippy@gmail.com>
  */
 public class BinaryPngTransport extends BinaryTransport {
-    int compressionLevel;
+
+    final int compressionLevel;
 
     byte[] cmdStreamData;
     BufferedImage packedImage;
 
     public BinaryPngTransport(int compressionLevel) {
-	this.compressionLevel = compressionLevel;
+        this.compressionLevel = compressionLevel;
     }
 
     @Override
     public void prepareUpdate(List<ScreenUpdate> pendingUpdateList, TreeImagePacker packer, List<Integer> cmdList) {
-	dataAvailable = true;
-	cmdStreamData = encodeImageCmdStream(cmdList);
+        dataAvailable = true;
+        cmdStreamData = encodeImageCmdStream(cmdList);
 
-	WebRect packedRegionBox = packer.getBoundingBox();
-	if (packedRegionBox.getWidth() > 0 && packedRegionBox.getHeight() > 0) {
-	    packedImage = new BufferedImage(packedRegionBox.getWidth(), packedRegionBox.getHeight(), BufferedImage.TYPE_INT_RGB);
-	    copyUpdatesToPackedImage(pendingUpdateList, packedImage, 0);
-	}
+        WebRect packedRegionBox = packer.getBoundingBox();
+        if (packedRegionBox.getWidth() > 0 && packedRegionBox.getHeight() > 0) {
+            packedImage = new BufferedImage(packedRegionBox.getWidth(), packedRegionBox.getHeight(), BufferedImage.TYPE_INT_RGB);
+            copyUpdatesToPackedImage(pendingUpdateList, packedImage, 0);
+        }
     }
 
     @Override
     public void writeToStream(OutputStream os) throws IOException {
-	if (dataAvailable) {
-	    os.write(cmdStreamData);
+        if (dataAvailable) {
+            os.write(cmdStreamData);
 
-	    if (packedImage != null) {
-		byte[] pngData = PNGEncoder.getInstance().encode(packedImage, compressionLevel);
-		packedImage = null;
-		os.write(pngData);
-	    }
-	} else {
-	    writeEmptyData(os);
-	}
+            if (packedImage != null) {
+                byte[] pngData = PNGEncoder.getInstance().encode(packedImage, compressionLevel);
+                packedImage = null;
+                os.write(pngData);
+            }
+        } else {
+            writeEmptyData(os);
+        }
 
-	dataAvailable = true;
+        dataAvailable = true;
     }
 }

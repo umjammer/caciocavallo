@@ -4,29 +4,32 @@
  */
 package net.java.openjdk.cacio.ctc;
 
+import java.awt.BorderLayout;
+import java.awt.GridLayout;
+import java.awt.event.KeyEvent;
+import javax.swing.JComponent;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+import javax.swing.KeyStroke;
+
 import com.jidesoft.hints.AbstractIntelliHints;
 import org.fest.swing.annotation.GUITest;
 import org.fest.swing.edt.GuiActionRunner;
 import org.fest.swing.edt.GuiTask;
 import org.fest.swing.fixture.FrameFixture;
-import org.fest.swing.junit.v4_5.runner.GUITestRunner;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.KeyEvent;
-
-//@RunWith(CacioFESTRunner.class)
-@RunWith(GUITestRunner.class)
+@GUITest
 public class JidePopupFocusFESTTest {
 
     private JFrame frame;
     private FrameFixture ff;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         GuiActionRunner.execute(new GuiTask() {
             @Override
@@ -84,7 +87,7 @@ public class JidePopupFocusFESTTest {
         ff = new FrameFixture(frame);
     }
 
-    @After
+    @AfterEach
     public void tearDown() throws Exception {
         ff.cleanUp();
         GuiActionRunner.execute(new GuiTask() {

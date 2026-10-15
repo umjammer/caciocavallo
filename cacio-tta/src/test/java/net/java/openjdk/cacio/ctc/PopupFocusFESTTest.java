@@ -33,22 +33,21 @@ import org.fest.swing.fixture.FrameFixture;
 import org.fest.swing.fixture.JButtonFixture;
 import org.fest.swing.fixture.JTextComponentFixture;
 import org.fest.swing.timing.Pause;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 import javax.swing.*;
 import java.awt.*;
 
-@RunWith(CacioFESTRunner.class)
-//@RunWith(GUITestRunner.class)
+@ExtendWith(CacioFESTRunner.class)
 public class PopupFocusFESTTest {
 
     private JFrame frame;
     private FrameFixture ff;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         GuiActionRunner.execute(new GuiTask() {
             @Override
@@ -74,7 +73,7 @@ public class PopupFocusFESTTest {
         ff = new FrameFixture(frame);
     }
 
-    @After
+    @AfterEach
     public void tearDown() throws Exception {
         ff.cleanUp();
         GuiActionRunner.execute(new GuiTask() {

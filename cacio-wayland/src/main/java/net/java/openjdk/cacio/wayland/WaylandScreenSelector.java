@@ -25,9 +25,9 @@
 
 package net.java.openjdk.cacio.wayland;
 
-import sun.awt.peer.cacio.CacioComponent;
-import sun.awt.peer.cacio.managed.PlatformScreen;
-import sun.awt.peer.cacio.managed.PlatformScreenSelector;
+import com.github.caciocavallosilano.cacio.peer.CacioComponent;
+import com.github.caciocavallosilano.cacio.peer.managed.PlatformScreen;
+import com.github.caciocavallosilano.cacio.peer.managed.PlatformScreenSelector;
 
 import java.awt.*;
 import java.util.*;

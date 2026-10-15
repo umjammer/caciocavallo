@@ -51,7 +51,7 @@ import java.awt.peer.ComponentPeer;
 import java.awt.peer.ContainerPeer;
 import java.awt.peer.WindowPeer;
 
-import sun.awt.CausedFocusEvent.Cause;
+import java.awt.event.FocusEvent.Cause;
 import sun.java2d.pipe.Region;
 
 class ProxyWindowPeer implements WindowPeer {
@@ -252,7 +252,6 @@ class ProxyWindowPeer implements WindowPeer {
         return getTarget().isFocusable();
     }
 
-    @Override
     public Image createImage(ImageProducer producer) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
@@ -267,12 +266,10 @@ class ProxyWindowPeer implements WindowPeer {
         return getTarget().createVolatileImage(width, height);
     }
 
-    @Override
     public boolean prepareImage(Image img, int w, int h, ImageObserver o) {
         return getTarget().prepareImage(img, w, h, o);
     }
 
-    @Override
     public int checkImage(Image img, int w, int h, ImageObserver o) {
         return getTarget().checkImage(img, w, h, o);
     }
@@ -338,8 +335,9 @@ class ProxyWindowPeer implements WindowPeer {
     }
 
     @Override
-    public void repositionSecurityWarning() {
-        throw new UnsupportedOperationException("Not supported yet.");
+    public GraphicsConfiguration getAppropriateGraphicsConfiguration(
+            GraphicsConfiguration gc) {
+        return gc;
     }
 
     @Override

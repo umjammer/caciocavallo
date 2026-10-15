@@ -27,11 +27,15 @@ package net.java.openjdk.cacio.servlet;
 
 import java.io.IOException;
 import javax.servlet.ServletException;
-import javax.servlet.http.*;
-import net.java.openjdk.awt.peer.web.*;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import net.java.openjdk.awt.peer.web.WebSessionState;
+
 
 /**
- * 
+ *
  * @author Clemens Eisserer <linuxhippy@gmail.com>
  */
 public class EventReceiveServlet extends HttpServlet {
@@ -39,18 +43,19 @@ public class EventReceiveServlet extends HttpServlet {
     public EventReceiveServlet() {
     }
 
+    @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-	String parameters = request.getParameter("events");
-	int eventID = Integer.parseInt(request.getParameter("eid"));
-	
-	WebSessionState currentState = WebSessionManager.getInstance().getSessionState(request);
-	if (currentState != null && currentState.getScreen() != null) {   
-	    try {
-		currentState.lockSession();
-		currentState.getEventManager().parseEventData(eventID, parameters);
-	    } finally {
-		currentState.unlockSession();
-	    }
-	}
+        String parameters = request.getParameter("events");
+        int eventID = Integer.parseInt(request.getParameter("eid"));
+
+        WebSessionState currentState = WebSessionManager.getInstance().getSessionState(request);
+        if (currentState != null && currentState.getScreen() != null) {
+            try {
+                currentState.lockSession();
+                currentState.getEventManager().parseEventData(eventID, parameters);
+            } finally {
+                currentState.unlockSession();
+            }
+        }
     }
 }

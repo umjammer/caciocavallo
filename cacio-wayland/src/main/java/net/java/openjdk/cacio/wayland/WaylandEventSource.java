@@ -25,9 +25,9 @@
 
 package net.java.openjdk.cacio.wayland;
 
-import sun.awt.peer.cacio.CacioEventSource;
-import sun.awt.peer.cacio.managed.EventData;
-import sun.awt.peer.cacio.managed.PlatformScreen;
+import com.github.caciocavallosilano.cacio.peer.CacioEventSource;
+import com.github.caciocavallosilano.cacio.peer.managed.EventData;
+import com.github.caciocavallosilano.cacio.peer.managed.PlatformScreen;
 
 import java.awt.*;
 

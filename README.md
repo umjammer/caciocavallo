@@ -1,8 +1,51 @@
-Project Caciocavallo - Portable GUI backends for OpenJDK
------------------------------------------------------------
+[![Release](https://jitpack.io/v/umjammer/caciocavallo.svg)](https://jitpack.io/#umjammer/caciocavallo)
+[![Java CI](https://github.com/umjammer/caciocavallo/actions/workflows/maven.yml/badge.svg)](https://github.com/umjammer/caciocavallo/actions/workflows/maven.yml)
+[![CodeQL](https://github.com/umjammer/caciocavallo/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/umjammer/caciocavallo/actions/workflows/codeql-analysis.yml)
+![Java](https://img.shields.io/badge/Java-17-b07219)
 
-Introduction
-------------
+# Caciocavallo
+
+Portable GUI backends for OpenJDK
+
+| name    | status | comment |
+|---------|:------:|---------|
+| sdl2    |   ✅️   |         |
+| eschher |        |         |
+| web     |        |         |
+| x11     |        |         |
+
+
+## Install
+
+- [maven](https://jitpack.io/#umjammer/caciocavallo)
+
+## Usage
+
+### run test
+
+```shell
+$ mvn -Dcacio.managed.background=#000000 \
+    -Dswingset2.seconds=0 \
+    -P native -pl cacio-sdl2 test
+```
+
+## References
+
+* https://github.com/CaciocavalloSilano/caciocavallo ... [vavi patched](https://github.com/umjammer/caciocavallo-silano) 🎯
+* https://github.com/libsdl4j/libsdl4j
+* https://jainja.thenesis.org/
+
+## TODO
+
+- others
+
+---
+
+# [Original](https://web.archive.org/web/20211204191824/http://openjdk.java.net/projects/caciocavallo/)
+ 
+ Portable GUI backends for OpenJDK
+
+## Introduction
 
 Caciocavallo - Portable GUI backends is one of the finalists of the
 OpenJDK Innovators Challenge. As of March 17, 2008 (well, more or
@@ -41,8 +84,7 @@ Good resource of information are the authors' blogs:
 * http://www.jroller.com/neugens
 * http://weblogs.java.net/blog/thetan/
 
-Checkout the code
------------------
+## Checkout the code
 
 Ok, if you are reading this README chances are that you already got the sources
 so you can skip this section.
@@ -69,8 +111,7 @@ ng, which is not really nice.
 
 That's all for now, time to move on to...
 
-Build
------
+## Build
 
 Building Cacio requires OpenJDK7 or later, it will not work with any
 previous release or alternative JDKs.
@@ -134,8 +175,7 @@ should do the trick.
 
 
 
-Caciocavallo-Web
-----
+## Caciocavallo-Web
 
 Caciocavallo-Web is a caciocavallo implementation for displaying AWT/Swing
 applications in a html5 capable browser, while the application is runing
@@ -190,12 +230,7 @@ When using png-compression, the compression-level can be adjusted additionally:
 http://localhost:8080/SessionInitializer?cls=SwingSet2&format=png&clevel=2
 where cLevel can be an integer between 0 (no) and 9 (highest) compression.
 
-
-Test
-----
-
-[TODO]
+TODO:
 
 It's pretty much everything for now, but stay tuned for other cool
 stuff :)
-

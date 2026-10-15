@@ -25,64 +25,73 @@
 
 package net.java.openjdk.cacio.server;
 
-import net.java.openjdk.cacio.servlet.*;
-import org.eclipse.jetty.server.*;
-import org.eclipse.jetty.server.handler.*;
-import org.eclipse.jetty.servlet.*;
-import org.eclipse.jetty.util.thread.*;
+import net.java.openjdk.cacio.servlet.AppStartServlet;
+import net.java.openjdk.cacio.servlet.EventReceiveServlet;
+import net.java.openjdk.cacio.servlet.ImageStreamer;
+import net.java.openjdk.cacio.servlet.ResourceLoaderServlet;
+import net.java.openjdk.cacio.servlet.SessionInitializeServlet;
+import net.java.openjdk.cacio.servlet.WebSocketServlet;
+import org.eclipse.jetty.server.Handler;
+import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.server.handler.HandlerList;
+import org.eclipse.jetty.server.handler.ResourceHandler;
+import org.eclipse.jetty.servlet.ServletContextHandler;
+import org.eclipse.jetty.servlet.ServletHolder;
+import org.eclipse.jetty.util.thread.QueuedThreadPool;
+
 
 /**
  * Server-Startup class for Caciocavallo-Web. Initializes a builtin Jetty
  * webserver, and sets the appropriate system properties.
- * 
+ *
  * @author Clemens Eisserer <linuxhippy@gmail.com>
  */
 public class CacioServer {
 
     public CacioServer() throws Exception {
-	this(8080, 125);
+        this(8080, 125);
     }
 
     /**
      * Initializes buitin http-server on the specified port, and sets system
      * properties.
-     * 
+     *
      * @param port
      * @throws Exception
      */
     public CacioServer(int port, int maxThreads) throws Exception {
-	applySystemProperties();
+        applySystemProperties();
 
-	Server server = new Server(port);
-	// https://stackoverflow.com/questions/16299981/jetty-thread-pool-and-sun-httpserver-session#comment27373331_16301885
-	server.setServer(new Server(new QueuedThreadPool(maxThreads)));
-	
-	ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
-	context.setContextPath("/");
-	context.setResourceBase("bin/");
-    context.getSessionHandler().setMaxInactiveInterval(90);
-	context.getSessionHandler().addEventListener(new CacioSessionListener());
+        Server server = new Server(port);
+        // https://stackoverflow.com/questions/16299981/jetty-thread-pool-and-sun-httpserver-session#comment27373331_16301885
+        server.setServer(new Server(new QueuedThreadPool(maxThreads)));
 
-	ResourceHandler handler = new ResourceHandler();
-	handler.setResourceBase("bin");
-	handler.setServer(server);
+        ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
+        context.setContextPath("/");
+        context.setResourceBase("bin/");
+        context.getSessionHandler().setMaxInactiveInterval(90);
+        context.getSessionHandler().addEventListener(new CacioSessionListener());
 
-	// context.addServlet(new ServletHolder(new ImgBenchServlet()),
-	// "/ImageStreamer");
+        ResourceHandler handler = new ResourceHandler();
+        handler.setResourceBase("bin");
+        handler.setServer(server);
 
-	context.addServlet(new ServletHolder(new SessionInitializeServlet()), "/SessionInitializer");
-	context.addServlet(new ServletHolder(new AppStartServlet()), "/AppStarter");
-	context.addServlet(new ServletHolder(new ImageStreamer()), "/ImageStreamer");
-	context.addServlet(new ServletHolder(new EventReceiveServlet()), "/EventReceiver");
-	context.addServlet(new ServletHolder(new WebSocketServlet()), "/WebSocket");
-	context.addServlet(new ServletHolder(new ResourceLoaderServlet()), "/ResourceLoader");
+        // context.addServlet(new ServletHolder(new ImgBenchServlet()),
+        // "/ImageStreamer");
 
-	HandlerList handlers = new HandlerList();
-	handlers.setHandlers(new Handler[] { handler, context });
-	server.setHandler(handlers);
-	
-	server.start();
-	server.join();
+        context.addServlet(new ServletHolder(new SessionInitializeServlet()), "/SessionInitializer");
+        context.addServlet(new ServletHolder(new AppStartServlet()), "/AppStarter");
+        context.addServlet(new ServletHolder(new ImageStreamer()), "/ImageStreamer");
+        context.addServlet(new ServletHolder(new EventReceiveServlet()), "/EventReceiver");
+        context.addServlet(new ServletHolder(new WebSocketServlet()), "/WebSocket");
+        context.addServlet(new ServletHolder(new ResourceLoaderServlet()), "/ResourceLoader");
+
+        HandlerList handlers = new HandlerList();
+        handlers.setHandlers(new Handler[] {handler, context});
+        server.setHandler(handlers);
+
+        server.start();
+        server.join();
     }
 
     /**
@@ -90,16 +99,16 @@ public class CacioServer {
      * specify all the caciocavallo-web classnames by hand.
      */
     protected void applySystemProperties() {
-	System.setProperty("awt.useSystemAAFontSettings", "on");
-	System.setProperty("awt.toolkit", "net.java.openjdk.awt.peer.web.WebToolkit");
-	System.setProperty("java.awt.graphicsenv", "net.java.openjdk.awt.peer.web.WebGraphicsEnvironment");
-	System.setProperty("cacio.focusmgr", "net.java.openjdk.awt.peer.web.WebFocusManager");
+        System.setProperty("awt.useSystemAAFontSettings", "on");
+        System.setProperty("awt.toolkit", "net.java.openjdk.awt.peer.web.WebToolkit");
+        System.setProperty("java.awt.graphicsenv", "net.java.openjdk.awt.peer.web.WebGraphicsEnvironment");
+        System.setProperty("cacio.focusmgr", "net.java.openjdk.awt.peer.web.WebFocusManager");
     }
 
-    public static void main(String[] args) throws Exception {
-	int port = Integer.getInteger("cacio.web.port", 8080);
-	int maxThreads = Integer.getInteger("cacio.threads", 125);
-	new CacioServer(port, maxThreads);
+    static void main(String[] args) throws Exception {
+        int port = Integer.getInteger("cacio.web.port", 8080);
+        int maxThreads = Integer.getInteger("cacio.threads", 125);
+        new CacioServer(port, maxThreads);
     }
 
 }

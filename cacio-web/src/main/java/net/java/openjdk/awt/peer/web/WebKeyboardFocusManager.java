@@ -35,6 +35,7 @@ import java.beans.PropertyVetoException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+
 public class WebKeyboardFocusManager extends DefaultKeyboardFocusManager {
 
     private static final Logger focusLog = Logger.getLogger("net.java.openjdk.awt.peer.web.WebKeyboardFocusManager");
@@ -44,7 +45,8 @@ public class WebKeyboardFocusManager extends DefaultKeyboardFocusManager {
     private Component permanentFocusOwner;
     private Window focusedWindow;
     private Window activeWindow;
-    
+
+    @Override
     public Component getFocusOwner() {
         synchronized (KeyboardFocusManager.class) {
             if (focusOwner == null) {
@@ -55,6 +57,7 @@ public class WebKeyboardFocusManager extends DefaultKeyboardFocusManager {
         }
     }
 
+    @Override
     protected Component getGlobalFocusOwner() throws SecurityException {
         synchronized (KeyboardFocusManager.class) {
             if (this == getCurrentKeyboardFocusManager()) {
@@ -68,6 +71,7 @@ public class WebKeyboardFocusManager extends DefaultKeyboardFocusManager {
         }
     }
 
+    @Override
     protected void setGlobalFocusOwner(Component focusOwner) {
         Component oldFocusOwner = null;
         boolean shouldFire = false;
@@ -78,7 +82,7 @@ public class WebKeyboardFocusManager extends DefaultKeyboardFocusManager {
 
                 try {
                     fireVetoableChange("focusOwner", oldFocusOwner,
-                                       focusOwner);
+                            focusOwner);
                 } catch (PropertyVetoException e) {
                     // rejected
                     return;
@@ -87,14 +91,12 @@ public class WebKeyboardFocusManager extends DefaultKeyboardFocusManager {
                 this.focusOwner = focusOwner;
 
                 if (focusOwner != null &&
-                    (getCurrentFocusCycleRoot() == null ||
-                     !focusOwner.isFocusCycleRoot(getCurrentFocusCycleRoot())))
-                {
+                        (getCurrentFocusCycleRoot() == null ||
+                                !focusOwner.isFocusCycleRoot(getCurrentFocusCycleRoot()))) {
                     Container rootAncestor =
-                        focusOwner.getFocusCycleRootAncestor();
-                    if (rootAncestor == null && (focusOwner instanceof Window))
-                    {
-                        rootAncestor = (Container)focusOwner;
+                            focusOwner.getFocusCycleRootAncestor();
+                    if (rootAncestor == null && (focusOwner instanceof Window)) {
+                        rootAncestor = (Container) focusOwner;
                     }
                     if (rootAncestor != null) {
                         setGlobalCurrentFocusCycleRoot(rootAncestor);
@@ -110,21 +112,22 @@ public class WebKeyboardFocusManager extends DefaultKeyboardFocusManager {
         }
     }
 
+    @Override
     protected Component getGlobalPermanentFocusOwner()
-            throws SecurityException
-        {
-            synchronized (KeyboardFocusManager.class) {
-                if (this == getCurrentKeyboardFocusManager()) {
-                    return permanentFocusOwner;
-                } else {
-                    if (focusLog.isLoggable(Level.FINER)) {
-                        focusLog.finer("This manager is " + this + ", current is " + getCurrentKeyboardFocusManager());
-                    }
-                    throw new SecurityException(notPrivileged);
+            throws SecurityException {
+        synchronized (KeyboardFocusManager.class) {
+            if (this == getCurrentKeyboardFocusManager()) {
+                return permanentFocusOwner;
+            } else {
+                if (focusLog.isLoggable(Level.FINER)) {
+                    focusLog.finer("This manager is " + this + ", current is " + getCurrentKeyboardFocusManager());
                 }
+                throw new SecurityException(notPrivileged);
             }
         }
+    }
 
+    @Override
     public Component getPermanentFocusOwner() {
         synchronized (KeyboardFocusManager.class) {
             if (permanentFocusOwner == null) {
@@ -135,8 +138,8 @@ public class WebKeyboardFocusManager extends DefaultKeyboardFocusManager {
         }
     }
 
-    protected void setGlobalPermanentFocusOwner(Component permanentFocusOwner)
-    {
+    @Override
+    protected void setGlobalPermanentFocusOwner(Component permanentFocusOwner) {
         Component oldPermanentFocusOwner = null;
         boolean shouldFire = false;
 
@@ -146,8 +149,8 @@ public class WebKeyboardFocusManager extends DefaultKeyboardFocusManager {
 
                 try {
                     fireVetoableChange("permanentFocusOwner",
-                                       oldPermanentFocusOwner,
-                                       permanentFocusOwner);
+                            oldPermanentFocusOwner,
+                            permanentFocusOwner);
                 } catch (PropertyVetoException e) {
                     // rejected
                     return;
@@ -165,9 +168,11 @@ public class WebKeyboardFocusManager extends DefaultKeyboardFocusManager {
 
         if (shouldFire) {
             firePropertyChange("permanentFocusOwner", oldPermanentFocusOwner,
-                               permanentFocusOwner);
+                    permanentFocusOwner);
         }
     }
+
+    @Override
     public Window getFocusedWindow() {
         synchronized (KeyboardFocusManager.class) {
             if (focusedWindow == null) {
@@ -178,10 +183,11 @@ public class WebKeyboardFocusManager extends DefaultKeyboardFocusManager {
         }
     }
 
+    @Override
     protected Window getGlobalFocusedWindow() throws SecurityException {
         synchronized (KeyboardFocusManager.class) {
             if (this == getCurrentKeyboardFocusManager()) {
-               return focusedWindow;
+                return focusedWindow;
             } else {
                 if (focusLog.isLoggable(Level.FINER)) {
                     focusLog.finer("This manager is " + this + ", current is " + getCurrentKeyboardFocusManager());
@@ -191,6 +197,7 @@ public class WebKeyboardFocusManager extends DefaultKeyboardFocusManager {
         }
     }
 
+    @Override
     protected void setGlobalFocusedWindow(Window focusedWindow) {
         Window oldFocusedWindow = null;
         boolean shouldFire = false;
@@ -201,7 +208,7 @@ public class WebKeyboardFocusManager extends DefaultKeyboardFocusManager {
 
                 try {
                     fireVetoableChange("focusedWindow", oldFocusedWindow,
-                                       focusedWindow);
+                            focusedWindow);
                 } catch (PropertyVetoException e) {
                     // rejected
                     return;
@@ -214,10 +221,11 @@ public class WebKeyboardFocusManager extends DefaultKeyboardFocusManager {
 
         if (shouldFire) {
             firePropertyChange("focusedWindow", oldFocusedWindow,
-                               focusedWindow);
+                    focusedWindow);
         }
     }
 
+    @Override
     public Window getActiveWindow() {
         synchronized (KeyboardFocusManager.class) {
             if (activeWindow == null) {
@@ -241,15 +249,16 @@ public class WebKeyboardFocusManager extends DefaultKeyboardFocusManager {
      * context.
      *
      * @return the active Window
+     * @throws SecurityException if this KeyboardFocusManager is not the
+     *                           current KeyboardFocusManager for the calling thread's context
      * @see #getActiveWindow
      * @see #setGlobalActiveWindow
-     * @throws SecurityException if this KeyboardFocusManager is not the
-     *         current KeyboardFocusManager for the calling thread's context
      */
+    @Override
     protected Window getGlobalActiveWindow() throws SecurityException {
         synchronized (KeyboardFocusManager.class) {
             if (this == getCurrentKeyboardFocusManager()) {
-               return activeWindow;
+                return activeWindow;
             } else {
                 if (focusLog.isLoggable(Level.FINER)) {
                     focusLog.finer("This manager is " + this + ", current is " + getCurrentKeyboardFocusManager());
@@ -274,13 +283,13 @@ public class WebKeyboardFocusManager extends DefaultKeyboardFocusManager {
      * Window, subject to platform limitations.
      *
      * @param activeWindow the active Window
+     * @beaninfo bound: true
      * @see #getActiveWindow
      * @see #getGlobalActiveWindow
      * @see Component#requestFocus()
      * @see Component#requestFocusInWindow()
-     * @beaninfo
-     *       bound: true
      */
+    @Override
     protected void setGlobalActiveWindow(Window activeWindow) {
         Window oldActiveWindow;
         synchronized (KeyboardFocusManager.class) {
@@ -291,7 +300,7 @@ public class WebKeyboardFocusManager extends DefaultKeyboardFocusManager {
 
             try {
                 fireVetoableChange("activeWindow", oldActiveWindow,
-                                   activeWindow);
+                        activeWindow);
             } catch (PropertyVetoException e) {
                 // rejected
                 return;

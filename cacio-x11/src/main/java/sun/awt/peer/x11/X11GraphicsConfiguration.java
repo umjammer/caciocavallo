@@ -34,10 +34,24 @@ import java.awt.geom.AffineTransform;
 import java.awt.image.ColorModel;
 import java.awt.image.DirectColorModel;
 
-class X11GraphicsConfiguration extends GraphicsConfiguration {
+import sun.awt.image.SunVolatileImage;
+import sun.awt.image.SurfaceManager;
+import sun.awt.image.VolatileSurfaceManager;
 
 
-    private X11GraphicsDevice device;
+class X11GraphicsConfiguration extends GraphicsConfiguration
+        implements SurfaceManager.Factory {
+
+    private final X11SurfaceManagerFactory surfaceManagerFactory = new X11SurfaceManagerFactory();
+
+    @Override
+    public VolatileSurfaceManager createVolatileManager(SunVolatileImage image,
+                                                        Object context) {
+        return surfaceManagerFactory.createVolatileManager(image, context);
+    }
+
+
+    private final X11GraphicsDevice device;
 
     X11GraphicsConfiguration(X11GraphicsDevice dev) {
         device = dev;
@@ -52,7 +66,7 @@ class X11GraphicsConfiguration extends GraphicsConfiguration {
     public ColorModel getColorModel() {
         // TODO: Implement.
         return new DirectColorModel(24, 0x00FF0000, 0x0000FF00,
-                                    0x000000FF);
+                0x000000FF);
     }
 
     @Override

@@ -25,10 +25,11 @@
 
 package net.java.openjdk.cacio.servlet.imgformat;
 
-import java.awt.image.*;
-
-import java.lang.reflect.*;
-import java.util.logging.*;
+import java.awt.image.BufferedImage;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Method;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 
 /**
@@ -36,39 +37,39 @@ import java.util.logging.*;
  * PNGEncoder interface, using the com.keypoint.PngEncoder png encoder, which is
  * faster than the ImageIO solution bundled with the JDK and allows
  * caciocavallo-web to modify the compression ratio.
- * 
+ *
  * @author Clemens Eisserer <linuxhippy@gmail.com>
  */
 public class PNGEncoderKeypoint extends PNGEncoder {
 
-    private static Logger logger = Logger.getLogger(PNGEncoderKeypoint.class.getName());
-    
+    private static final Logger logger = Logger.getLogger(PNGEncoderKeypoint.class.getName());
+
     private static Class<?> keypointEncoderCls;
     private static Constructor<?> keypointEncoderConstructor;
     private static Method keypointEncodeMethod;
 
     public PNGEncoderKeypoint() {
-	loadKeypointEncoder();
+        loadKeypointEncoder();
     }
 
     /**
      * Loads the keypoint png encoder using reflection.
      */
-    private void loadKeypointEncoder() {
-	try {
-	    keypointEncoderCls = Class.forName("com.keypoint.PngEncoderB");
-	    keypointEncoderConstructor = keypointEncoderCls.getConstructor(new Class[] { BufferedImage.class, boolean.class, int.class, int.class });
-	    keypointEncodeMethod = keypointEncoderCls.getMethod("pngEncode", new Class[0]);
-	} catch (ReflectiveOperationException ex) {
-	    logger.log(Level.INFO, ex.getMessage());
-	}
+    private static void loadKeypointEncoder() {
+        try {
+            keypointEncoderCls = Class.forName("com.keypoint.PngEncoderB");
+            keypointEncoderConstructor = keypointEncoderCls.getConstructor(BufferedImage.class, boolean.class, int.class, int.class);
+            keypointEncodeMethod = keypointEncoderCls.getMethod("pngEncode");
+        } catch (ReflectiveOperationException ex) {
+            logger.log(Level.INFO, ex.getMessage());
+        }
     }
 
     /**
      * @return true iff loading com.keypoint.PngEncoder was successful.
      */
     protected boolean isAvailable() {
-	return keypointEncodeMethod != null;
+        return keypointEncodeMethod != null;
     }
 
     /**
@@ -76,13 +77,13 @@ public class PNGEncoderKeypoint extends PNGEncoder {
      */
     @Override
     public byte[] encode(BufferedImage img, int compression) {
-	try {
-	    Object encoderInstance = keypointEncoderConstructor.newInstance(new Object[] { img, Boolean.FALSE, Integer.valueOf(0), compression });
-	    return (byte[]) keypointEncodeMethod.invoke(encoderInstance, new Object[0]);
-	} catch (ReflectiveOperationException ex) {
-	    logger.log(Level.SEVERE, "Error encoding png image", ex);
-	}
+        try {
+            Object encoderInstance = keypointEncoderConstructor.newInstance(img, Boolean.FALSE, 0, compression);
+            return (byte[]) keypointEncodeMethod.invoke(encoderInstance, new Object[0]);
+        } catch (ReflectiveOperationException ex) {
+            logger.log(Level.SEVERE, "Error encoding png image", ex);
+        }
 
-	return null;
+        return null;
     }
 }

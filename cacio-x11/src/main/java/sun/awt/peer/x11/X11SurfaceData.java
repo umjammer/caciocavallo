@@ -29,13 +29,15 @@ import java.awt.GraphicsConfiguration;
 import java.awt.Rectangle;
 import java.awt.image.ColorModel;
 import java.awt.image.Raster;
+
 import sun.java2d.SurfaceData;
 import sun.java2d.loops.SurfaceType;
+
 
 class X11SurfaceData extends SurfaceData {
 
     // TODO: Implement all the surface types.
-    static SurfaceType typeDefault =
+    static final SurfaceType typeDefault =
             SurfaceType.IntRgb.deriveSubType("Cacio X11 default");
 
     static {
@@ -43,11 +45,12 @@ class X11SurfaceData extends SurfaceData {
         X11Blit.register();
     }
 
-    private int width, height;
+    private final int width;
+    private final int height;
 
-    private GraphicsConfiguration configuration;
+    private final GraphicsConfiguration configuration;
 
-    private Object destination;
+    private final Object destination;
 
     private static native void initIDs();
 

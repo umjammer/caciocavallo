@@ -35,12 +35,13 @@ import java.awt.geom.Area;
 import java.awt.image.ColorModel;
 import java.util.List;
 
-import sun.awt.peer.cacio.CacioEventSource;
-import sun.awt.peer.cacio.WindowClippedGraphics;
-import sun.awt.peer.cacio.managed.EventData;
-import sun.awt.peer.cacio.managed.FullScreenWindowFactory;
-import sun.awt.peer.cacio.managed.PlatformScreen;
+import com.github.caciocavallosilano.cacio.peer.CacioEventSource;
+import com.github.caciocavallosilano.cacio.peer.WindowClippedGraphics;
+import com.github.caciocavallosilano.cacio.peer.managed.EventData;
+import com.github.caciocavallosilano.cacio.peer.managed.FullScreenWindowFactory;
+import com.github.caciocavallosilano.cacio.peer.managed.PlatformScreen;
 import sun.java2d.SunGraphics2D;
+
 
 class X11PlatformScreen implements PlatformScreen, CacioEventSource {
 
@@ -50,9 +51,10 @@ class X11PlatformScreen implements PlatformScreen, CacioEventSource {
 
     private X11SurfaceData surfaceData;
 
-    private int width, height;
+    private final int width;
+    private final int height;
 
-    private long window;
+    private final long window;
 
     private EventData eventData;
 
@@ -67,7 +69,7 @@ class X11PlatformScreen implements PlatformScreen, CacioEventSource {
         this.width = dim.width;
         this.height = dim.height;
         window = nativeInitScreen(X11GraphicsEnvironment.getDisplay(),
-                                  width, height);
+                width, height);
     }
 
     @Override
@@ -75,7 +77,7 @@ class X11PlatformScreen implements PlatformScreen, CacioEventSource {
                                          List<Rectangle> clipRects) {
         X11SurfaceData sd = getSurfaceData();
         Graphics2D g2d = new SunGraphics2D(sd, fg, bg, font);
-        if (clipRects != null && clipRects.size() > 0) {
+        if (clipRects != null && !clipRects.isEmpty()) {
             Area a = new Area(getBounds());
             for (Rectangle clip : clipRects) {
                 a.subtract(new Area(clip));
@@ -88,25 +90,29 @@ class X11PlatformScreen implements PlatformScreen, CacioEventSource {
     private X11SurfaceData getSurfaceData() {
         if (surfaceData == null) {
             surfaceData = new X11SurfaceData(X11SurfaceData.typeDefault,
-                                             getColorModel(), width, height,
-                                             getGraphicsConfiguration(), this,
-                                             window);
+                    getColorModel(), width, height,
+                    getGraphicsConfiguration(), this,
+                    window);
         }
         return surfaceData;
     }
 
+    @Override
     public ColorModel getColorModel() {
         return getGraphicsConfiguration().getColorModel();
     }
 
+    @Override
     public GraphicsConfiguration getGraphicsConfiguration() {
         return X11GraphicsConfiguration.getDefaultGC();
     }
 
+    @Override
     public Rectangle getBounds() {
         return new Rectangle(0, 0, width, height);
     }
 
+    @Override
     public EventData getNextEvent() {
         if (eventData == null) {
             eventData = new EventData();
@@ -114,7 +120,10 @@ class X11PlatformScreen implements PlatformScreen, CacioEventSource {
         eventData.clear();
         nativeGetEvent(X11GraphicsEnvironment.getDisplay(), eventData);
         if (eventData.getId() == 0) {
-            try { Thread.sleep(100); } catch (Exception ex) {}
+            try {
+                Thread.sleep(100);
+            } catch (Exception ex) {
+            }
         }
         eventData.setSource(this);
         return eventData;

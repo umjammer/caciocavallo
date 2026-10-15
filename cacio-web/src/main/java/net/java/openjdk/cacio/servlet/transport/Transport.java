@@ -25,20 +25,24 @@
 
 package net.java.openjdk.cacio.servlet.transport;
 
-import java.awt.*;
-import java.awt.image.*;
-import java.io.*;
+import java.awt.Graphics;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.util.List;
 
-import net.java.openjdk.awt.peer.web.*;
+import net.java.openjdk.awt.peer.web.BlitScreenUpdate;
+import net.java.openjdk.awt.peer.web.ScreenUpdate;
+import net.java.openjdk.awt.peer.web.TreeImagePacker;
+
 
 /**
  * Base-Class of all Transport implementations. A transpor defines the way the
  * image-data as well as the command-stream are encoded and sent to the client.
- * 
+ * <p>
  * Each transport consists of its javascript counterpart, so the browser-client
  * can deal with the data it receives.
- * 
+ *
  * @author Clemens Eisserer <linuxhippy@gmail.com>
  */
 public abstract class Transport {
@@ -48,39 +52,40 @@ public abstract class Transport {
     public static final String FORMAT_PNG_XHR = "png";
     public static final String FORMAT_RLE = "rle";
 
-    String contentType;
+    final String contentType;
     boolean dataAvailable = false;
 
     public Transport(String contentType) {
-	this.contentType = contentType;
+        this.contentType = contentType;
     }
 
     /**
      * Utility function to copy the ScreenUpdates into a single, packed BufferedImage.
      * The ScreenUpdates need to have the packed coordinates set already.
+     *
      * @param updateList
      * @param packedImage
      * @param packedAreaHeight
      */
     protected void copyUpdatesToPackedImage(List<ScreenUpdate> updateList, BufferedImage packedImage, int packedAreaHeight) {
-	Graphics g = packedImage.getGraphics();
+        Graphics g = packedImage.getGraphics();
 
-	for (ScreenUpdate update : updateList) {
-	    if (update instanceof BlitScreenUpdate) {
-		BlitScreenUpdate bsUpdate = (BlitScreenUpdate) update;
+        for (ScreenUpdate update : updateList) {
+            if (update instanceof BlitScreenUpdate bsUpdate) {
 
-		int width = bsUpdate.getUpdateArea().getWidth();
-		int height = bsUpdate.getUpdateArea().getHeight();
+                int width = bsUpdate.getUpdateArea().getWidth();
+                int height = bsUpdate.getUpdateArea().getHeight();
 
-		g.drawImage(bsUpdate.getImage(), bsUpdate.getPackedX(), bsUpdate.getPackedY() + packedAreaHeight, bsUpdate.getPackedX() + width,
-			bsUpdate.getPackedY() + height + packedAreaHeight, bsUpdate.getSrcX(), bsUpdate.getSrcY(), bsUpdate.getSrcX() + width,
-			bsUpdate.getSrcY() + height, null);
-	    }
-	}
+                g.drawImage(bsUpdate.getImage(), bsUpdate.getPackedX(), bsUpdate.getPackedY() + packedAreaHeight, bsUpdate.getPackedX() + width,
+                        bsUpdate.getPackedY() + height + packedAreaHeight, bsUpdate.getSrcX(), bsUpdate.getSrcY(), bsUpdate.getSrcX() + width,
+                        bsUpdate.getSrcY() + height, null);
+            }
+        }
     }
 
     /**
      * Encodes pendingUpdateList and preseves the ScreenUpdate data
+     *
      * @param pendingUpdateList
      * @param packer
      * @param cmdData
@@ -91,35 +96,35 @@ public abstract class Transport {
      * @return the HTTP content type the transport outputs.
      */
     public String getContentType() {
-	return contentType;
+        return contentType;
     }
 
     /**
      * Initializes a Transport for the given transportName.
-     * 
+     *
      * @param transportName
      * @param compressionLevel
      * @return
      */
     public static Transport getTransportForName(String transportName, int compressionLevel) {
-	if (transportName.equalsIgnoreCase(FORMAT_RLE)) {
-	    return new BinaryRLETransport();
-	} else if (transportName.equalsIgnoreCase(FORMAT_PNG_XHR)) {
-	    return new BinaryPngTransport(compressionLevel);
-	} else if (transportName.equalsIgnoreCase(FORMAT_PNG_IMG)) {
-	    return new ImageTransport(compressionLevel);
-	} else {
-	    return new Base64PngTransport(compressionLevel);
-	}
+        if (transportName.equalsIgnoreCase(FORMAT_RLE)) {
+            return new BinaryRLETransport();
+        } else if (transportName.equalsIgnoreCase(FORMAT_PNG_XHR)) {
+            return new BinaryPngTransport(compressionLevel);
+        } else if (transportName.equalsIgnoreCase(FORMAT_PNG_IMG)) {
+            return new ImageTransport(compressionLevel);
+        } else {
+            return new Base64PngTransport(compressionLevel);
+        }
     }
-    
+
     public abstract void writeToStream(OutputStream os) throws IOException;
-    
+
     public byte[] asByteArray() {
-	throw new RuntimeException("Not implemented.");
+        throw new RuntimeException("Not implemented.");
     }
-    
+
     public String asString() {
-	throw new RuntimeException("Not implemented");
+        throw new RuntimeException("Not implemented");
     }
 }

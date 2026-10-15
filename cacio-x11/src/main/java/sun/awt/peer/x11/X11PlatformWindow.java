@@ -37,32 +37,38 @@ import java.awt.Image;
 import java.awt.Insets;
 import java.awt.Point;
 import java.awt.Rectangle;
+import java.awt.event.FocusEvent.Cause;
 import java.awt.image.ColorModel;
 import java.awt.peer.ContainerPeer;
-import sun.awt.CausedFocusEvent.Cause;
+import java.lang.System.Logger;
+import java.lang.System.Logger.Level;
+
+import com.github.caciocavallosilano.cacio.peer.CacioComponent;
+import com.github.caciocavallosilano.cacio.peer.PlatformToplevelWindow;
 import sun.awt.SunToolkit;
-import sun.awt.peer.cacio.CacioComponent;
-import sun.awt.peer.cacio.PlatformToplevelWindow;
 import sun.java2d.NullSurfaceData;
 import sun.java2d.SunGraphics2D;
 import sun.java2d.SurfaceData;
 import sun.java2d.pipe.Region;
 
+
 class X11PlatformWindow implements PlatformToplevelWindow {
+
+    private static final Logger logger = System.getLogger(X11PlatformWindow.class.getName());
 
     static {
         initIDs();
     }
 
-    private long nativeWindow;
+    private final long nativeWindow;
 
-    private boolean toplevel;
+    private final boolean toplevel;
 
     private boolean visible;
 
     private X11SurfaceData surfaceData;
 
-    private CacioComponent cacioComponent;
+    private final CacioComponent cacioComponent;
 
     private X11PlatformWindow parent;
 
@@ -83,7 +89,7 @@ class X11PlatformWindow implements PlatformToplevelWindow {
         SunToolkit.awtLock();
         try {
             nativeWindow = nativeInit(X11GraphicsEnvironment.getDisplay(), 0L,
-                                      x, y, w, h);
+                    x, y, w, h);
         } finally {
             SunToolkit.awtUnlock();
         }
@@ -100,7 +106,7 @@ class X11PlatformWindow implements PlatformToplevelWindow {
         SunToolkit.awtLock();
         try {
             nativeWindow = nativeInit(X11GraphicsEnvironment.getDisplay(),
-                                      p.nativeWindow, x, y, w, h);
+                    p.nativeWindow, x, y, w, h);
             // We need to set the visibility here, otherwise subwindows
             // will not be mapped when the parent gets mapped.
             setVisible(comp.getAWTComponent().isVisible());
@@ -117,23 +123,29 @@ class X11PlatformWindow implements PlatformToplevelWindow {
         return cacioComponent;
     }
 
+    @Override
     public ColorModel getColorModel() {
         return getGraphicsConfiguration().getColorModel();
     }
 
+    @Override
     public GraphicsConfiguration getGraphicsConfiguration() {
         return X11GraphicsConfiguration.getDefaultGC();
     }
 
-    private Rectangle bounds = new Rectangle();
+    private final Rectangle bounds = new Rectangle();
+
+    @Override
     public Rectangle getBounds() {
         return new Rectangle(bounds);
     }
 
+    @Override
     public void dispose() {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
+    @Override
     public Graphics2D getGraphics(Color fg, Color bg, Font font) {
         SurfaceData sd = getSurfaceData();
         Graphics2D g2d = new SunGraphics2D(sd, fg, bg, font);
@@ -141,18 +153,19 @@ class X11PlatformWindow implements PlatformToplevelWindow {
     }
 
     private SurfaceData getSurfaceData() {
-        if (! visible) {
+        if (!visible) {
             return NullSurfaceData.theInstance;
         }
         if (surfaceData == null) {
             surfaceData = new X11SurfaceData(X11SurfaceData.typeDefault,
-                                             getColorModel(), bounds.width, bounds.height,
-                                             getGraphicsConfiguration(), this,
-                                             nativeWindow);
+                    getColorModel(), bounds.width, bounds.height,
+                    getGraphicsConfiguration(), this,
+                    nativeWindow);
         }
         return surfaceData;
     }
 
+    @Override
     public void setBounds(int x, int y, int width, int height, int op) {
         bounds.x = x;
         bounds.y = y;
@@ -161,17 +174,19 @@ class X11PlatformWindow implements PlatformToplevelWindow {
         SunToolkit.awtLock();
         try {
             nativeSetBounds(X11GraphicsEnvironment.getDisplay(), nativeWindow,
-                            x, y, width, height);
+                    x, y, width, height);
         } finally {
             SunToolkit.awtUnlock();
         }
     }
 
+    @Override
     public Insets getInsets() {
         // TODO: Return correct insets...
         return new Insets(0, 0, 0, 0);
     }
 
+    @Override
     public Point getLocationOnScreen() {
         Point ownLoc = getLocation();
         if (parent != null) {
@@ -187,46 +202,54 @@ class X11PlatformWindow implements PlatformToplevelWindow {
         SunToolkit.awtLock();
         try {
             nativeGetLocation(X11GraphicsEnvironment.getDisplay(),
-                              nativeWindow, p);
+                    nativeWindow, p);
         } finally {
             SunToolkit.awtUnlock();
         }
         return p;
     }
 
+    @Override
     public boolean canDetermineObscurity() {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
+    @Override
     public boolean isObscured() {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
+    @Override
     public void applyShape(Region shape) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
+    @Override
     public boolean isReparentSuppored() {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
+    @Override
     public void reparent(ContainerPeer newContainer) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
+    @Override
     public boolean isRestackSupported() {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
+    @Override
     public void restack() {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
+    @Override
     public void setVisible(boolean b) {
         SunToolkit.awtLock();
         try {
             nativeSetVisible(X11GraphicsEnvironment.getDisplay(), nativeWindow,
-                             b);
+                    b);
         } finally {
             SunToolkit.awtUnlock();
         }
@@ -249,42 +272,52 @@ class X11PlatformWindow implements PlatformToplevelWindow {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
+    @Override
     public void createBuffers(int numBuffers, BufferCapabilities caps) throws AWTException {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
+    @Override
     public void destroyBuffers() {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
+    @Override
     public void flip(int x1, int y1, int x2, int y2, FlipContents flipAction) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
+    @Override
     public Image getBackBuffer() {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
+    @Override
     public void requestFocus() {
-        System.err.println("IMPLEMENT: X11PlatformWindow.requestFocus()");
+        logger.log(Level.DEBUG, "IMPLEMENT: X11PlatformWindow.requestFocus()");
     }
 
+    @Override
     public int getState() {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
+    @Override
     public void setState(int state) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
+    @Override
     public void setMaximizedBounds(Rectangle bounds) {
-        System.err.println("TODO: Implement X11PlatformWindow.setMaximizedBounds()");
+        logger.log(Level.DEBUG, "TODO: Implement X11PlatformWindow.setMaximizedBounds()");
     }
 
+    @Override
     public void setResizable(boolean resizable) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
+    @Override
     public void setTitle(String title) {
         throw new UnsupportedOperationException("Not supported yet.");
     }

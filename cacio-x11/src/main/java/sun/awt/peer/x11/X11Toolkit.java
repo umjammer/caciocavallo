@@ -31,7 +31,6 @@ import java.awt.Frame;
 import java.awt.GraphicsDevice;
 import java.awt.HeadlessException;
 import java.awt.PrintJob;
-import java.awt.Robot;
 import java.awt.SystemTray;
 import java.awt.TrayIcon;
 import java.awt.Window;
@@ -45,18 +44,25 @@ import java.awt.im.spi.InputMethodDescriptor;
 import java.awt.image.ColorModel;
 import java.awt.peer.DesktopPeer;
 import java.awt.peer.FontPeer;
+import java.awt.peer.FramePeer;
 import java.awt.peer.RobotPeer;
 import java.awt.peer.SystemTrayPeer;
 import java.awt.peer.TrayIconPeer;
+import java.lang.System.Logger;
+import java.lang.System.Logger.Level;
 import java.util.Map;
 import java.util.Properties;
 
+import com.github.caciocavallosilano.cacio.peer.CacioToolkit;
+import com.github.caciocavallosilano.cacio.peer.PlatformWindowFactory;
+import com.github.caciocavallosilano.cacio.peer.managed.FullScreenWindowFactory;
+import sun.awt.LightweightFrame;
 import sun.awt.datatransfer.DataTransferer;
-import sun.awt.peer.cacio.CacioToolkit;
-import sun.awt.peer.cacio.managed.FullScreenWindowFactory;
-import sun.awt.peer.cacio.PlatformWindowFactory;
+
 
 public class X11Toolkit extends CacioToolkit {
+
+    private static final Logger logger = System.getLogger(X11Toolkit.class.getName());
 
     static {
         System.loadLibrary("cacio-x11");
@@ -111,16 +117,14 @@ public class X11Toolkit extends CacioToolkit {
     }
 
     @Override
-    public RobotPeer createRobot(Robot arg0, GraphicsDevice arg1) throws AWTException {
+    public RobotPeer createRobot(GraphicsDevice arg1) throws AWTException {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
-    @Override
     protected int getScreenWidth() {
         return X11GraphicsConfiguration.getDefaultGC().getBounds().width;
     }
 
-    @Override
     protected int getScreenHeight() {
         return X11GraphicsConfiguration.getDefaultGC().getBounds().height;
     }
@@ -132,12 +136,12 @@ public class X11Toolkit extends CacioToolkit {
 
     @Override
     public void grab(Window arg0) {
-        System.err.println("IMPLEMENT ME: X11Toolkit.grab()");
+        logger.log(Level.DEBUG, "IMPLEMENT ME: X11Toolkit.grab()");
     }
 
     @Override
     public void ungrab(Window arg0) {
-        System.err.println("IMPLEMENT ME: X11Toolkit.ungrab()");
+        logger.log(Level.DEBUG, "IMPLEMENT ME: X11Toolkit.ungrab()");
     }
 
     @Override
@@ -146,7 +150,12 @@ public class X11Toolkit extends CacioToolkit {
     }
 
     @Override
-    protected DesktopPeer createDesktopPeer(Desktop target) throws HeadlessException {
+    public boolean isTaskbarSupported() {
+        return false;
+    }
+
+    @Override
+    public DesktopPeer createDesktopPeer(Desktop target) throws HeadlessException {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
@@ -193,5 +202,10 @@ public class X11Toolkit extends CacioToolkit {
     @Override
     public DataTransferer getDataTransferer() {
         throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public FramePeer createLightweightFrame(LightweightFrame target) throws HeadlessException {
+        return null;
     }
 }

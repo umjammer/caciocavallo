@@ -28,8 +28,13 @@ package gnu.java.awt.peer.x;
 import java.awt.Component;
 import java.awt.GraphicsEnvironment;
 import java.awt.event.MouseEvent;
+import java.lang.System.Logger;
+import java.lang.System.Logger.Level;
 import java.util.HashMap;
+import java.util.Map;
 
+import com.github.caciocavallosilano.cacio.peer.CacioComponent;
+import com.github.caciocavallosilano.cacio.peer.CacioEventPump;
 import gnu.x11.Display;
 import gnu.x11.event.ButtonPress;
 import gnu.x11.event.ButtonRelease;
@@ -37,12 +42,13 @@ import gnu.x11.event.Event;
 import gnu.x11.event.Expose;
 import gnu.x11.event.MotionNotify;
 import sun.awt.SunToolkit;
-import sun.awt.peer.cacio.CacioComponent;
-import sun.awt.peer.cacio.CacioEventPump;
+
 
 class EscherEventPump extends CacioEventPump<Event> {
 
-    private HashMap<Long, EscherPlatformWindow> windowMap;
+    private static final Logger logger = System.getLogger(EscherEventPump.class.getName());
+
+    private final Map<Long, EscherPlatformWindow> windowMap;
 
     EscherEventPump() {
         windowMap = new HashMap<>();
@@ -53,12 +59,12 @@ class EscherEventPump extends CacioEventPump<Event> {
         SunToolkit.awtLock();
         Event eventData = null;
         try {
-            eventData = nativeFetchEvent(XGraphicsEnvironment.class.cast(GraphicsEnvironment.getLocalGraphicsEnvironment()).getDisplay());
+            eventData = nativeFetchEvent(((XGraphicsEnvironment) GraphicsEnvironment.getLocalGraphicsEnvironment()).getDisplay());
         } finally {
             SunToolkit.awtUnlock();
         }
         if (eventData == null) {
-            try { Thread.sleep(10); } catch (InterruptedException ex) { }
+            try { Thread.sleep(10); } catch (InterruptedException _) {}
         }
         return eventData;
     }
@@ -72,53 +78,53 @@ class EscherEventPump extends CacioEventPump<Event> {
             case MAP_NOTIFY:
                 break;
             case EXPOSE: {
-                Expose event = Expose.class.cast(nativeEvent);
-                EscherPlatformWindow w = windowMap.get(Long.valueOf(event.getWindowID()));
+                Expose event = (Expose) nativeEvent;
+                EscherPlatformWindow w = windowMap.get((long) event.getWindowID());
                 CacioComponent source = w.getCacioComponent();
                 Component c = source.getAWTComponent();
-System.err.println("EscherEventPump::dispatchNativeEvent: exposing: " + c);
+                logger.log(Level.DEBUG, "EscherEventPump::dispatchNativeEvent: exposing: " + c);
                 postPaintEvent(source, 0, 0, c.getWidth(), c.getHeight());
                 break;
             }
             case MOTION_NOTIFY: {
-                MotionNotify event = MotionNotify.class.cast(nativeEvent);
-                EscherPlatformWindow w = windowMap.get(Long.valueOf(event.getEventWindowID()));
+                MotionNotify event = (MotionNotify) nativeEvent;
+                EscherPlatformWindow w = windowMap.get((long) event.getEventWindowID());
                 CacioComponent source = w.getCacioComponent();
                 postMouseEvent(source, MouseEvent.MOUSE_MOVED, System.currentTimeMillis(), 0, event.getEventX(), event.getEventY(), 0, false);
                 break;
             }
             case BUTTON_PRESS: {
-                ButtonPress event = ButtonPress.class.cast(nativeEvent);
-                EscherPlatformWindow w = windowMap.get(Long.valueOf(event.getEventWindowID()));
+                ButtonPress event = (ButtonPress) nativeEvent;
+                EscherPlatformWindow w = windowMap.get((long) event.getEventWindowID());
                 CacioComponent source = w.getCacioComponent();
                 /* TODO: Fix mods. */
-System.err.println("EscherEventPump::dispatchNativeEvent: BUTTON_PRESS");
+                logger.log(Level.DEBUG, "EscherEventPump::dispatchNativeEvent: BUTTON_PRESS");
                 postMouseEvent(source, MouseEvent.MOUSE_PRESSED, System.currentTimeMillis(), MouseEvent.BUTTON1_DOWN_MASK, event.getEventX(), event.getEventY(), 0, false);
                 break;
             }
             case BUTTON_RELEASE: {
-                ButtonRelease event = ButtonRelease.class.cast(nativeEvent);
-                EscherPlatformWindow w = windowMap.get(Long.valueOf(event.getEventWindowID()));
+                ButtonRelease event = (ButtonRelease) nativeEvent;
+                EscherPlatformWindow w = windowMap.get((long) event.getEventWindowID());
                 CacioComponent source = w.getCacioComponent();
-                /* TODO: Fix mods. */
-System.err.println("EscherEventPump::dispatchNativeEvent: BUTTON_RELEASE");
+                // TODO: Fix mods.
+                logger.log(Level.DEBUG, "EscherEventPump::dispatchNativeEvent: BUTTON_RELEASE");
                 postMouseEvent(source, MouseEvent.MOUSE_RELEASED, System.currentTimeMillis(), 0, event.getEventX(), event.getEventY(), 0, false);
                 break;
             }
             default:
-System.err.println("EscherEventPump::dispatchNativeEvent: unhandled event type: " + nativeEvent.code());
+                logger.log(Level.DEBUG, "EscherEventPump::dispatchNativeEvent: unhandled event type: " + nativeEvent.code());
         }
     }
 
     void registerWindow(long windowId, EscherPlatformWindow w) {
-        windowMap.put(Long.valueOf(windowId), w);
+        windowMap.put(windowId, w);
     }
 
     void deregisterWindow(long windowId) {
-        windowMap.remove(Long.valueOf(windowId));
+        windowMap.remove(windowId);
     }
 
-    private Event nativeFetchEvent(Display display) {
+    private static Event nativeFetchEvent(Display display) {
         Event event;
 
         if (!display.eventAvailable()) {
@@ -126,16 +132,12 @@ System.err.println("EscherEventPump::dispatchNativeEvent: unhandled event type: 
         }
 
         event = display.nextEvent();
-        switch (event.code()) {
-            case MAP_NOTIFY:
-            case EXPOSE:
-            case MOTION_NOTIFY:
-            case BUTTON_PRESS:
-            case BUTTON_RELEASE:
-                return event;
-            default:
-System.err.printf("Unhandled X event type: %s\n", event.code());
-                return null;
-        }
+        return switch (event.code()) {
+            case MAP_NOTIFY, EXPOSE, MOTION_NOTIFY, BUTTON_PRESS, BUTTON_RELEASE -> event;
+            default -> {
+                System.err.printf("Unhandled X event type: %s\n", event.code());
+                yield null;
+            }
+        };
     }
 }

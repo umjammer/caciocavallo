@@ -25,93 +25,97 @@
 
 package net.java.openjdk.cacio.servlet.transport;
 
-import java.awt.image.*;
-import java.io.*;
-import java.util.*;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.util.List;
 
-import net.java.openjdk.awt.peer.web.*;
-import net.java.openjdk.cacio.servlet.imgformat.*;
+import net.java.openjdk.awt.peer.web.ScreenUpdate;
+import net.java.openjdk.awt.peer.web.TreeImagePacker;
+import net.java.openjdk.awt.peer.web.WebRect;
+import net.java.openjdk.cacio.servlet.imgformat.PNGEncoder;
+
 
 /**
  * Transport encoding the command-stream directly in a png-image.
- * 
+ * <p>
  * This has the advantage of not requiring a lot of javascript-processing of
  * image-data, the image can be loaded by the browser using native code - and
  * the bytes of the command-stream can be read from that image later.
- * 
+ * <p>
  * Unfourtunatly Webkit based Browsers have a bug which causes a memory-leak,
  * furthermore it is not guaranteed that the cmd-stream data can be extracted
  * again with the required precision (this is tested at run-time by the
  * javascript-part of the backend).
- * 
+ * <p>
  * The javascript-counterpart of this backend is ImgTransport.js
- * 
+ *
  * @author Clemens Eisserer <linuxhippy@gmail.com>
  */
 public class ImageTransport extends Transport {
 
-    byte[] emptyImgData;
-    int compressionLevel;
+    final byte[] emptyImgData;
+    final int compressionLevel;
 
     BufferedImage packedImage;
 
     public ImageTransport(int compressionLevel) {
-	super("image/png");
-	this.compressionLevel = compressionLevel;
+        super("image/png");
+        this.compressionLevel = compressionLevel;
 
-	BufferedImage emptyImg = new BufferedImage(1, 1, BufferedImage.TYPE_INT_RGB);
-	emptyImg.setRGB(0, 0, 0);
-	emptyImgData = PNGEncoder.getInstance().encode(emptyImg, 2);
+        BufferedImage emptyImg = new BufferedImage(1, 1, BufferedImage.TYPE_INT_RGB);
+        emptyImg.setRGB(0, 0, 0);
+        emptyImgData = PNGEncoder.getInstance().encode(emptyImg, 2);
     }
 
     /**
      * Encodes the command-stream in the BufferedImage passed. The red byte is
      * simply used for the sign, while green+blue are used as 16 bit integer
      * value.
-     * 
+     *
      * @param bImg
      * @param cmdList
      */
     protected void encodeImageCmdStream(BufferedImage bImg, List<Integer> cmdList) {
-	bImg.setRGB(0, 0, cmdList.size());
+        bImg.setRGB(0, 0, cmdList.size());
 
-	for (int i = 0; i < cmdList.size(); i++) {
-	    int pixelCnt = i + 1;
-	    int yPos = pixelCnt / bImg.getWidth();
-	    int xPos = pixelCnt % bImg.getWidth();
+        for (int i = 0; i < cmdList.size(); i++) {
+            int pixelCnt = i + 1;
+            int yPos = pixelCnt / bImg.getWidth();
+            int xPos = pixelCnt % bImg.getWidth();
 
-	    int intValue = cmdList.get(i);
-	    int r = intValue < 0 ? 1 << 16 : 0; // sign
-	    int gb = Math.abs(intValue) & 0x0000FFFF;
+            int intValue = cmdList.get(i);
+            int r = intValue < 0 ? 1 << 16 : 0; // sign
+            int gb = Math.abs(intValue) & 0x0000FFFF;
 
-	    int rgb = r | gb;
-	    bImg.setRGB(xPos, yPos, rgb);
-	}
+            int rgb = r | gb;
+            bImg.setRGB(xPos, yPos, rgb);
+        }
     }
 
     @Override
     public void prepareUpdate(List<ScreenUpdate> pendingUpdateList, TreeImagePacker packer, List<Integer> cmdList) {
-	WebRect packedRegionBox = packer.getBoundingBox();
-	int regionWidth = packedRegionBox.getWidth() != 0 ? packedRegionBox.getWidth() : 16;
-	int regionHeight = packedRegionBox.getHeight();
-	int cmdAreaHeight = (int) Math.ceil(((double) cmdList.size() + 1) / (regionWidth));
+        WebRect packedRegionBox = packer.getBoundingBox();
+        int regionWidth = packedRegionBox.getWidth() != 0 ? packedRegionBox.getWidth() : 16;
+        int regionHeight = packedRegionBox.getHeight();
+        int cmdAreaHeight = (int) Math.ceil(((double) cmdList.size() + 1) / (regionWidth));
 
-	packedImage = new BufferedImage(regionWidth, regionHeight + cmdAreaHeight, BufferedImage.TYPE_INT_RGB);
-	encodeImageCmdStream(packedImage, cmdList);
-	copyUpdatesToPackedImage(pendingUpdateList, packedImage, cmdAreaHeight);
-	dataAvailable = true;
+        packedImage = new BufferedImage(regionWidth, regionHeight + cmdAreaHeight, BufferedImage.TYPE_INT_RGB);
+        encodeImageCmdStream(packedImage, cmdList);
+        copyUpdatesToPackedImage(pendingUpdateList, packedImage, cmdAreaHeight);
+        dataAvailable = true;
     }
 
     @Override
     public void writeToStream(OutputStream os) throws IOException {
-	if (dataAvailable) {
-	    byte[] imgData = PNGEncoder.getInstance().encode(packedImage, compressionLevel);
-	    os.write(imgData);
-	    packedImage = null;
-	} else {
-	    os.write(emptyImgData);
-	}
+        if (dataAvailable) {
+            byte[] imgData = PNGEncoder.getInstance().encode(packedImage, compressionLevel);
+            os.write(imgData);
+            packedImage = null;
+        } else {
+            os.write(emptyImgData);
+        }
 
-	dataAvailable = false;
+        dataAvailable = false;
     }
 }

@@ -1,0 +1,240 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>net.java.openjdk.cacio</groupId>
+    <artifactId>cacio</artifactId>
+    <version>1.10.0</version>
+  </parent>
+
+  <artifactId>cacio-sdl2</artifactId>
+	<packaging>jar</packaging>
+
+  <properties>
+		<SDL2.include>/usr/include/SDL2</SDL2.include>
+    <SDL2.lib>/usr/lib</SDL2.lib>
+    <native.headers>${project.build.directory}/native/include</native.headers>
+    <native.library>${project.build.directory}/${native.libraryName}</native.library>
+    <native.libraryName>libcacio-sdl2.dylib</native.libraryName>
+  </properties>
+
+  <name>Cacio SDL2 Module</name>
+
+  <profiles>
+    <profile>
+      <!-- Homebrew puts SDL2 outside the default prefix -->
+      <id>mac</id>
+      <activation>
+        <os><family>mac</family></os>
+      </activation>
+      <properties>
+        <SDL2.include>/opt/homebrew/include/SDL2</SDL2.include>
+        <SDL2.lib>/opt/homebrew/lib</SDL2.lib>
+      </properties>
+    </profile>
+
+    <profile>
+      <!--
+        mvn -P native test
+        Builds libcacio-sdl2 from src/main/native and runs the SwingSet2 test on
+        it. Needs SDL2 (brew install sdl2) and a cc. Without this profile the
+        module is java-only and the test skips itself.
+      -->
+      <id>native</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>exec-maven-plugin</artifactId>
+            <version>3.6.4</version>
+            <executions>
+              <execution>
+                <!--
+                  javah is gone since JDK 10 and javac only writes headers for
+                  the classes it actually compiles, so asking the main compile
+                  for them silently produces nothing when it has nothing to do.
+                  The classes carrying native methods are compiled again here,
+                  to a throwaway directory, purely for their headers.
+                -->
+                <id>native-headers</id>
+                <phase>process-classes</phase>
+                <goals>
+                  <goal>exec</goal>
+                </goals>
+                <configuration>
+                  <executable>${java.home}/bin/javac</executable>
+                  <arguments>
+                    <argument>-d</argument>
+                    <argument>${project.build.directory}/native/classes</argument>
+                    <argument>-h</argument>
+                    <argument>${native.headers}</argument>
+                    <argument>-sourcepath</argument>
+                    <argument>${project.build.sourceDirectory}</argument>
+                    <argument>-classpath</argument>
+                    <classpath/>
+                    <argument>--add-exports=java.desktop/java.awt.peer=ALL-UNNAMED</argument>
+                    <argument>--add-exports=java.desktop/java.awt.dnd.peer=ALL-UNNAMED</argument>
+                    <argument>--add-exports=java.desktop/sun.awt=ALL-UNNAMED</argument>
+                    <argument>--add-exports=java.desktop/sun.awt.datatransfer=ALL-UNNAMED</argument>
+                    <argument>--add-exports=java.desktop/sun.awt.image=ALL-UNNAMED</argument>
+                    <argument>--add-exports=java.desktop/sun.java2d=ALL-UNNAMED</argument>
+                    <argument>--add-exports=java.desktop/sun.java2d.loops=ALL-UNNAMED</argument>
+                    <argument>--add-exports=java.desktop/sun.java2d.pipe=ALL-UNNAMED</argument>
+                    <argument>${project.build.sourceDirectory}/net/java/openjdk/awt/peer/sdl2/SDL2Blit.java</argument>
+                    <argument>${project.build.sourceDirectory}/net/java/openjdk/awt/peer/sdl2/SDL2GraphicsEnvironment.java</argument>
+                    <argument>${project.build.sourceDirectory}/net/java/openjdk/awt/peer/sdl2/SDL2Screen.java</argument>
+                    <argument>${project.build.sourceDirectory}/net/java/openjdk/awt/peer/sdl2/SDL2SurfaceData.java</argument>
+                    <argument>${project.build.sourceDirectory}/net/java/openjdk/awt/peer/sdl2/SDL2VolatileSurfaceManager.java</argument>
+                  </arguments>
+                </configuration>
+              </execution>
+              <execution>
+                <id>link-native</id>
+                <phase>process-classes</phase>
+                <goals>
+                  <goal>exec</goal>
+                </goals>
+                <configuration>
+                  <executable>cc</executable>
+                  <arguments>
+                    <argument>-dynamiclib</argument>
+                    <argument>-g</argument>
+                    <argument>-Wall</argument>
+                    <argument>-O2</argument>
+                    <argument>-fPIC</argument>
+                    <argument>-I${java.home}/include</argument>
+                    <argument>-I${java.home}/include/darwin</argument>
+                    <argument>-I${native.headers}</argument>
+                    <argument>-Isrc/main/native</argument>
+                    <argument>-I${SDL2.include}</argument>
+                    <argument>src/main/native/cacio-sdl2.c</argument>
+                    <argument>src/main/native/SDL2Blit.c</argument>
+                    <argument>src/main/native/SDL2GraphicsEnvironment.c</argument>
+                    <argument>src/main/native/SDL2Screen.c</argument>
+                    <argument>src/main/native/SDL2SurfaceData.c</argument>
+                    <argument>src/main/native/SDL2VolatileSurfaceManager.c</argument>
+                    <argument>-L${SDL2.lib}</argument>
+                    <argument>-lSDL2</argument>
+                    <argument>-L${java.home}/lib</argument>
+                    <argument>-lawt</argument>
+                    <argument>-ljava</argument>
+                    <argument>-framework</argument>
+                    <argument>CoreFoundation</argument>
+                    <argument>-o</argument>
+                    <argument>${native.library}</argument>
+                  </arguments>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <configuration>
+              <systemPropertyVariables>
+                <java.awt.headless>false</java.awt.headless>
+                <awt.toolkit>net.java.openjdk.awt.peer.sdl2.SDL2Toolkit</awt.toolkit>
+                <java.awt.graphicsenv>net.java.openjdk.awt.peer.sdl2.SDL2GraphicsEnvironment</java.awt.graphicsenv>
+              </systemPropertyVariables>
+              <argLine>
+                <!--
+                  SDL2's Cocoa backend only works on the process main thread,
+                  which is what -XstartOnFirstThread makes main() run on.
+                -->
+                -XstartOnFirstThread
+                -Djava.library.path=${project.build.directory}
+                --enable-native-access=ALL-UNNAMED
+                -XX:+EnableDynamicAgentLoading
+                -Djdk.attach.allowAttachSelf=true
+                --add-exports=java.desktop/java.awt.peer=ALL-UNNAMED
+                --add-exports=java.desktop/sun.awt=ALL-UNNAMED
+                --add-exports=java.desktop/sun.awt.datatransfer=ALL-UNNAMED
+                --add-exports=java.desktop/sun.awt.event=ALL-UNNAMED
+                --add-exports=java.desktop/sun.awt.image=ALL-UNNAMED
+                --add-exports=java.desktop/sun.font=ALL-UNNAMED
+                --add-exports=java.desktop/sun.java2d=ALL-UNNAMED
+                --add-exports=java.desktop/sun.java2d.loops=ALL-UNNAMED
+                --add-exports=java.desktop/sun.java2d.pipe=ALL-UNNAMED
+                --add-opens=java.desktop/java.awt=ALL-UNNAMED
+                --add-opens=java.desktop/sun.awt=ALL-UNNAMED
+                --add-opens=java.desktop/sun.java2d=ALL-UNNAMED
+                --add-opens=java.base/java.util=ALL-UNNAMED
+                --add-opens=java.base/java.lang.reflect=ALL-UNNAMED
+              </argLine>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+
+    <profile>
+      <!-- mvn -P jnaerator jnaerator:generate -->
+      <id>jnaerator</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>com.nativelibs4java</groupId>
+            <artifactId>maven-jnaerator-plugin</artifactId>
+            <version>${jnaerator.version}</version>
+            <executions>
+              <execution>
+                <goals>
+                  <goal>generate</goal>
+                </goals>
+              </execution>
+            </executions>
+            <configuration>
+              <javaOutputDirectory>${project.build.sourceDirectory}</javaOutputDirectory>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+      </plugin>
+    </plugins>
+  </build>
+
+  <dependencies>
+    <dependency>
+      <groupId>${cacio.groupId}</groupId>
+      <artifactId>${cacio.artifactId}</artifactId>
+      <version>${cacio.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>net.bytebuddy</groupId>
+      <artifactId>byte-buddy</artifactId>
+      <version>1.18.15-jdk5</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>net.bytebuddy</groupId>
+      <artifactId>byte-buddy-agent</artifactId>
+      <version>1.18.15-jdk5</version>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter-api</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter-engine</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.junit.platform</groupId>
+      <artifactId>junit-platform-commons</artifactId>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+</project>

@@ -3,12 +3,16 @@ package net.java.openjdk.cacio.ctc;
 import java.awt.GraphicsDevice;
 
 import sun.java2d.SunGraphicsEnvironment;
-import sun.java2d.SurfaceManagerFactory;
 
 public class CTCGraphicsEnvironment extends SunGraphicsEnvironment {
 
+    private static final CTCGraphicsEnvironment INSTANCE = new CTCGraphicsEnvironment();
+
+    public static CTCGraphicsEnvironment getInstance() {
+        return INSTANCE;
+    }
+
     public CTCGraphicsEnvironment() {
-        SurfaceManagerFactory.setInstance(new CTCSurfaceManagerFactory());
     }
 
     @Override

@@ -37,136 +37,121 @@ exception statement from your version. */
 
 package gnu.java.awt.peer.x;
 
-import gnu.x11.Display;
-import gnu.x11.EscherServerConnectionException;
-
 import java.awt.GraphicsDevice;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.lang.System.Logger;
+import java.lang.System.Logger.Level;
 import java.util.ArrayList;
 import java.util.Properties;
 
+import gnu.x11.Display;
+import gnu.x11.EscherServerConnectionException;
 import sun.java2d.SunGraphicsEnvironment;
-import sun.java2d.SurfaceManagerFactory;
+
 
 /**
  * Represents the X environment for AWT.
  *
  * @author Roman Kennke (kennke@aicas.com)
  */
-public class XGraphicsEnvironment
-  extends SunGraphicsEnvironment
-{
+public class XGraphicsEnvironment extends SunGraphicsEnvironment {
 
-  static
-  {
-    System.err.println("setting the surface manager");
-    SurfaceManagerFactory.setInstance(new EscherSurfaceManagerFactory());
-    System.err.println("finished setting the surface manager");
-    System.setProperty("sun.font.fontmanager", "gnu.java.awt.peer.x.EscherFontManager");
-  }
+    private static final Logger logger = System.getLogger(XGraphicsEnvironment.class.getName());
 
-  /**
-   * The default graphics device. This is normally the local main X
-   * Display, but can be configured to be any X connection.
-   */
-  private XGraphicsDevice defaultDevice;
+    static {
+        logger.log(Level.DEBUG, "setting the surface manager");
+        logger.log(Level.DEBUG, "finished setting the surface manager");
+        System.setProperty("sun.font.fontmanager", "gnu.java.awt.peer.x.EscherFontManager");
+    }
 
-  /**
-   * All configured devices.
-   */
-  private XGraphicsDevice[] devices;
+    /**
+     * The default graphics device. This is normally the local main X
+     * Display, but can be configured to be any X connection.
+     */
+    private XGraphicsDevice defaultDevice;
 
-  /**
-   * Creates a new XGraphicsEnvironment. This loads the configuration if
-   * there is one present and initializes the XGraphicsDevices in the
-   * environment. If there is no configuration, then there is one
-   * default device initialized with the local main X device.
-   */
-  public XGraphicsEnvironment()
-  {
-    // Initiliaze the devices.
-    Properties props = new Properties();
-    File config = new File(System.getProperty("user.home"),
-                           ".xawt.properties");
-    try
-      {
-        FileInputStream configIn = new FileInputStream(config);
-        props.load(configIn);
-        int dev = 1;
-        ArrayList<XGraphicsDevice> deviceList = new ArrayList<>();
-        while (true)
-          {
-            String propName = "display." + dev;
-            String propValue = props.getProperty(propName);
-            if (propValue != null)
-              {
-                XGraphicsDevice device = new XGraphicsDevice(propValue);
-                if (dev == 1)
-                  defaultDevice = device;
-                deviceList.add(device);
-                dev++;
-              }
-            else
-              {
-                if (dev == 1)
-                  {
-                    defaultDevice = initDefaultDevice();
-                    deviceList.add(defaultDevice);
-                  }
-                break;
-              }
-          }
-        devices = deviceList.toArray
-                                      (new XGraphicsDevice[deviceList.size()]);
-      }
-    catch (FileNotFoundException ex)
-      {
-        defaultDevice = initDefaultDevice();
-        devices = new XGraphicsDevice[]{ defaultDevice };
-      }
-    catch (IOException ex)
-      {
-        defaultDevice = initDefaultDevice();
-        devices = new XGraphicsDevice[]{ defaultDevice };
-      }
-  }
+    /**
+     * All configured devices.
+     */
+    private XGraphicsDevice[] devices;
 
-  /**
-   * Helper method that initializes the default device in the case when there
-   * is no configuration for the default.
-   * @throws EscherServerConnectionException 
-   */
-  private XGraphicsDevice initDefaultDevice()
-  {
-    String display = System.getenv("DISPLAY");
-    if (display == null)
-      display = ":0.0";
-    return new XGraphicsDevice(display);
-  }
+    /**
+     * Creates a new XGraphicsEnvironment. This loads the configuration if
+     * there is one present and initializes the XGraphicsDevices in the
+     * environment. If there is no configuration, then there is one
+     * default device initialized with the local main X device.
+     */
+    public XGraphicsEnvironment() {
+        // Initiliaze the devices.
+        Properties props = new Properties();
+        File config = new File(System.getProperty("user.home"),
+                ".xawt.properties");
+        try {
+            FileInputStream configIn = new FileInputStream(config);
+            props.load(configIn);
+            int dev = 1;
+            ArrayList<XGraphicsDevice> deviceList = new ArrayList<>();
+            while (true) {
+                String propName = "display." + dev;
+                String propValue = props.getProperty(propName);
+                if (propValue != null) {
+                    XGraphicsDevice device = new XGraphicsDevice(propValue);
+                    if (dev == 1)
+                        defaultDevice = device;
+                    deviceList.add(device);
+                    dev++;
+                } else {
+                    if (dev == 1) {
+                        defaultDevice = initDefaultDevice();
+                        deviceList.add(defaultDevice);
+                    }
+                    break;
+                }
+            }
+            devices = deviceList.toArray
+                    (XGraphicsDevice[]::new);
+        } catch (FileNotFoundException ex) {
+            defaultDevice = initDefaultDevice();
+            devices = new XGraphicsDevice[] {defaultDevice};
+        } catch (IOException ex) {
+            defaultDevice = initDefaultDevice();
+            devices = new XGraphicsDevice[] {defaultDevice};
+        }
+    }
 
-  @Override
-  protected int getNumScreens()
-  {
-    return devices.length;
-  }
+    /**
+     * Helper method that initializes the default device in the case when there
+     * is no configuration for the default.
+     *
+     * @throws EscherServerConnectionException
+     */
+    private static XGraphicsDevice initDefaultDevice() {
+        String display = System.getenv("DISPLAY");
+        if (display == null)
+            display = ":0.0";
+        return new XGraphicsDevice(display);
+    }
 
-  @Override
-  protected GraphicsDevice makeScreenDevice(int i)
-  {
-    return devices[i];
-  }
+    @Override
+    protected int getNumScreens() {
+        return devices.length;
+    }
 
-  @Override
-  public boolean isDisplayLocal()
-  {
-    // TODO: Implement properly.
-    return true;
-  }
+    @Override
+    protected GraphicsDevice makeScreenDevice(int i) {
+        return devices[i];
+    }
 
-  public Display getDisplay() {
-      return defaultDevice.getDisplay();
-  }
+    @Override
+    public boolean isDisplayLocal() {
+        // TODO: Implement properly.
+        return true;
+    }
+
+    public Display getDisplay() {
+        return defaultDevice.getDisplay();
+    }
 }

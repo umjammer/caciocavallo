@@ -23,9 +23,9 @@ import java.util.Properties;
 
 import sun.awt.LightweightFrame;
 import sun.awt.datatransfer.DataTransferer;
-import sun.awt.peer.cacio.CacioToolkit;
-import sun.awt.peer.cacio.PlatformWindowFactory;
-import sun.awt.peer.cacio.managed.FullScreenWindowFactory;
+import com.github.caciocavallosilano.cacio.peer.CacioToolkit;
+import com.github.caciocavallosilano.cacio.peer.PlatformWindowFactory;
+import com.github.caciocavallosilano.cacio.peer.managed.FullScreenWindowFactory;
 
 public class CTCToolkit extends CacioToolkit {
 
@@ -86,17 +86,15 @@ public class CTCToolkit extends CacioToolkit {
     }
 
     @Override
-    public RobotPeer createRobot(Robot target, GraphicsDevice screen)
+    public RobotPeer createRobot(GraphicsDevice screen)
             throws AWTException {
         return new CTCRobotPeer();
     }
 
-    @Override
     protected int getScreenWidth() {
         return FullScreenWindowFactory.getScreenDimension().width;
     }
 
-    @Override
     protected int getScreenHeight() {
         return FullScreenWindowFactory.getScreenDimension().height;
     }
@@ -126,10 +124,15 @@ public class CTCToolkit extends CacioToolkit {
     }
 
     @Override
-    protected DesktopPeer createDesktopPeer(Desktop target)
+    public DesktopPeer createDesktopPeer(Desktop target)
             throws HeadlessException {
         // TODO Auto-generated method stub
         return null;
+    }
+
+    @Override
+    public boolean isTaskbarSupported() {
+        return false;
     }
 
     @Override

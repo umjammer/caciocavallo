@@ -4,12 +4,12 @@
   <parent>
     <groupId>net.java.openjdk.cacio</groupId>
     <artifactId>cacio</artifactId>
-    <version>1.10-SNAPSHOT</version>
+    <version>1.10.0</version>
   </parent>
 
   <artifactId>cacio-escher</artifactId>
-  <packaging>jar</packaging>
 
+  <packaging>jar</packaging>
   <name>Cacio Escher Module</name>
 
   <build>
@@ -17,27 +17,15 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
-        <configuration>
-          <source>1.8</source>
-          <target>1.8</target>
-          <compilerArgument>-XDignore.symbol.file=true</compilerArgument>
-        </configuration>
       </plugin>
     </plugins>
   </build>
 
-  <repositories>
-    <repository>
-      <id>jitpack.io</id>
-      <url>https://jitpack.io</url>
-    </repository>
-  </repositories>
-
   <dependencies>
     <dependency>
-      <groupId>net.java.openjdk.cacio</groupId>
-      <artifactId>cacio-shared</artifactId>
-      <version>${project.version}</version>
+      <groupId>${cacio.groupId}</groupId>
+      <artifactId>${cacio.artifactId}</artifactId>
+      <version>${cacio.version}</version>
     </dependency>
     <dependency>
       <groupId>com.github.umjammer</groupId>
@@ -48,9 +36,8 @@
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-      <version>4.13.1</version>
+      <version>4.13.2</version>
       <scope>test</scope>
     </dependency>
   </dependencies>
-
 </project>

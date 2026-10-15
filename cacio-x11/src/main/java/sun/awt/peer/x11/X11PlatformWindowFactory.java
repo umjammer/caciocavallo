@@ -26,29 +26,34 @@
 package sun.awt.peer.x11;
 
 import java.awt.Component;
-import sun.awt.peer.cacio.CacioComponent;
-import sun.awt.peer.cacio.CacioEventPump;
-import sun.awt.peer.cacio.PlatformToplevelWindow;
-import sun.awt.peer.cacio.PlatformWindow;
-import sun.awt.peer.cacio.PlatformWindowFactory;
+
+import com.github.caciocavallosilano.cacio.peer.CacioComponent;
+import com.github.caciocavallosilano.cacio.peer.CacioEventPump;
+import com.github.caciocavallosilano.cacio.peer.PlatformToplevelWindow;
+import com.github.caciocavallosilano.cacio.peer.PlatformWindow;
+import com.github.caciocavallosilano.cacio.peer.PlatformWindowFactory;
+
 
 public class X11PlatformWindowFactory implements PlatformWindowFactory {
 
     private X11EventPump eventPump;
 
+    @Override
     public PlatformWindow createPlatformWindow(CacioComponent component, PlatformWindow parent) {
         Component awtC = component.getAWTComponent();
         return new X11PlatformWindow(getEventPump(), component, (X11PlatformWindow) parent,
-                                     awtC.getX(), awtC.getY(), awtC.getWidth(),
-                                     awtC.getHeight());
+                awtC.getX(), awtC.getY(), awtC.getWidth(),
+                awtC.getHeight());
     }
 
+    @Override
     public PlatformToplevelWindow createPlatformToplevelWindow(CacioComponent component) {
         Component awtC = component.getAWTComponent();
         return new X11PlatformWindow(getEventPump(), component, awtC.getX(), awtC.getY(), awtC.getWidth(),
-                                     awtC.getHeight());
+                awtC.getHeight());
     }
 
+    @Override
     public CacioEventPump<?> createEventPump() {
         return getEventPump();
     }
@@ -62,10 +67,10 @@ public class X11PlatformWindowFactory implements PlatformWindowFactory {
 
     @Override
     public PlatformWindow createPlatformToplevelWindow(CacioComponent component,
-            PlatformWindow owner) {
+                                                       PlatformWindow owner) {
         Component awtC = component.getAWTComponent();
         return new X11PlatformWindow(getEventPump(), component, (X11PlatformWindow) owner,
-                                     awtC.getX(), awtC.getY(), awtC.getWidth(),
-                                     awtC.getHeight());
+                awtC.getX(), awtC.getY(), awtC.getWidth(),
+                awtC.getHeight());
     }
 }

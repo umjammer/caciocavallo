@@ -25,85 +25,104 @@
 
 package net.java.openjdk.awt.peer.web;
 
-import java.awt.*;
-import java.awt.geom.*;
-import java.awt.image.*;
-import java.lang.ref.*;
+import java.awt.GraphicsConfiguration;
+import java.awt.GraphicsDevice;
+import java.awt.GraphicsEnvironment;
+import java.awt.Rectangle;
+import java.awt.Transparency;
+import java.awt.geom.AffineTransform;
+import java.awt.image.ColorModel;
+import java.awt.image.DirectColorModel;
+import java.lang.ref.WeakReference;
 
-import net.java.openjdk.cacio.servlet.*;
+import net.java.openjdk.cacio.servlet.WebSessionManager;
+import sun.awt.image.SunVolatileImage;
+import sun.awt.image.SurfaceManager;
+import sun.awt.image.VolatileSurfaceManager;
+
 
 /**
  * GraphicConfiguration implementation for caciocavallo-web.
- * 
+ *
  * @author Clemens Eisserer <linuxhippy@gmail.com>
  * @author Mario Torre <neugens.limasoftware@gmail.com>
  */
-public class WebGraphicsConfiguration extends GraphicsConfiguration {
+public class WebGraphicsConfiguration extends GraphicsConfiguration
+        implements SurfaceManager.Factory {
 
-    private WebGraphicsDevice device;
+    private final WebSurfaceManagerFactory surfaceManagerFactory = new WebSurfaceManagerFactory();
+
+    @Override
+    public VolatileSurfaceManager createVolatileManager(SunVolatileImage image,
+                                                        Object context) {
+        return surfaceManagerFactory.createVolatileManager(image, context);
+    }
+
+
+    private final WebGraphicsDevice device;
     private WeakReference<WebScreen> screenRef;
 
     public WebGraphicsConfiguration() {
-	device = new WebGraphicsDevice();
+        device = new WebGraphicsDevice();
     }
 
     WebGraphicsConfiguration(WebGraphicsDevice device) {
-	this.device = device;
-	
-	/* 
-	 * Sometimes awt/swing caches stuff, keeping references to
-	 * the heavyweight WebScreen longer alive than required, so
-	 * we use a WeakReference.
-	 * A strong reference is held by WebSessionState, so as long as
-	 * the session is valid, we have a reference to the WebScreen.
-	 */
-	WebScreen screen = new WebScreen(this);
-	screenRef = new WeakReference<>(screen);
-	WebSessionManager.getInstance().getCurrentState().setScreen(screen);
+        this.device = device;
+
+        /*
+         * Sometimes awt/swing caches stuff, keeping references to
+         * the heavyweight WebScreen longer alive than required, so
+         * we use a WeakReference.
+         * A strong reference is held by WebSessionState, so as long as
+         * the session is valid, we have a reference to the WebScreen.
+         */
+        WebScreen screen = new WebScreen(this);
+        screenRef = new WeakReference<>(screen);
+        WebSessionManager.getInstance().getCurrentState().setScreen(screen);
     }
 
     static GraphicsConfiguration getDefaultConfiguration() {
-	GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
-	GraphicsDevice gd = ge.getDefaultScreenDevice();
-	GraphicsConfiguration gc = gd.getDefaultConfiguration();
-	return gc;
+        GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
+        GraphicsDevice gd = ge.getDefaultScreenDevice();
+        GraphicsConfiguration gc = gd.getDefaultConfiguration();
+        return gc;
     }
 
     @Override
     public GraphicsDevice getDevice() {
-	return this.device;
+        return this.device;
     }
 
     @Override
     public ColorModel getColorModel() {
-	return new DirectColorModel(24, 0x00FF0000, 0x0000FF00, 0x000000FF);
+        return new DirectColorModel(24, 0x00FF0000, 0x0000FF00, 0x000000FF);
     }
 
     @Override
     public ColorModel getColorModel(int transparency) {
-	if (transparency == Transparency.OPAQUE) {
-	    return getColorModel();
-	} else {
-	    return ColorModel.getRGBdefault();
-	}
+        if (transparency == Transparency.OPAQUE) {
+            return getColorModel();
+        } else {
+            return ColorModel.getRGBdefault();
+        }
     }
 
     @Override
     public AffineTransform getDefaultTransform() {
-	return new AffineTransform();
+        return new AffineTransform();
     }
 
     @Override
     public AffineTransform getNormalizingTransform() {
-	return new AffineTransform();
+        return new AffineTransform();
     }
 
     @Override
     public Rectangle getBounds() {
-	return getScreen().getBounds();
+        return getScreen().getBounds();
     }
 
     public WebScreen getScreen() {
-	return screenRef.get();
+        return screenRef.get();
     }
 }

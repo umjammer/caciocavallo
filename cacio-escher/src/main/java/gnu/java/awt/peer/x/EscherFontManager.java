@@ -45,57 +45,51 @@ import sun.awt.FontConfiguration;
 import sun.font.PhysicalFont;
 import sun.font.SunFontManager;
 
-public class EscherFontManager
-    extends SunFontManager
-{  
+
+public class EscherFontManager extends SunFontManager {
+
     private PhysicalFont defaultPhysicalFont;
 
-  @Override
-  public String getFontPath(boolean noType1Fonts)
-  {
-    return "/usr/share/fonts/";
-  }
+    @Override
+    public String getFontPath(boolean noType1Fonts) {
+        return "/usr/share/fonts/";
+    }
 
-  @Override
-  protected FontConfiguration createFontConfiguration()
-  {
-    return new EscherFontConfiguration(this);
-  }
+    @Override
+    protected FontConfiguration createFontConfiguration() {
+        return new EscherFontConfiguration(this);
+    }
 
-  @Override
-  public FontConfiguration createFontConfiguration(boolean preferLocaleFonts,
-                                                   boolean preferPropFonts)
-  {
-    return new EscherFontConfiguration(this);
-  }
+    @Override
+    public FontConfiguration createFontConfiguration(boolean preferLocaleFonts, boolean preferPropFonts) {
+        return new EscherFontConfiguration(this);
+    }
 
-  /**
-   * Returns an array of two strings. The first element is the
-   * name of the font. The second element is the file name.
-   */
-  @Override
-  public String[] getDefaultPlatformFont() {
-    // TODO: This probably only works on my Linux distro (Ubuntu). Maybe
-    // figure out something more clever.
-    return new String[] { "Arial",
-                          "/Library/Fonts/Arial.ttf"
-                        };
-  }
+    /**
+     * Returns an array of two strings. The first element is the
+     * name of the font. The second element is the file name.
+     */
+    @Override
+    public String[] getDefaultPlatformFont() {
+        // TODO: This probably only works on my Linux distro (Ubuntu). Maybe
+        // figure out something more clever.
+        return new String[] {"Arial", "/Library/Fonts/Arial.ttf"};
+    }
 
-  @Override
-  public PhysicalFont getDefaultPhysicalFont() {
-      if (defaultPhysicalFont == null) {
-          File fontFile = new File(getDefaultPlatformFont()[1]);
-          try {
-              defaultPhysicalFont = (PhysicalFont)
-              createFont2D(fontFile,
-                      Font.TRUETYPE_FONT,
-                      false,
-                      null); // TODO
-          } catch (FontFormatException ex) {
-              throw new Error("Probable fatal error: No fonts found.");
-          }
-      }
-      return defaultPhysicalFont;
-  }
+    @Override
+    public PhysicalFont getDefaultPhysicalFont() {
+        if (defaultPhysicalFont == null) {
+            File fontFile = new File(getDefaultPlatformFont()[1]);
+            try {
+                defaultPhysicalFont = (PhysicalFont)
+                        createFont2D(fontFile,
+                                Font.TRUETYPE_FONT,
+                                false,
+                                false)[0];
+            } catch (FontFormatException ex) {
+                throw new Error("Probable fatal error: No fonts found.");
+            }
+        }
+        return defaultPhysicalFont;
+    }
 }

@@ -25,66 +25,67 @@
 
 package net.java.openjdk.awt.peer.web;
 
-import java.util.*;
-import sun.java2d.pipe.*;
+import java.util.List;
+
+import sun.java2d.pipe.Region;
+
 
 /**
  * ScreenUpdate generated when state between browser and server is synchronized
  * by sending a copyArea.
- * 
+ * <p>
  * The browser also needs to honor the currently set clip.
- * 
+ *
+ * @author Clemens Eisserer <linuxhippy@gmail.com>
  * @see ScreenUpdate
  * @see BlitScreenUpdate
- * @author Clemens Eisserer <linuxhippy@gmail.com>
  */
 public class CopyAreaScreenUpdate extends ScreenUpdate {
 
-    int dx, dy;
-    Region clip;
+    final int dx;
+    final int dy;
+    final Region clip;
 
     /**
-     * 
-     * @param x1
-     *            x1 coordinate of src area
+     *
+     * @param x1   x1 coordinate of src area
      * @param y1
      * @param x2
      * @param y2
-     * @param dx
-     *            - x difference between src and dst pos
+     * @param dx   - x difference between src and dst pos
      * @param dy
-     * @param clip
-     *            - clip, if one has been applied.
+     * @param clip - clip, if one has been applied.
      */
     public CopyAreaScreenUpdate(int x1, int y1, int x2, int y2, int dx, int dy, Region clip) {
-	super(new WebRect(x1, y1, x2, y2));
-	this.dx = dx;
-	this.dy = dy;
-	this.clip = clip;
+        super(new WebRect(x1, y1, x2, y2));
+        this.dx = dx;
+        this.dy = dy;
+        this.clip = clip;
     }
 
     @Override
     public void writeToCmdStream(List<Integer> cmdList) {
-	cmdList.add(1);
-	cmdList.add(updateArea.getX1());
-	cmdList.add(updateArea.getY1());
-	cmdList.add(updateArea.getX2());
-	cmdList.add(updateArea.getY2());
-	cmdList.add(dx);
-	cmdList.add(dy);
-	cmdList.add(clip.getLoX());
-	cmdList.add(clip.getLoY());
-	cmdList.add(clip.getWidth());
-	cmdList.add(clip.getHeight());
+        cmdList.add(1);
+        cmdList.add(updateArea.getX1());
+        cmdList.add(updateArea.getY1());
+        cmdList.add(updateArea.getX2());
+        cmdList.add(updateArea.getY2());
+        cmdList.add(dx);
+        cmdList.add(dy);
+        cmdList.add(clip.getLoX());
+        cmdList.add(clip.getLoY());
+        cmdList.add(clip.getWidth());
+        cmdList.add(clip.getHeight());
     }
 
+    @Override
     public WebRect getSurfaceDataUpdateArea() {
-	WebRect updateArea = getUpdateArea();
-	return new WebRect(updateArea.getX1() + dx, updateArea.getY1() + dy, updateArea.getX2() + dx, updateArea.getY2() + dy);
+        WebRect updateArea = getUpdateArea();
+        return new WebRect(updateArea.getX1() + dx, updateArea.getY1() + dy, updateArea.getX2() + dx, updateArea.getY2() + dy);
     }
 
     @Override
     public String toString() {
-	return "CopyAreaScreenUpdate [dx=" + dx + ", dy=" + dy + ", updateArea=" + updateArea + "]";
+        return "CopyAreaScreenUpdate [dx=" + dx + ", dy=" + dy + ", updateArea=" + updateArea + "]";
     }
 }

@@ -25,31 +25,36 @@
 
 package net.java.openjdk.cacio.servlet.imgformat;
 
-import java.awt.image.*;
-import java.io.*;
-import javax.imageio.*;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.lang.System.Logger;
+import java.lang.System.Logger.Level;
+import javax.imageio.ImageIO;
+
 
 /**
  * Implementation of the PNGEncoder interface using ImageIO.
- * 
+ *
  * @author Clemens Eisserer <linuxhippy@gmail.com>
  */
-public class PNGEncoderImageIO extends PNGEncoder {    
-   
+public class PNGEncoderImageIO extends PNGEncoder {
+
+    private static final Logger logger = System.getLogger(PNGEncoderImageIO.class.getName());
+
     /**
      * @see PNGEncoder
      */
     @Override
     public byte[] encode(BufferedImage img, int compression) {
-	ByteArrayOutputStream bos = new ByteArrayOutputStream((img.getWidth() * img.getHeight()) / 2);
+        ByteArrayOutputStream bos = new ByteArrayOutputStream((img.getWidth() * img.getHeight()) / 2);
 
-	try {
-	    ImageIO.write(img, "PNG", bos);
-	} catch (IOException e) {
-	    e.printStackTrace();
-	}
-	
-	return bos.toByteArray();
+        try {
+            ImageIO.write(img, "PNG", bos);
+        } catch (IOException e) {
+            logger.log(Level.ERROR, e.getMessage(), e);
+        }
+
+        return bos.toByteArray();
     }
-
 }

@@ -26,14 +26,15 @@
 package sun.awt.peer.x11;
 
 import sun.awt.image.SunVolatileImage;
+import sun.awt.image.SurfaceManager;
 import sun.awt.image.VolatileSurfaceManager;
-import sun.java2d.SurfaceManagerFactory;
 
-public class X11SurfaceManagerFactory extends SurfaceManagerFactory {
+
+public class X11SurfaceManagerFactory implements SurfaceManager.Factory {
 
     @Override
     public VolatileSurfaceManager
-            createVolatileManager(SunVolatileImage image, Object context) {
+    createVolatileManager(SunVolatileImage image, Object context) {
         return new X11VolatileSurfaceManager(image, context);
     }
 }

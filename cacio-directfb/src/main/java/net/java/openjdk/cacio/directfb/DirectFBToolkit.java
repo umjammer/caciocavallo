@@ -53,9 +53,9 @@ import java.util.Properties;
 
 import sun.awt.LightweightFrame;
 import sun.awt.datatransfer.DataTransferer;
-import sun.awt.peer.cacio.CacioToolkit;
-import sun.awt.peer.cacio.PlatformWindowFactory;
-import sun.awt.peer.cacio.managed.FullScreenWindowFactory;
+import com.github.caciocavallosilano.cacio.peer.CacioToolkit;
+import com.github.caciocavallosilano.cacio.peer.PlatformWindowFactory;
+import com.github.caciocavallosilano.cacio.peer.managed.FullScreenWindowFactory;
 
 public class DirectFBToolkit extends CacioToolkit {
 

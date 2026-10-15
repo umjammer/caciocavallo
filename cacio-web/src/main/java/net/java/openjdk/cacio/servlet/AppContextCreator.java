@@ -26,60 +26,68 @@
 package net.java.openjdk.cacio.servlet;
 
 import java.awt.KeyboardFocusManager;
-import java.lang.reflect.*;
-import java.util.*;
+import java.lang.System.Logger;
+import java.lang.System.Logger.Level;
+import java.lang.reflect.Method;
+import java.util.Random;
 
-import net.java.openjdk.awt.peer.web.*;
-import sun.awt.*;
+import net.java.openjdk.awt.peer.web.WebKeyboardFocusManager;
+import net.java.openjdk.awt.peer.web.WebSessionState;
+import sun.awt.AppContext;
+import sun.awt.SunToolkit;
+
 
 /**
  * Initializes a new AppContext, and starts the specified Application within the
  * new AppContext. Waits until the Application has started up, to avoid browsers
  * fetching image-data and pumping events, before initialization is finished.
- * 
+ *
  * @author Clemens Eisserer <linuxhippy@gmail.com>
  */
 public class AppContextCreator {
 
-    public void startAppInNewAppContext(final WebSessionState sessionState) {
+    private static final Logger logger = System.getLogger(AppContextCreator.class.getName());
 
-	ThreadGroup appGroup = new ThreadGroup("AppThreadGroup " + String.valueOf(new Random().nextLong()));
-	Thread t = new Thread(appGroup, "AppInitThread") {
-	    public void run() {
-		AppContext appContext = SunToolkit.createNewAppContext();
+    public void startAppInNewAppContext(WebSessionState sessionState) {
+
+        ThreadGroup appGroup = new ThreadGroup("AppThreadGroup " + new Random().nextLong());
+        Thread t = new Thread(appGroup, "AppInitThread") {
+            @Override
+            public void run() {
+                AppContext appContext = SunToolkit.createNewAppContext();
 
 //		RepaintManager mgr = new RepaintManager();
 //		mgr.setDoubleBufferingEnabled(false);
 //		RepaintManager.setCurrentManager(mgr);
-		
-		try {
-		    sessionState.lockSession();
-		    WebSessionManager.getInstance().registerAppContext(appContext, sessionState);
-		    
-		    KeyboardFocusManager.setCurrentKeyboardFocusManager(new WebKeyboardFocusManager());
-		    
-		    ClassLoader loader = getClass().getClassLoader();
-		    Class<?> cls = loader.loadClass(sessionState.getMainClsName());
-		    Method mainMethod = cls.getMethod("main", String[].class);
-		    mainMethod.setAccessible(true);
-		    mainMethod.invoke(cls, (Object) sessionState.getCmdLineParams());
-		    
-		    sessionState.setContextInitialized(true);
-		} catch (Exception ex) {
-		    ex.printStackTrace();
-		} finally {
-		    sessionState.unlockSession();
-		}
-	    }
-	};
 
-	try {
-	    t.start();
+                try {
+                    sessionState.lockSession();
+                    WebSessionManager.getInstance().registerAppContext(appContext, sessionState);
 
-	    // Wait for initialization to finish
-	    t.join();
-	} catch (InterruptedException e) {
-	    e.printStackTrace();
-	}
+                    KeyboardFocusManager.setCurrentKeyboardFocusManager(new WebKeyboardFocusManager());
+
+                    ClassLoader loader = getClass().getClassLoader();
+                    Class<?> cls = loader.loadClass(sessionState.getMainClsName());
+                    Method mainMethod = cls.getMethod("main", String[].class);
+                    mainMethod.setAccessible(true);
+                    mainMethod.invoke(cls, (Object) sessionState.getCmdLineParams());
+
+                    sessionState.setContextInitialized(true);
+                } catch (Exception ex) {
+                    logger.log(Level.ERROR, ex.getMessage(), ex);
+                } finally {
+                    sessionState.unlockSession();
+                }
+            }
+        };
+
+        try {
+            t.start();
+
+            // Wait for initialization to finish
+            t.join();
+        } catch (InterruptedException e) {
+            logger.log(Level.ERROR, e.getMessage(), e);
+        }
     }
 }

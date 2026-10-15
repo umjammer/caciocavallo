@@ -3,8 +3,8 @@ package net.java.openjdk.cacio.ctc;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
-import sun.awt.peer.cacio.CacioEventSource;
-import sun.awt.peer.cacio.managed.EventData;
+import com.github.caciocavallosilano.cacio.peer.CacioEventSource;
+import com.github.caciocavallosilano.cacio.peer.managed.EventData;
 
 public class CTCEventSource implements CacioEventSource {
 

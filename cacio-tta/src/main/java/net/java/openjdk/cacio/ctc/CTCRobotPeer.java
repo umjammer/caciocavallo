@@ -6,8 +6,8 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.peer.RobotPeer;
 
-import sun.awt.peer.cacio.CacioMouseInfoPeer;
-import sun.awt.peer.cacio.managed.EventData;
+import com.github.caciocavallosilano.cacio.peer.CacioMouseInfoPeer;
+import com.github.caciocavallosilano.cacio.peer.managed.EventData;
 
 public class CTCRobotPeer implements RobotPeer {
 
@@ -169,12 +169,6 @@ public class CTCRobotPeer implements RobotPeer {
     @Override
     public int[] getRGBPixels(Rectangle bounds) {
         return CTCScreen.getInstance().getRGBPixels(bounds);
-    }
-
-    @Override
-    public void dispose() {
-        // TODO Auto-generated method stub
-
     }
 
 }
