@@ -3,22 +3,38 @@ package net.java.openjdk.cacio.servlet;
 import java.io.IOException;
 import java.lang.System.Logger;
 import java.lang.System.Logger.Level;
-import javax.servlet.http.HttpSession;
+import java.lang.reflect.Proxy;
+import java.util.List;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
+import jakarta.websocket.EndpointConfig;
+import jakarta.websocket.HandshakeResponse;
+import jakarta.websocket.OnClose;
+import jakarta.websocket.OnMessage;
+import jakarta.websocket.OnOpen;
+import jakarta.websocket.Session;
+import jakarta.websocket.server.HandshakeRequest;
+import jakarta.websocket.server.ServerEndpoint;
+import jakarta.websocket.server.ServerEndpointConfig;
 
 import net.java.openjdk.awt.peer.web.WebSessionState;
 import net.java.openjdk.cacio.servlet.transport.Transport;
-import org.eclipse.jetty.websocket.api.Session;
-import org.eclipse.jetty.websocket.api.annotations.OnWebSocketClose;
-import org.eclipse.jetty.websocket.api.annotations.OnWebSocketConnect;
-import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
-import org.eclipse.jetty.websocket.api.annotations.WebSocket;
-import org.eclipse.jetty.websocket.servlet.UpgradeHttpServletRequest;
 
 
-@WebSocket
+@ServerEndpoint(value = "/WebSocket", configurator = WebSocketStreamThread.HttpSessionConfigurator.class)
 public class WebSocketStreamThread extends Thread {
 
     private static final Logger logger = System.getLogger(WebSocketStreamThread.class.getName());
+
+    public static class HttpSessionConfigurator extends ServerEndpointConfig.Configurator {
+        @Override
+        public void modifyHandshake(ServerEndpointConfig config, HandshakeRequest request, HandshakeResponse response) {
+            Object httpSession = request.getHttpSession();
+            if (httpSession != null) {
+                config.getUserProperties().put(HttpSession.class.getName(), httpSession);
+            }
+        }
+    }
 
     WebSessionState state;
     private Session session;
@@ -30,28 +46,29 @@ public class WebSocketStreamThread extends Thread {
         this.sessionManager = WebSessionManager.getInstance();
     }
 
-    @OnWebSocketConnect
-    public void onConnect(Session session) {
+    @OnOpen
+    public void onConnect(Session session, EndpointConfig config) {
         this.session = session;
         // why jetty wraps HttpServletRequest?, there is no compatibility.
         // at least the wrapped class should have a getter method for original.
-        this.state = WebSessionManager.getInstance().getSessionState(new UpgradeHttpServletRequest(null) {
-            // depends on getSessionState() implementation uses only two methods bellow.
-            @Override
-            public HttpSession getSession(boolean create) {
-                // casting depends on UpgradeRequest implementation is only ServletUpgradeRequest.
-                return (HttpSession) session.getUpgradeRequest().getSession();
-            }
-
-            @Override
-            public String getParameter(String name) {
-                return session.getUpgradeRequest().getParameterMap().get(name).getFirst();
-            }
-        });
+        this.state = WebSessionManager.getInstance().getSessionState((HttpServletRequest) Proxy.newProxyInstance(
+                HttpServletRequest.class.getClassLoader(),
+                new Class<?>[] {HttpServletRequest.class},
+                (proxy, method, args) -> {
+                    // depends on getSessionState() implementation uses only two methods bellow.
+                    if ("getSession".equals(method.getName())) {
+                        // casting depends on UpgradeRequest implementation is only ServletUpgradeRequest.
+                        return config.getUserProperties().get(HttpSession.class.getName());
+                    } else if ("getParameter".equals(method.getName()) && args != null && args.length == 1) {
+                        List<String> values = session.getRequestParameterMap().get((String) args[0]);
+                        return values != null && !values.isEmpty() ? values.getFirst() : null;
+                    }
+                    return null;
+                }));
         start();
     }
 
-    @OnWebSocketMessage
+    @OnMessage
     public void onText(String message) {
         WebSessionManager.getInstance().registerSessionAtCurrentThread(state);
         if (state.getEventManager() != null) {
@@ -59,8 +76,8 @@ public class WebSocketStreamThread extends Thread {
         }
     }
 
-    @OnWebSocketClose
-    public void onClose(int statusCode, String reason) {
+    @OnClose
+    public void onClose(Session session) {
         close = true;
     }
 
@@ -73,7 +90,7 @@ public class WebSocketStreamThread extends Thread {
                 Transport transport = state.getScreen().pollForScreenUpdates(15000);
 
                 if (!close) {
-                    session.getRemote().sendStringByFuture(transport.asString());
+                    session.getAsyncRemote().sendText(transport.asString());
                 }
             }
         } catch (IOException e) {
