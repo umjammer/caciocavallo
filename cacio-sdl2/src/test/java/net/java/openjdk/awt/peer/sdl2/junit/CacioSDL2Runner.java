@@ -3,15 +3,20 @@ package net.java.openjdk.awt.peer.sdl2.junit;
 import java.awt.GraphicsEnvironment;
 import java.awt.Toolkit;
 import java.io.IOException;
+import java.io.InputStream;
+import java.lang.instrument.Instrumentation;
 import java.lang.reflect.Field;
-import java.util.Map;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
+import java.util.jar.JarOutputStream;
 
 import javax.swing.plaf.metal.MetalLookAndFeel;
 
 import net.bytebuddy.ByteBuddy;
 import net.bytebuddy.agent.ByteBuddyAgent;
 import net.bytebuddy.dynamic.ClassFileLocator;
-import net.bytebuddy.dynamic.loading.ClassInjector;
 import net.bytebuddy.dynamic.loading.ClassReloadingStrategy;
 import net.bytebuddy.implementation.MethodDelegation;
 import net.bytebuddy.matcher.ElementMatchers;
@@ -63,6 +68,7 @@ public final class CacioSDL2Runner {
             headlessField.set(null, Boolean.FALSE);
 
             injectGraphicsEnvironment();
+            PostEventShim.installIfNeeded();
 
             Field toolkit = Toolkit.class.getDeclaredField("toolkit");
             toolkit.setAccessible(true);
@@ -73,9 +79,7 @@ public final class CacioSDL2Runner {
     }
 
     private static void injectGraphicsEnvironment() throws IOException {
-        ByteBuddyAgent.install();
-
-        injectIntoBootstrapClassLoader(SDL2Interceptor.class);
+        injectIntoBootstrapClassLoader(ByteBuddyAgent.install(), SDL2Interceptor.class);
 
         // the injected copy is a different class from the one on the app
         // classpath, so the environment has to be handed to that copy
@@ -98,13 +102,22 @@ public final class CacioSDL2Runner {
                       ClassReloadingStrategy.fromInstalledAgent());
     }
 
-    private static void injectIntoBootstrapClassLoader(Class<?>... classes) throws IOException {
-        for (Class<?> clazz : classes) {
-            byte[] buffer = clazz.getClassLoader()
-                    .getResourceAsStream(clazz.getName().replace('.', '/').concat(".class"))
-                    .readAllBytes();
-            ClassInjector.UsingUnsafe injector = new ClassInjector.UsingUnsafe(null);
-            injector.injectRaw(Map.of(clazz.getName(), buffer));
+    /**
+     * Unsafe based injection is gone as of JDK 26, this is the supported way.
+     */
+    private static void injectIntoBootstrapClassLoader(Instrumentation instrumentation, Class<?>... classes) throws IOException {
+        Path jar = Files.createTempFile("cacio-sdl2-bootstrap", ".jar");
+        jar.toFile().deleteOnExit();
+        try (JarOutputStream out = new JarOutputStream(Files.newOutputStream(jar))) {
+            for (Class<?> clazz : classes) {
+                String name = clazz.getName().replace('.', '/').concat(".class");
+                out.putNextEntry(new JarEntry(name));
+                try (InputStream in = clazz.getClassLoader().getResourceAsStream(name)) {
+                    in.transferTo(out);
+                }
+                out.closeEntry();
+            }
         }
+        instrumentation.appendToBootstrapClassLoaderSearch(new JarFile(jar.toFile()));
     }
 }
