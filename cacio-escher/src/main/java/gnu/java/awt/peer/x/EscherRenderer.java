@@ -37,12 +37,12 @@ exception statement from your version. */
 
 package gnu.java.awt.peer.x;
 
-import java.awt.Polygon;
 import java.awt.Shape;
 import java.awt.geom.AffineTransform;
+import java.awt.geom.Arc2D;
+import java.awt.geom.Ellipse2D;
 import java.awt.geom.Path2D;
-import java.lang.System.Logger;
-import java.lang.System.Logger.Level;
+import java.awt.geom.RoundRectangle2D;
 
 import gnu.x11.Drawable;
 import gnu.x11.GC;
@@ -56,9 +56,13 @@ import sun.java2d.pipe.ShapeDrawPipe;
 import sun.java2d.pipe.ShapeSpanIterator;
 
 
+/**
+ * Draws directly on an X drawable, for what does not go through a back buffer.
+ * X could do lines and arcs itself, but it would not produce the pixels the
+ * JDK's loops do, so the curved shapes are turned into spans by java2d and only
+ * rectangles and lines go to the server as such.
+ */
 public class EscherRenderer implements PixelDrawPipe, PixelFillPipe, ShapeDrawPipe {
-
-    private static final Logger logger = System.getLogger(EscherRenderer.class.getName());
 
     private static EscherRenderer instance;
 
@@ -76,9 +80,23 @@ public class EscherRenderer implements PixelDrawPipe, PixelFillPipe, ShapeDrawPi
         // Nothing to do here.
     }
 
+    private static Path2D.Float path(int[] xPoints, int[] yPoints, int nPoints, boolean close) {
+        Path2D.Float path = new Path2D.Float();
+        if (nPoints > 0) {
+            path.moveTo(xPoints[0], yPoints[0]);
+            for (int i = 1; i < nPoints; i++) {
+                path.lineTo(xPoints[i], yPoints[i]);
+            }
+            if (close) {
+                path.closePath();
+            }
+        }
+        return path;
+    }
+
     @Override
-    public void drawArc(SunGraphics2D arg0, int arg1, int arg2, int arg3, int arg4, int arg5, int arg6) {
-        throw new UnsupportedOperationException();
+    public void drawArc(SunGraphics2D sg2d, int x, int y, int w, int h, int start, int extent) {
+        draw(sg2d, new Arc2D.Float(x, y, w, h, start, extent, Arc2D.OPEN));
     }
 
     @Override
@@ -97,18 +115,18 @@ public class EscherRenderer implements PixelDrawPipe, PixelFillPipe, ShapeDrawPi
     }
 
     @Override
-    public void drawOval(SunGraphics2D arg0, int arg1, int arg2, int arg3, int arg4) {
-        throw new UnsupportedOperationException();
+    public void drawOval(SunGraphics2D sg2d, int x, int y, int w, int h) {
+        draw(sg2d, new Ellipse2D.Float(x, y, w, h));
     }
 
     @Override
-    public void drawPolygon(SunGraphics2D arg0, int[] arg1, int[] arg2, int arg3) {
-        throw new UnsupportedOperationException();
+    public void drawPolygon(SunGraphics2D sg2d, int[] xPoints, int[] yPoints, int nPoints) {
+        draw(sg2d, path(xPoints, yPoints, nPoints, true));
     }
 
     @Override
-    public void drawPolyline(SunGraphics2D arg0, int[] arg1, int[] arg2, int arg3) {
-        throw new UnsupportedOperationException();
+    public void drawPolyline(SunGraphics2D sg2d, int[] xPoints, int[] yPoints, int nPoints) {
+        draw(sg2d, path(xPoints, yPoints, nPoints, false));
     }
 
     @Override
@@ -125,64 +143,52 @@ public class EscherRenderer implements PixelDrawPipe, PixelFillPipe, ShapeDrawPi
     }
 
     @Override
-    public void drawRoundRect(SunGraphics2D arg0, int arg1, int arg2, int arg3, int arg4, int arg5, int arg6) {
-        throw new UnsupportedOperationException();
+    public void drawRoundRect(SunGraphics2D sg2d, int x, int y, int w, int h, int arcW, int arcH) {
+        draw(sg2d, new RoundRectangle2D.Float(x, y, w, h, arcW, arcH));
     }
 
     @Override
-    public void fillArc(SunGraphics2D arg0, int arg1, int arg2, int arg3, int arg4, int arg5, int arg6) {
-        throw new UnsupportedOperationException();
+    public void fillArc(SunGraphics2D sg2d, int x, int y, int w, int h, int start, int extent) {
+        fill(sg2d, new Arc2D.Float(x, y, w, h, start, extent, Arc2D.PIE));
     }
 
     @Override
-    public void fillOval(SunGraphics2D arg0, int arg1, int arg2, int arg3, int arg4) {
-        throw new UnsupportedOperationException();
+    public void fillOval(SunGraphics2D sg2d, int x, int y, int w, int h) {
+        fill(sg2d, new Ellipse2D.Float(x, y, w, h));
     }
 
     @Override
-    public void fillPolygon(SunGraphics2D arg0, int[] arg1, int[] arg2, int arg3) {
-        throw new UnsupportedOperationException();
+    public void fillPolygon(SunGraphics2D sg2d, int[] xPoints, int[] yPoints, int nPoints) {
+        fill(sg2d, path(xPoints, yPoints, nPoints, true));
     }
 
     @Override
     public void fillRect(SunGraphics2D sg2d, int x, int y, int w, int h) {
         SunToolkit.awtLock();
         try {
-            xFillRect(sg2d, x + sg2d.transX, y + sg2d.transY, w, h);
+            XDrawableSurfaceData xdsf = (XDrawableSurfaceData) sg2d.surfaceData;
+            xdsf.getDrawable().fill_rectangle(xdsf.getRenderGC(sg2d), x + sg2d.transX, y + sg2d.transY, w, h);
         } finally {
             SunToolkit.awtUnlock();
         }
     }
 
     @Override
-    public void fillRoundRect(SunGraphics2D arg0, int arg1, int arg2, int arg3, int arg4, int arg5, int arg6) {
-        throw new UnsupportedOperationException();
+    public void fillRoundRect(SunGraphics2D sg2d, int x, int y, int w, int h, int arcW, int arcH) {
+        fill(sg2d, new RoundRectangle2D.Float(x, y, w, h, arcW, arcH));
     }
 
     @Override
     public void draw(SunGraphics2D sg2d, Shape s) {
         if (sg2d.strokeState == SunGraphics2D.STROKE_THIN) {
-            // Delegate to drawPolygon() if possible...
-            if (s instanceof Polygon p && sg2d.transformState < SunGraphics2D.TRANSFORM_TRANSLATESCALE) {
-                drawPolygon(sg2d, p.xpoints, p.ypoints, p.npoints);
-                return;
-            }
-
-            // Otherwise we will use drawPath() for
-            // high-quality thin paths.
-            doPath(sg2d, s, false);
+            fillDevice(sg2d, sg2d.stroke.createStrokedShape(s));
         } else if (sg2d.strokeState < SunGraphics2D.STROKE_CUSTOM) {
             // REMIND: X11 can handle uniform scaled wide lines
             // and dashed lines itself if we set the appropriate
             // XGC attributes (TBD).
             ShapeSpanIterator si = LoopPipe.getStrokeSpans(sg2d, s);
             try {
-                SunToolkit.awtLock();
-                try {
-                    fillSpans(sg2d, si, 0, 0);
-                } finally {
-                    SunToolkit.awtUnlock();
-                }
+                fillSpans(sg2d, si, 0, 0);
             } finally {
                 si.dispose();
             }
@@ -194,13 +200,7 @@ public class EscherRenderer implements PixelDrawPipe, PixelFillPipe, ShapeDrawPi
     @Override
     public void fill(SunGraphics2D sg2d, Shape s) {
         if (sg2d.strokeState == SunGraphics2D.STROKE_THIN) {
-            // Delegate to fillPolygon() if possible...
-            if (s instanceof Polygon p && sg2d.transformState < SunGraphics2D.TRANSFORM_TRANSLATESCALE) {
-                fillPolygon(sg2d, p.xpoints, p.ypoints, p.npoints);
-            } else {
-                // Otherwise we will use fillPath() for high-quality fills.
-                doPath(sg2d, s, true);
-            }
+            fillDevice(sg2d, s);
         } else {
             AffineTransform at;
             int transx, transy;
@@ -225,55 +225,40 @@ public class EscherRenderer implements PixelDrawPipe, PixelFillPipe, ShapeDrawPi
                         clip.getHiX() - transx,
                         clip.getHiY() - transy);
                 ssi.appendPath(s.getPathIterator(at));
-                SunToolkit.awtLock();
-                try {
-                    fillSpans(sg2d, ssi, transx, transy);
-                } finally {
-                    SunToolkit.awtUnlock();
-                }
+                fillSpans(sg2d, ssi, transx, transy);
             } finally {
                 ssi.dispose();
             }
+        }
+    }
+
+    /**
+     * Fills a shape given in user space through the transform of the graphics.
+     */
+    private static void fillDevice(SunGraphics2D sg2d, Shape s) {
+        ShapeSpanIterator ssi = new ShapeSpanIterator(false);
+        try {
+            ssi.setOutputArea(sg2d.getCompClip());
+            ssi.appendPath(s.getPathIterator(sg2d.transform));
+            fillSpans(sg2d, ssi, 0, 0);
+        } finally {
+            ssi.dispose();
         }
     }
 
     private static void fillSpans(SunGraphics2D sg2d, ShapeSpanIterator ssi, int transX, int transY) {
-        logger.log(Level.DEBUG, "IMPLEMENT: EscherRenderer.fillSpans()");
-    }
-
-    private static void doPath(SunGraphics2D sg2d, Shape s, boolean isFill) {
         SunToolkit.awtLock();
         try {
-            ShapeSpanIterator ssi = new ShapeSpanIterator(false);
-            try {
-                Path2D.Float p2df = new Path2D.Float(s, sg2d.transform);
-                ssi.setOutputArea(sg2d.clipRegion);
-                ssi.appendPath(p2df.getPathIterator(null));
-                int[] spanbox = new int[4];
-                while (ssi.nextSpan(spanbox)) {
-                    int x = spanbox[0];
-                    int y = spanbox[1];
-                    int w = spanbox[2] - x;
-                    int h = spanbox[3] - y;
-                    xFillRect(sg2d, x, y, w, h);
-                }
-
-            } finally {
-                ssi.dispose();
+            XDrawableSurfaceData xdsf = (XDrawableSurfaceData) sg2d.surfaceData;
+            GC gc = xdsf.getRenderGC(sg2d);
+            Drawable xDrawable = xdsf.getDrawable();
+            int[] spanbox = new int[4];
+            while (ssi.nextSpan(spanbox)) {
+                xDrawable.fill_rectangle(gc, spanbox[0] + transX, spanbox[1] + transY,
+                        spanbox[2] - spanbox[0], spanbox[3] - spanbox[1]);
             }
         } finally {
             SunToolkit.awtUnlock();
         }
-    }
-
-    private void doPath(SunGraphics2D sg2d, int transX, int transY, Path2D.Float p2df, boolean isFill) {
-    }
-
-    private static void xFillRect(SunGraphics2D sg2d, int x, int y, int w, int h) {
-        XDrawableSurfaceData xdsf = (XDrawableSurfaceData) sg2d.surfaceData;
-        GC gc = xdsf.getRenderGC(sg2d);
-        Drawable xDrawable = xdsf.getDrawable();
-        xDrawable.fill_rectangle(gc, x, y, w, h);
-        //logger.log(Level.DEBUG, "fillRect: " + x + ", " + y + ", " + w + ", " + h);
     }
 }

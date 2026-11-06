@@ -40,13 +40,16 @@ package gnu.java.awt.peer.x;
 import java.awt.AWTError;
 import java.awt.GraphicsConfiguration;
 import java.awt.GraphicsDevice;
+import java.io.IOException;
 import java.lang.System.Logger;
 import java.lang.System.Logger.Level;
-import java.lang.reflect.Constructor;
 import java.net.Socket;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import gnu.x11.Display;
 import gnu.x11.EscherServerConnectionException;
+import gnu.x11.UnixDomainSocket;
 
 
 /**
@@ -77,11 +80,16 @@ public class XGraphicsDevice extends GraphicsDevice {
             String[] pair = dn.split(":");
             this.hostname = pair[0];
             this.displayNumber = pair[1].indexOf('.') != -1 ? Integer.valueOf(pair[1].substring(0, pair[1].indexOf('.'))) : Integer.valueOf(pair[1]);
-            this.screenNumber = pair[1].indexOf('.') != -1 ? Integer.parseInt(pair[1].substring(pair[1].lastIndexOf('.'))) : -1;
+            this.screenNumber = pair[1].indexOf('.') != -1 ? Integer.parseInt(pair[1].substring(pair[1].lastIndexOf('.') + 1)) : -1;
         }
 
         public String getIDString() {
             return ":" + displayNumber + (screenNumber != -1 ? "." + screenNumber : "");
+        }
+
+        @Override
+        public String toString() {
+            return hostname + getIDString();
         }
     }
 
@@ -91,9 +99,10 @@ public class XGraphicsDevice extends GraphicsDevice {
     private final DisplayName displayName;
 
     /**
-     * The event pump for this X Display.
+     * The windows on this X Display by their X window id, for the event pump
+     * to find the target of an event. It runs on its own thread.
      */
-    private XEventSource eventSource;
+    private final Map<Integer, EscherPlatformWindow> windows = new ConcurrentHashMap<>();
 
     /**
      * Creates a new XGraphicsDevice.
@@ -114,8 +123,7 @@ public class XGraphicsDevice extends GraphicsDevice {
 
     @Override
     public GraphicsConfiguration[] getConfigurations() {
-        // TODO: Implement this.
-        throw new UnsupportedOperationException("Not yet implemented.");
+        return new GraphicsConfiguration[] {getDefaultConfiguration()};
     }
 
     @Override
@@ -167,41 +175,36 @@ public class XGraphicsDevice extends GraphicsDevice {
                 awtErr.initCause(ex);
                 throw awtErr;
             }
-
-            eventSource = new XEventSource(display);
         }
         return display;
     }
 
-    XEventSource getEventSource() {
-        return eventSource;
+    void registerWindow(EscherPlatformWindow window) {
+        windows.put(window.xwindow.id(), window);
+    }
+
+    void unregisterWindow(EscherPlatformWindow window) {
+        windows.remove(window.xwindow.id());
     }
 
     /**
-     * Tries to load the LocalSocket class and initiate a connection to the
-     * local X server.
+     * @return the window for that id, null for a window that is gone already
+     */
+    EscherPlatformWindow getWindow(int id) {
+        return windows.get(id);
+    }
+
+    /**
+     * Tries to connect to the local X server through its unix domain socket.
+     *
+     * @return the connected socket, null when there is none to connect to
      */
     private Socket createLocalSocket() {
-        Socket socket = null;
         try {
-            // TODO: Is this 100% ok?
-            String sockPath = "/tmp/.X11-unix/X" + displayName.displayNumber;
-            Class<?> localSocketAddressClass =
-                    Class.forName("gnu.java.net.local.LocalSocketAddress");
-            Constructor<?> localSocketAddressConstr =
-                    localSocketAddressClass.getConstructor(String.class);
-            Object addr =
-                    localSocketAddressConstr.newInstance(sockPath);
-            Class<?> localSocketClass =
-                    Class.forName("gnu.java.net.local.LocalSocket");
-            Constructor<?> localSocketConstructor =
-                    localSocketClass.getConstructor(localSocketAddressClass);
-            Object localSocket =
-                    localSocketConstructor.newInstance(addr);
-            socket = (Socket) localSocket;
-        } catch (Exception ex) {
-            // Whatever goes wrong here, we return null.
+            return new UnixDomainSocket("/tmp/.X11-unix/X" + displayName.displayNumber);
+        } catch (IOException ex) {
+            logger.log(Level.DEBUG, "no local socket for " + displayName.getIDString() + ": " + ex);
+            return null;
         }
-        return socket;
     }
 }

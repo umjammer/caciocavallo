@@ -209,15 +209,15 @@ final class KeyboardMapping {
         int mods = 0;
 
         if ((xMods & Input.KeyMask.SHIFT_MASK.getCode()) != 0)
-            mods |= KeyEvent.SHIFT_MASK | KeyEvent.SHIFT_DOWN_MASK;
+            mods |= KeyEvent.SHIFT_DOWN_MASK;
         if ((xMods & Input.KeyMask.META_MASK.getCode()) != 0)
-            mods |= KeyEvent.META_MASK | KeyEvent.META_DOWN_MASK;
+            mods |= KeyEvent.META_DOWN_MASK;
         if ((xMods & Input.KeyMask.ALT_MASK.getCode()) != 0)
-            mods |= KeyEvent.ALT_MASK | KeyEvent.ALT_DOWN_MASK;
+            mods |= KeyEvent.ALT_DOWN_MASK;
         if ((xMods & Input.KeyMask.MOD5_MASK.getCode()) != 0)
-            mods |= KeyEvent.ALT_GRAPH_MASK | KeyEvent.ALT_GRAPH_DOWN_MASK;
+            mods |= KeyEvent.ALT_GRAPH_DOWN_MASK;
         if ((xMods & Input.KeyMask.CONTROL_MASK.getCode()) != 0)
-            mods |= KeyEvent.CTRL_MASK | KeyEvent.CTRL_DOWN_MASK;
+            mods |= KeyEvent.CTRL_DOWN_MASK;
 
         return mods;
     }

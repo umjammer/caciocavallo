@@ -36,7 +36,6 @@ import java.awt.PrintJob;
 import java.awt.SystemTray;
 import java.awt.TrayIcon;
 import java.awt.Window;
-import java.awt.datatransfer.Clipboard;
 import java.awt.dnd.DragGestureEvent;
 import java.awt.dnd.InvalidDnDOperationException;
 import java.awt.dnd.peer.DragSourceContextPeer;
@@ -47,14 +46,12 @@ import java.awt.image.ColorModel;
 import java.awt.peer.DesktopPeer;
 import java.awt.peer.FontPeer;
 import java.awt.peer.FramePeer;
-import java.awt.peer.MouseInfoPeer;
 import java.awt.peer.RobotPeer;
 import java.awt.peer.SystemTrayPeer;
 import java.awt.peer.TrayIconPeer;
 import java.util.Map;
 import java.util.Properties;
 
-import com.github.caciocavallosilano.cacio.peer.CacioEventSource;
 import com.github.caciocavallosilano.cacio.peer.CacioToolkit;
 import com.github.caciocavallosilano.cacio.peer.PlatformWindowFactory;
 import sun.awt.LightweightFrame;
@@ -132,15 +129,8 @@ public class EscherToolkit extends CacioToolkit {
     }
 
     @Override
-    public synchronized MouseInfoPeer getMouseInfoPeer() {
-        // TODO: Implement properly. Can't use the DefaultMouseInfoPeer...
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
     public ColorModel getColorModel() throws HeadlessException {
-        // TODO: I assume 24 bit depth here, we can do this better.
-        return ColorModel.getRGBdefault();
+        return getDefaultDevice().getDefaultConfiguration().getColorModel();
     }
 
     @Override
@@ -156,11 +146,6 @@ public class EscherToolkit extends CacioToolkit {
         XGraphicsConfiguration xgc = (XGraphicsConfiguration) gc;
 
         return xgc.getResolution();
-    }
-
-    @Override
-    public Clipboard getSystemClipboard() throws HeadlessException {
-        return null;
     }
 
     @Override

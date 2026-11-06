@@ -41,8 +41,10 @@ import java.awt.Dimension;
 import java.awt.GraphicsConfiguration;
 import java.awt.GraphicsDevice;
 import java.awt.Rectangle;
+import java.awt.Transparency;
 import java.awt.geom.AffineTransform;
 import java.awt.image.ColorModel;
+import java.awt.image.DirectColorModel;
 
 import gnu.x11.Display;
 import gnu.x11.Screen;
@@ -69,6 +71,9 @@ public class XGraphicsConfiguration extends GraphicsConfiguration
         System.setProperty("sun.java2d.volatilesurfacemanager", "gnu.java.awt.peer.x.EscherVolatileSurfaceManager");
     }
 
+    /** Opaque, images made for this configuration must not carry an alpha to composite. */
+    private static final ColorModel COLOR_MODEL = new DirectColorModel(24, 0x00FF0000, 0x0000FF00, 0x000000FF);
+
     XGraphicsDevice device;
 
     private RenderLoops solidLoops;
@@ -84,14 +89,12 @@ public class XGraphicsConfiguration extends GraphicsConfiguration
 
     @Override
     public ColorModel getColorModel() {
-        // TODO: Implement properly.
-        return ColorModel.getRGBdefault();
+        return COLOR_MODEL;
     }
 
     @Override
     public ColorModel getColorModel(int transparency) {
-        // TODO: Implement properly.
-        return ColorModel.getRGBdefault();
+        return transparency == Transparency.OPAQUE ? COLOR_MODEL : ColorModel.getRGBdefault();
     }
 
     @Override
@@ -101,8 +104,7 @@ public class XGraphicsConfiguration extends GraphicsConfiguration
 
     @Override
     public AffineTransform getNormalizingTransform() {
-        // TODO: Implement this.
-        throw new UnsupportedOperationException("Not yet implemented.");
+        return new AffineTransform();
     }
 
     @Override

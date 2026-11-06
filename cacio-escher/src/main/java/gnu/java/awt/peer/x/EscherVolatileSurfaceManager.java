@@ -40,7 +40,6 @@ package gnu.java.awt.peer.x;
 import java.awt.GraphicsConfiguration;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
-import java.awt.Transparency;
 
 import gnu.x11.Pixmap;
 import sun.awt.image.SunVolatileImage;
@@ -56,7 +55,12 @@ public class EscherVolatileSurfaceManager extends VolatileSurfaceManager {
 
     @Override
     protected boolean isAccelerationEnabled() {
-        return vImg.getTransparency() == Transparency.OPAQUE;
+        // Drawing into a pixmap means every primitive is a request of its own,
+        // and whatever X cannot do (gradients, antialiased text, alpha) reads
+        // the pixels back one round trip at a time. So the back buffers stay in
+        // java, where the JDK's loops do all of it, and only get blitted to the
+        // window as a finished image.
+        return false;
     }
 
     @Override
