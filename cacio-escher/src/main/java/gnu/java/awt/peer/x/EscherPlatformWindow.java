@@ -126,6 +126,11 @@ class EscherPlatformWindow implements PlatformToplevelWindow {
      */
     private volatile boolean blocked;
 
+    /**
+     * The cursor that was set last.
+     */
+    private volatile java.awt.Cursor currentCursor;
+
     EscherPlatformWindow(CacioComponent cacioComp, PlatformWindow parent) {
 
         cacioComponent = cacioComp;
@@ -430,6 +435,20 @@ class EscherPlatformWindow implements PlatformToplevelWindow {
     }
 
     @Override
+    public void setCursor(java.awt.Cursor cursor) {
+        if (cursor != currentCursor) {
+            currentCursor = cursor;
+            gnu.x11.Cursor xcursor = EscherToolkit.getDefaultDevice().getXCursor(cursor);
+            if (xcursor != null) {
+                WindowAttributes attributes = new WindowAttributes();
+                attributes.setCursor(xcursor);
+                xwindow.changeAttributes(attributes);
+                xwindow.getDisplay().flush();
+            }
+        }
+    }
+
+    @Override
     public void requestFocus() {
         takeFocus();
     }
@@ -471,6 +490,15 @@ class EscherPlatformWindow implements PlatformToplevelWindow {
         if (mapped) {
             takeFocus();
         }
+    }
+
+    /**
+     * Enters where the window really is. {@link Window#move(int, int)} skips what
+     * it takes for no change, so a position a window manager came up with has to
+     * be known to it, or going back to the requested one would do nothing.
+     */
+    void locationChanged(Point p) {
+        xwindow.setGeometryCache(new gnu.x11.Rectangle(p.x, p.y, xwindow.width, xwindow.height));
     }
 
     /**

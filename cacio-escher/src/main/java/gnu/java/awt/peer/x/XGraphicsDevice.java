@@ -38,6 +38,7 @@ exception statement from your version. */
 package gnu.java.awt.peer.x;
 
 import java.awt.AWTError;
+import java.awt.Component;
 import java.awt.GraphicsConfiguration;
 import java.awt.GraphicsDevice;
 import java.io.IOException;
@@ -47,6 +48,7 @@ import java.net.Socket;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import gnu.x11.Cursor;
 import gnu.x11.Display;
 import gnu.x11.EscherServerConnectionException;
 import gnu.x11.UnixDomainSocket;
@@ -103,6 +105,14 @@ public class XGraphicsDevice extends GraphicsDevice {
      * to find the target of an event. It runs on its own thread.
      */
     private final Map<Integer, EscherPlatformWindow> windows = new ConcurrentHashMap<>();
+
+    /** The X cursors by AWT cursor type, they are created when first used. */
+    private final Map<Integer, Cursor> cursors = new ConcurrentHashMap<>();
+
+    private EscherClipboard clipboard;
+    private EscherClipboard primarySelection;
+
+    private volatile boolean buttonDown;
 
     /**
      * Creates a new XGraphicsDevice.
@@ -185,6 +195,90 @@ public class XGraphicsDevice extends GraphicsDevice {
 
     void unregisterWindow(EscherPlatformWindow window) {
         windows.remove(window.xwindow.id());
+    }
+
+    /**
+     * @return the X window a component is on, null if it is not showing
+     */
+    EscherPlatformWindow getWindowOf(Component component) {
+        for (Component c = component; c != null; c = c.getParent()) {
+            if (c instanceof java.awt.Window) {
+                for (EscherPlatformWindow window : windows.values()) {
+                    if (window.getCacioComponent().getAWTComponent() == c) {
+                        return window;
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
+    /**
+     * @return the X cursor for an AWT one
+     */
+    Cursor getXCursor(java.awt.Cursor cursor) {
+        if (cursor instanceof EscherCustomCursor custom) {
+            return custom.xcursor();
+        }
+        return cursors.computeIfAbsent(cursor.getType(), type -> new Cursor(getDisplay(), switch (type) {
+            case java.awt.Cursor.CROSSHAIR_CURSOR -> Cursor.Shape.CROSSHAIR;
+            case java.awt.Cursor.TEXT_CURSOR -> Cursor.Shape.XTERM;
+            case java.awt.Cursor.WAIT_CURSOR -> Cursor.Shape.WATCH;
+            case java.awt.Cursor.SW_RESIZE_CURSOR -> Cursor.Shape.BOTTOM_LEFT_CORNER;
+            case java.awt.Cursor.SE_RESIZE_CURSOR -> Cursor.Shape.BOTTOM_RIGHT_CORNER;
+            case java.awt.Cursor.NW_RESIZE_CURSOR -> Cursor.Shape.TOP_LEFT_CORNER;
+            case java.awt.Cursor.NE_RESIZE_CURSOR -> Cursor.Shape.TOP_RIGHT_CORNER;
+            case java.awt.Cursor.N_RESIZE_CURSOR -> Cursor.Shape.TOP_SIDE;
+            case java.awt.Cursor.S_RESIZE_CURSOR -> Cursor.Shape.BOTTOM_SIDE;
+            case java.awt.Cursor.W_RESIZE_CURSOR -> Cursor.Shape.LEFT_SIDE;
+            case java.awt.Cursor.E_RESIZE_CURSOR -> Cursor.Shape.RIGHT_SIDE;
+            case java.awt.Cursor.HAND_CURSOR -> Cursor.Shape.HAND2;
+            case java.awt.Cursor.MOVE_CURSOR -> Cursor.Shape.FLEUR;
+            default -> Cursor.Shape.LEFT_PTR;
+        }));
+    }
+
+    /**
+     * @return the CLIPBOARD selection as a clipboard
+     */
+    synchronized EscherClipboard getClipboard() {
+        if (clipboard == null) {
+            clipboard = new EscherClipboard(getDisplay(), "CLIPBOARD");
+        }
+        return clipboard;
+    }
+
+    /**
+     * @return the PRIMARY selection as a clipboard
+     */
+    synchronized EscherClipboard getPrimarySelection() {
+        if (primarySelection == null) {
+            primarySelection = new EscherClipboard(getDisplay(), "PRIMARY");
+        }
+        return primarySelection;
+    }
+
+    /**
+     * @return the clipboard for a selection, null if it is not one in use
+     */
+    synchronized EscherClipboard getClipboard(int selection) {
+        for (EscherClipboard c : new EscherClipboard[] {clipboard, primarySelection}) {
+            if (c != null && c.selectionID() == selection) {
+                return c;
+            }
+        }
+        return null;
+    }
+
+    void setButtonDown(boolean down) {
+        buttonDown = down;
+    }
+
+    /**
+     * @return whether a mouse button is being held down, according to the events so far
+     */
+    boolean isButtonDown() {
+        return buttonDown;
     }
 
     /**

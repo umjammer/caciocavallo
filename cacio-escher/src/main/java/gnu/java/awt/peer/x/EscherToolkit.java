@@ -26,18 +26,28 @@
 package gnu.java.awt.peer.x;
 
 import java.awt.AWTException;
+import java.awt.Component;
+import java.awt.Cursor;
 import java.awt.Desktop;
+import java.awt.Dimension;
 import java.awt.Frame;
 import java.awt.GraphicsConfiguration;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
 import java.awt.HeadlessException;
+import java.awt.Image;
+import java.awt.Point;
 import java.awt.PrintJob;
 import java.awt.SystemTray;
 import java.awt.TrayIcon;
 import java.awt.Window;
+import java.awt.datatransfer.Clipboard;
 import java.awt.dnd.DragGestureEvent;
+import java.awt.dnd.DragGestureListener;
+import java.awt.dnd.DragGestureRecognizer;
+import java.awt.dnd.DragSource;
 import java.awt.dnd.InvalidDnDOperationException;
+import java.awt.dnd.MouseDragGestureRecognizer;
 import java.awt.dnd.peer.DragSourceContextPeer;
 import java.awt.font.TextAttribute;
 import java.awt.im.InputMethodHighlight;
@@ -54,6 +64,7 @@ import java.util.Properties;
 
 import com.github.caciocavallosilano.cacio.peer.CacioToolkit;
 import com.github.caciocavallosilano.cacio.peer.PlatformWindowFactory;
+import gnu.x11.Display;
 import sun.awt.LightweightFrame;
 import sun.awt.datatransfer.DataTransferer;
 
@@ -73,12 +84,53 @@ public class EscherToolkit extends CacioToolkit {
     @Override
     public DragSourceContextPeer createDragSourceContextPeer(DragGestureEvent dge)
             throws InvalidDnDOperationException {
+        return new EscherDragSourceContextPeer(dge);
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public <T extends DragGestureRecognizer> T createDragGestureRecognizer(
+            Class<T> recognizerClass, DragSource ds, Component c, int actions, DragGestureListener dgl) {
+        if (MouseDragGestureRecognizer.class.equals(recognizerClass)) {
+            return (T) new EscherDragGestureRecognizer(ds, c, actions, dgl);
+        }
         return null;
     }
 
     @Override
+    public DataTransferer getDataTransferer() {
+        return EscherDataTransferer.instance();
+    }
+
+    @Override
     public RobotPeer createRobot(GraphicsDevice screen) throws AWTException {
-        return null;
+        return new EscherRobotPeer((XGraphicsDevice) screen);
+    }
+
+    @Override
+    public Clipboard getSystemClipboard() throws HeadlessException {
+        return getDefaultDevice().getClipboard();
+    }
+
+    @Override
+    public Clipboard getSystemSelection() throws HeadlessException {
+        return getDefaultDevice().getPrimarySelection();
+    }
+
+    @Override
+    public Cursor createCustomCursor(Image cursor, Point hotSpot, String name)
+            throws IndexOutOfBoundsException, HeadlessException {
+        return new EscherCustomCursor(cursor, hotSpot, name);
+    }
+
+    @Override
+    public Dimension getBestCursorSize(int preferredWidth, int preferredHeight) throws HeadlessException {
+        return new Dimension(preferredWidth > 0 ? preferredWidth : 32, preferredHeight > 0 ? preferredHeight : 32);
+    }
+
+    @Override
+    public int getMaximumCursorColors() throws HeadlessException {
+        return 2;
     }
 
     @Override
@@ -112,7 +164,21 @@ public class EscherToolkit extends CacioToolkit {
 
     @Override
     protected boolean syncNativeQueue(long timeout) {
-        return false;
+        Display display = getDefaultDevice().getDisplay();
+        // when this comes back, the server has handled everything sent so far
+        // and what that caused is on its way here
+        display.getInput().inputFocus();
+        boolean events = display.eventAvailable();
+        long end = System.currentTimeMillis() + timeout;
+        while (display.eventAvailable() && System.currentTimeMillis() < end) {
+            try {
+                Thread.sleep(1);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                break;
+            }
+        }
+        return events;
     }
 
     @Override

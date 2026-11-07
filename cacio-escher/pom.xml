@@ -21,6 +21,10 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
+        <configuration>
+          <!-- a toolkit is for life, every test class gets a JVM of its own -->
+          <reuseForks>false</reuseForks>
+        </configuration>
       </plugin>
     </plugins>
   </build>
