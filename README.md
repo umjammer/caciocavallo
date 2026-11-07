@@ -5,15 +5,19 @@
 
 # Caciocavallo
 
+<img alt="logo" src="doc/duke_caciocavallo.png" width="160" />
+
 Portable GUI backends for OpenJDK
 
-| name    | status | comment |
-|---------|:------:|---------|
-| sdl2    |   ✅️   |         |
-| eschher |        |         |
-| web     |        |         |
-| x11     |        |         |
-
+| name      | status | library                                                      | comment |
+|-----------|:------:|--------------------------------------------------------------|---------|
+| sdl2      |   ✅️   | this                                                         |         |
+| eschher   |   🚧   | this                                                         |         |
+| web       |   🚧   | this                                                         |         |
+| x11       |   🚧   | this                                                         |         |
+| html5     |   ✅️   | [vavi-awt-html5](https://github.com/umjammer/vavi-awt-html5) |         |
+| minecraft |        |                                                              |         |
+| retroarch |        |                                                              |         |
 
 ## Install
 
@@ -254,3 +258,7 @@ TODO:
 
 It's pretty much everything for now, but stay tuned for other cool
 stuff :)
+
+---
+
+<sub>image designed by @umjammer, drawn by nano banana</sub>
