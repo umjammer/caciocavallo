@@ -36,9 +36,9 @@
       <version>${cacio.version}</version>
     </dependency>
     <dependency>
-      <groupId>escher</groupId> <!-- escher / com.github.umjammer -->
+      <groupId>com.github.umjammer</groupId> <!-- escher / com.github.umjammer -->
       <artifactId>classpath-escher</artifactId>
-      <version>0.4.2-SNAPSHOT</version>
+      <version>0.4.2</version>
     </dependency>
 
     <dependency>

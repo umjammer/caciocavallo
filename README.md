@@ -9,15 +9,15 @@
 
 Portable GUI backends for OpenJDK
 
-| name      | status | library                                                      | comment |
-|-----------|:------:|--------------------------------------------------------------|---------|
-| sdl2      |   ✅️   | this                                                         |         |
-| eschher   |   🚧   | this                                                         |         |
-| web       |   🚧   | this                                                         |         |
-| x11       |   🚧   | this                                                         |         |
-| html5     |   ✅️   | [vavi-awt-html5](https://github.com/umjammer/vavi-awt-html5) |         |
-| minecraft |        |                                                              |         |
-| retroarch |        |                                                              |         |
+| name      | status | library                                                      | comment                             |
+|-----------|:------:|--------------------------------------------------------------|-------------------------------------|
+| sdl2      |   ✅️   | this                                                         |                                     |
+| eschher   |   ✅️   | this                                                         |                                     |
+| web       |   🚧   | this                                                         | what is the difference from html5?  |
+| x11       |   🚧   | this                                                         | what is the difference from escher? |
+| html5     |   ✅️   | [vavi-awt-html5](https://github.com/umjammer/vavi-awt-html5) |                                     |
+| minecraft |        |                                                              |                                     |
+| retroarch |        |                                                              |                                     |
 
 ## Install
 
