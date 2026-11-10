@@ -26,118 +26,412 @@
 package gnu.java.awt.peer.x;
 
 import java.awt.Component;
+import java.awt.Container;
+import java.awt.EventQueue;
 import java.awt.GraphicsEnvironment;
+import java.awt.Point;
+import java.awt.Window;
+import java.awt.event.ComponentEvent;
+import java.awt.event.FocusEvent;
+import java.awt.event.InputEvent;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseWheelEvent;
+import java.awt.event.WindowEvent;
 import java.lang.System.Logger;
 import java.lang.System.Logger.Level;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import com.github.caciocavallosilano.cacio.peer.CacioComponent;
 import com.github.caciocavallosilano.cacio.peer.CacioEventPump;
+import com.github.caciocavallosilano.cacio.peer.CacioMouseInfoPeer;
 import gnu.x11.Display;
 import gnu.x11.event.ButtonPress;
 import gnu.x11.event.ButtonRelease;
+import gnu.x11.event.ClientMessage;
+import gnu.x11.event.ConfigureNotify;
+import gnu.x11.event.EnterNotify;
 import gnu.x11.event.Event;
 import gnu.x11.event.Expose;
+import gnu.x11.event.FocusIn;
+import gnu.x11.event.FocusOut;
+import gnu.x11.event.Input;
+import gnu.x11.event.LeaveNotify;
+import gnu.x11.event.MapNotify;
 import gnu.x11.event.MotionNotify;
+import gnu.x11.event.SelectionClear;
+import gnu.x11.event.SelectionNotify;
+import gnu.x11.event.SelectionRequest;
+import gnu.x11.event.UnmapNotify;
+import sun.awt.AWTAccessor;
 import sun.awt.SunToolkit;
 
 
+/**
+ * Fetches events from X, translates them to AWT events and pumps them up
+ * into the AWT event queue.
+ *
+ * @author Roman Kennke (kennke@aicas.com)
+ */
 class EscherEventPump extends CacioEventPump<Event> {
 
     private static final Logger logger = System.getLogger(EscherEventPump.class.getName());
 
-    private final Map<Long, EscherPlatformWindow> windowMap;
+    /** How long two presses may be apart to count as a multi click. */
+    private static final long MULTI_CLICK_MILLIS = 500;
 
-    EscherEventPump() {
-        windowMap = new HashMap<>();
+    /** How far the pointer may travel for a press and a release to still be a click. */
+    private static final int CLICK_SLOP = 4;
+
+    /** The buttons being held down, as extended modifiers. */
+    private volatile int buttonsDown;
+
+    private int clickCount;
+    private int clickButton;
+    private long lastPressTime;
+    private int pressX, pressY;
+    private EscherPlatformWindow pressWindow;
+
+    /** The window that holds the X input focus. */
+    private EscherPlatformWindow focused;
+
+    private volatile EscherPlatformWindow cursorWindow;
+    private volatile int cursorX, cursorY;
+    private final AtomicBoolean cursorUpdatePending = new AtomicBoolean();
+
+    private static XGraphicsDevice device() {
+        return (XGraphicsDevice) GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
     }
 
     @Override
     protected Event fetchNativeEvent() {
+        Event event = null;
         SunToolkit.awtLock();
-        Event eventData = null;
         try {
-            eventData = nativeFetchEvent(((XGraphicsEnvironment) GraphicsEnvironment.getLocalGraphicsEnvironment()).getDisplay());
+            Display display = device().getDisplay();
+            // never block here, this is holding the lock everything else needs
+            event = display.pollEvent();
+        } catch (gnu.x11.Error e) {
+            // an error for something long gone, not worth losing the pump for
+            logger.log(Level.WARNING, "asynchronous X error: " + e);
         } finally {
             SunToolkit.awtUnlock();
         }
-        if (eventData == null) {
-            try { Thread.sleep(10); } catch (InterruptedException _) {}
+        if (event == null) {
+            try {
+                Thread.sleep(5);
+            } catch (InterruptedException _) {
+                Thread.currentThread().interrupt();
+            }
         }
-        return eventData;
+        return event;
     }
 
     @Override
-    protected void dispatchNativeEvent(Event nativeEvent) {
-        if (nativeEvent == null) {
+    protected void dispatchNativeEvent(Event event) {
+        if (event == null) {
             return;
         }
-        switch (nativeEvent.code()) {
-            case MAP_NOTIFY:
-                break;
-            case EXPOSE: {
-                Expose event = (Expose) nativeEvent;
-                EscherPlatformWindow w = windowMap.get((long) event.getWindowID());
-                CacioComponent source = w.getCacioComponent();
-                Component c = source.getAWTComponent();
-                logger.log(Level.DEBUG, "EscherEventPump::dispatchNativeEvent: exposing: " + c);
-                postPaintEvent(source, 0, 0, c.getWidth(), c.getHeight());
-                break;
-            }
-            case MOTION_NOTIFY: {
-                MotionNotify event = (MotionNotify) nativeEvent;
-                EscherPlatformWindow w = windowMap.get((long) event.getEventWindowID());
-                CacioComponent source = w.getCacioComponent();
-                postMouseEvent(source, MouseEvent.MOUSE_MOVED, System.currentTimeMillis(), 0, event.getEventX(), event.getEventY(), 0, false);
-                break;
-            }
-            case BUTTON_PRESS: {
-                ButtonPress event = (ButtonPress) nativeEvent;
-                EscherPlatformWindow w = windowMap.get((long) event.getEventWindowID());
-                CacioComponent source = w.getCacioComponent();
-                /* TODO: Fix mods. */
-                logger.log(Level.DEBUG, "EscherEventPump::dispatchNativeEvent: BUTTON_PRESS");
-                postMouseEvent(source, MouseEvent.MOUSE_PRESSED, System.currentTimeMillis(), MouseEvent.BUTTON1_DOWN_MASK, event.getEventX(), event.getEventY(), 0, false);
-                break;
-            }
-            case BUTTON_RELEASE: {
-                ButtonRelease event = (ButtonRelease) nativeEvent;
-                EscherPlatformWindow w = windowMap.get((long) event.getEventWindowID());
-                CacioComponent source = w.getCacioComponent();
-                // TODO: Fix mods.
-                logger.log(Level.DEBUG, "EscherEventPump::dispatchNativeEvent: BUTTON_RELEASE");
-                postMouseEvent(source, MouseEvent.MOUSE_RELEASED, System.currentTimeMillis(), 0, event.getEventX(), event.getEventY(), 0, false);
-                break;
-            }
-            default:
-                logger.log(Level.DEBUG, "EscherEventPump::dispatchNativeEvent: unhandled event type: " + nativeEvent.code());
+        try {
+            dispatch(event);
+        } catch (gnu.x11.Error e) {
+            logger.log(Level.WARNING, "X error while dispatching " + event.code() + ": " + e);
         }
     }
 
-    void registerWindow(long windowId, EscherPlatformWindow w) {
-        windowMap.put(windowId, w);
-    }
-
-    void deregisterWindow(long windowId) {
-        windowMap.remove(windowId);
-    }
-
-    private static Event nativeFetchEvent(Display display) {
-        Event event;
-
-        if (!display.eventAvailable()) {
-            return null;
-        }
-
-        event = display.nextEvent();
-        return switch (event.code()) {
-            case MAP_NOTIFY, EXPOSE, MOTION_NOTIFY, BUTTON_PRESS, BUTTON_RELEASE -> event;
-            default -> {
-                System.err.printf("Unhandled X event type: %s\n", event.code());
-                yield null;
+    private void dispatch(Event event) {
+        XGraphicsDevice device = device();
+        switch (event) {
+            case Expose e -> {
+                EscherPlatformWindow w = device.getWindow(e.getWindowID());
+                if (w != null) {
+                    postPaintEvent(w.getCacioComponent(), e.x(), e.y(), e.width(), e.height());
+                }
             }
+            case MapNotify e -> {
+                EscherPlatformWindow w = device.getWindow(e.getWindowID());
+                if (w != null) {
+                    w.mapped(true);
+                }
+            }
+            case UnmapNotify e -> {
+                EscherPlatformWindow w = device.getWindow(e.getWindowID());
+                if (w != null) {
+                    w.mapped(false);
+                }
+            }
+            case ConfigureNotify e -> {
+                EscherPlatformWindow w = device.getWindow(e.getWindowID());
+                if (w != null) {
+                    configure(w, e.width(), e.height());
+                }
+            }
+            case MotionNotify e -> motion(device.getWindow(e.getEventWindowID()), e);
+            case ButtonPress e -> press(device.getWindow(e.getEventWindowID()), e);
+            case ButtonRelease e -> release(device.getWindow(e.getEventWindowID()), e);
+            case EnterNotify e -> crossing(device.getWindow(e.getEventWindowID()), e, MouseEvent.MOUSE_ENTERED);
+            case LeaveNotify e -> crossing(device.getWindow(e.getEventWindowID()), e, MouseEvent.MOUSE_EXITED);
+            case gnu.x11.event.KeyPress e -> key(device.getWindow(e.getEventWindowID()), e, true);
+            case gnu.x11.event.KeyRelease e -> key(device.getWindow(e.getEventWindowID()), e, false);
+            case FocusIn e -> focusIn(device.getWindow(e.getEventWindowID()));
+            case FocusOut e -> focusOut(device.getWindow(e.getEventWindowID()));
+            case SelectionRequest e -> {
+                EscherClipboard clipboard = device.getClipboard(e.getSelectionAtomID());
+                if (clipboard != null) {
+                    clipboard.selectionRequest(e);
+                }
+            }
+            case SelectionNotify e -> {
+                EscherClipboard clipboard = device.getClipboard(e.getSelectionAtomID());
+                if (clipboard != null) {
+                    clipboard.selectionNotify(e);
+                }
+            }
+            case SelectionClear e -> {
+                EscherClipboard clipboard = device.getClipboard(e.getSelectionAtomID());
+                if (clipboard != null) {
+                    clipboard.selectionClear(e);
+                }
+            }
+            case ClientMessage e -> {
+                EscherPlatformWindow w = device.getWindow(e.getWindowID());
+                if (w != null && e.deleteWindow()
+                        && w.getCacioComponent().getAWTComponent() instanceof Window) {
+                    postWindwoEvent(w.getCacioComponent(), WindowEvent.WINDOW_CLOSING, 0, 0);
+                }
+            }
+            default -> logger.log(Level.TRACE, "unhandled X event: " + event.code());
+        }
+    }
+
+    /**
+     * Handles the size and position of a window as the X server has it. Requests
+     * of our own come back through here as well, and they have already been
+     * entered in the X window, so what is different here is news: the window
+     * manager did it, or the user dragged a border.
+     */
+    private void configure(EscherPlatformWindow w, int width, int height) {
+        CacioComponent source = w.getCacioComponent();
+        if (!(source.getAWTComponent() instanceof Window window)) {
+            return;
+        }
+        AWTAccessor.ComponentAccessor accessor = AWTAccessor.getComponentAccessor();
+        if (w.sizeChanged(width, height)) {
+            accessor.setSize(window, width, height);
+            postComponentEvent(source, ComponentEvent.COMPONENT_RESIZED);
+            postPaintEvent(source, 0, 0, width, height);
+        }
+        // a reparenting window manager reports these relative to its frame
+        if (window.isShowing()) {
+            Point p = w.getLocationOnScreen();
+            w.locationChanged(p);
+            if (p.x != window.getX() || p.y != window.getY()) {
+                accessor.setLocation(window, p.x, p.y);
+                postComponentEvent(source, ComponentEvent.COMPONENT_MOVED);
+            }
+        }
+    }
+
+    private static int buttonMask(int button) {
+        return switch (button) {
+            case 1 -> InputEvent.BUTTON1_DOWN_MASK;
+            case 2 -> InputEvent.BUTTON2_DOWN_MASK;
+            case 3 -> InputEvent.BUTTON3_DOWN_MASK;
+            default -> 0;
         };
+    }
+
+    private static boolean isWheel(int button) {
+        return button == 4 || button == 5;
+    }
+
+    private void pointerAt(Input e) {
+        CacioMouseInfoPeer.getInstance().setMouseScreenCoordinates(e.getRootX(), e.getRootY());
+    }
+
+    private void post(EscherPlatformWindow w, int id, long when, int modifiers, int x, int y,
+                      int clicks, boolean popupTrigger, int button) {
+        CacioComponent source = w.getCacioComponent();
+        source.handlePeerEvent(new MouseEvent(source.getAWTComponent(), id, when, modifiers,
+                x, y, clicks, popupTrigger, button));
+    }
+
+    /**
+     * Has the cursor of the component under the pointer shown. cacio-shared's
+     * {@code updateCursorImmediately} does nothing, so nobody tells us when a
+     * component changes its cursor: it shows on the next move of the mouse. This
+     * has to wait for the EDT, the event just posted may be what changes it.
+     */
+    private void trackCursor(EscherPlatformWindow w, int x, int y) {
+        cursorWindow = w;
+        cursorX = x;
+        cursorY = y;
+        if (cursorUpdatePending.compareAndSet(false, true)) {
+            EventQueue.invokeLater(this::updateCursor);
+        }
+    }
+
+    private void updateCursor() {
+        cursorUpdatePending.set(false);
+        EscherPlatformWindow w = cursorWindow;
+        // while a button is down, the cursor stays what it was when it went down
+        if (w != null && buttonsDown == 0 && w.getCacioComponent().getAWTComponent() instanceof Container container) {
+            Component under = container.findComponentAt(cursorX, cursorY);
+            w.setCursor((under != null ? under : container).getCursor());
+        }
+    }
+
+    private void motion(EscherPlatformWindow w, MotionNotify e) {
+        pointerAt(e);
+        int mods = KeyboardMapping.mapModifiers(e.getState()) | buttonsDown;
+        EscherDragSourceContextPeer drag = EscherDragSourceContextPeer.active();
+        if (drag != null) {
+            drag.motion(e.getRootX(), e.getRootY(), mods);
+            return;
+        }
+        if (w == null || w.isBlocked()) {
+            return;
+        }
+        trackCursor(w, e.getEventX(), e.getEventY());
+        int id = buttonsDown != 0 ? MouseEvent.MOUSE_DRAGGED : MouseEvent.MOUSE_MOVED;
+        post(w, id, System.currentTimeMillis(), mods, e.getEventX(), e.getEventY(), 0, false, MouseEvent.NOBUTTON);
+    }
+
+    private void press(EscherPlatformWindow w, ButtonPress e) {
+        pointerAt(e);
+        if (w == null || w.isBlocked()) {
+            return;
+        }
+        w.takeFocus();
+
+        int button = e.detail();
+        long when = System.currentTimeMillis();
+        int mods = KeyboardMapping.mapModifiers(e.getState()) | buttonsDown;
+        int x = e.getEventX();
+        int y = e.getEventY();
+
+        if (isWheel(button)) {
+            CacioComponent source = w.getCacioComponent();
+            source.handlePeerEvent(new MouseWheelEvent(source.getAWTComponent(), MouseEvent.MOUSE_WHEEL, when,
+                    mods, x, y, 0, false, MouseWheelEvent.WHEEL_UNIT_SCROLL, 3, button == 4 ? -1 : 1));
+            return;
+        }
+        int mask = buttonMask(button);
+        if (mask == 0) {
+            return; // AWT does not do extra buttons here
+        }
+
+        boolean again = button == clickButton && w == pressWindow
+                && when - lastPressTime <= MULTI_CLICK_MILLIS
+                && Math.abs(x - pressX) <= CLICK_SLOP && Math.abs(y - pressY) <= CLICK_SLOP;
+        clickCount = again ? clickCount + 1 : 1;
+        clickButton = button;
+        lastPressTime = when;
+        pressX = x;
+        pressY = y;
+        pressWindow = w;
+
+        buttonsDown |= mask;
+        device().setButtonDown(true);
+        post(w, MouseEvent.MOUSE_PRESSED, when, mods | mask, x, y, clickCount, button == 3, button);
+    }
+
+    private void release(EscherPlatformWindow w, ButtonRelease e) {
+        pointerAt(e);
+        int button = e.detail();
+        int mask = buttonMask(button);
+        if (mask == 0) {
+            return;
+        }
+        buttonsDown &= ~mask;
+        device().setButtonDown(buttonsDown != 0);
+        int mods = KeyboardMapping.mapModifiers(e.getState()) & ~mask | buttonsDown;
+        EscherDragSourceContextPeer drag = EscherDragSourceContextPeer.active();
+        if (drag != null) {
+            if (buttonsDown == 0) {
+                drag.drop(e.getRootX(), e.getRootY(), mods);
+            }
+            return; // AWT did not see the drag, and it does not get to see the end of it
+        }
+        if (w == null || w.isBlocked()) {
+            return;
+        }
+        long when = System.currentTimeMillis();
+        int x = e.getEventX();
+        int y = e.getEventY();
+        trackCursor(w, x, y);
+        post(w, MouseEvent.MOUSE_RELEASED, when, mods, x, y, clickCount, false, button);
+        if (w == pressWindow && button == clickButton
+                && Math.abs(x - pressX) <= CLICK_SLOP && Math.abs(y - pressY) <= CLICK_SLOP) {
+            post(w, MouseEvent.MOUSE_CLICKED, when, mods, x, y, clickCount, false, button);
+        }
+    }
+
+    private void crossing(EscherPlatformWindow w, Input e, int id) {
+        pointerAt(e);
+        if (w == null || w.isBlocked()) {
+            return;
+        }
+        int mods = KeyboardMapping.mapModifiers(e.getState()) | buttonsDown;
+        post(w, id, System.currentTimeMillis(), mods, e.getEventX(), e.getEventY(), 0, false, MouseEvent.NOBUTTON);
+        if (id == MouseEvent.MOUSE_ENTERED) {
+            trackCursor(w, e.getEventX(), e.getEventY());
+        }
+    }
+
+    private void key(EscherPlatformWindow w, Input e, boolean pressed) {
+        int xKeyCode = e.detail();
+        int xMods = e.getState();
+        Display display = e.display;
+        int keyCode = KeyboardMapping.mapToKeyCode(display.getInput(), xKeyCode, xMods);
+        EscherDragSourceContextPeer drag = EscherDragSourceContextPeer.active();
+        if (drag != null) {
+            if (keyCode == KeyEvent.VK_ESCAPE) {
+                if (pressed) {
+                    drag.cancel();
+                }
+            } else {
+                // the event has the state from before the key, ask for the new one
+                drag.modifiers(withKey(keyCode, pressed, KeyboardMapping.mapModifiers(xMods)) | buttonsDown);
+            }
+            return;
+        }
+        if (w == null || w.isBlocked()) {
+            return;
+        }
+        CacioComponent source = w.getCacioComponent();
+        char keyChar = KeyboardMapping.mapToKeyChar(display.getInput(), xKeyCode, xMods);
+        int mods = KeyboardMapping.mapModifiers(xMods);
+        long when = System.currentTimeMillis();
+        postKeyEvent(source, pressed ? KeyEvent.KEY_PRESSED : KeyEvent.KEY_RELEASED, when, mods, keyCode);
+        if (pressed && keyChar != KeyEvent.CHAR_UNDEFINED) {
+            postKeyTypedEvent(source, KeyEvent.KEY_TYPED, when, mods, keyChar);
+        }
+    }
+
+    private static int withKey(int keyCode, boolean pressed, int mods) {
+        int mask = switch (keyCode) {
+            case KeyEvent.VK_SHIFT -> InputEvent.SHIFT_DOWN_MASK;
+            case KeyEvent.VK_CONTROL -> InputEvent.CTRL_DOWN_MASK;
+            case KeyEvent.VK_ALT -> InputEvent.ALT_DOWN_MASK;
+            default -> 0;
+        };
+        return pressed ? mods | mask : mods & ~mask;
+    }
+
+    private void focusIn(EscherPlatformWindow w) {
+        if (w == null || w == focused) {
+            return;
+        }
+        focused = w;
+        postFocusEvent(w.getCacioComponent(), FocusEvent.FOCUS_GAINED, false, null);
+    }
+
+    private void focusOut(EscherPlatformWindow w) {
+        if (w == null || w != focused) {
+            return;
+        }
+        focused = null;
+        postFocusEvent(w.getCacioComponent(), FocusEvent.FOCUS_LOST, false, null);
     }
 }

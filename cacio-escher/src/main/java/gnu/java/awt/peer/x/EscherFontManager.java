@@ -67,13 +67,18 @@ public class EscherFontManager extends SunFontManager {
 
     /**
      * Returns an array of two strings. The first element is the
-     * name of the font. The second element is the file name.
+     * name of the font, {@code cacio.escher.font.name}. The second element is
+     * the file name, {@code cacio.escher.font.file}.
+     * <p>
+     * Note that this only applies where this font manager is in use: since
+     * {@code sun.font.fontmanager} is gone from the JDK, nothing installs it.
      */
     @Override
     public String[] getDefaultPlatformFont() {
-        // TODO: This probably only works on my Linux distro (Ubuntu). Maybe
-        // figure out something more clever.
-        return new String[] {"Arial", "/Library/Fonts/Arial.ttf"};
+        return new String[] {
+                System.getProperty("cacio.escher.font.name", "Arial"),
+                System.getProperty("cacio.escher.font.file", "/Library/Fonts/Arial.ttf")
+        };
     }
 
     @Override

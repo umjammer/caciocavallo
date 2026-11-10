@@ -1,19 +1,23 @@
 [![Release](https://jitpack.io/v/umjammer/caciocavallo.svg)](https://jitpack.io/#umjammer/caciocavallo)
 [![Java CI](https://github.com/umjammer/caciocavallo/actions/workflows/maven.yml/badge.svg)](https://github.com/umjammer/caciocavallo/actions/workflows/maven.yml)
 [![CodeQL](https://github.com/umjammer/caciocavallo/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/umjammer/caciocavallo/actions/workflows/codeql-analysis.yml)
-![Java](https://img.shields.io/badge/Java-17-b07219)
+![Java](https://img.shields.io/badge/Java-25-b07219)
 
 # Caciocavallo
 
+<img alt="logo" src="doc/duke_caciocavallo.png" width="160" />
+
 Portable GUI backends for OpenJDK
 
-| name    | status | comment |
-|---------|:------:|---------|
-| sdl2    |   ✅️   |         |
-| eschher |        |         |
-| web     |        |         |
-| x11     |        |         |
-
+| name      | status | library                                                      | comment                             |
+|-----------|:------:|--------------------------------------------------------------|-------------------------------------|
+| sdl2      |   ✅️   | this                                                         |                                     |
+| eschher   |   ✅️   | this                                                         |                                     |
+| web       |   🚧   | this                                                         | what is the difference from html5?  |
+| x11       |   🚧   | this                                                         | what is the difference from escher? |
+| html5     |   ✅️   | [vavi-awt-html5](https://github.com/umjammer/vavi-awt-html5) |                                     |
+| minecraft |        |                                                              |                                     |
+| retroarch |        |                                                              |                                     |
 
 ## Install
 
@@ -27,6 +31,26 @@ Portable GUI backends for OpenJDK
 $ mvn -Dcacio.managed.background=#000000 \
     -Dswingset2.seconds=0 \
     -P native -pl cacio-sdl2 test
+```
+
+### run SwingSet2 on escher
+
+needs an X server at `$DISPLAY` (XQuartz, Xvfb, ...) and
+[classpath-escher](https://github.com/umjammer/classpath-escher) installed locally (`mvn install` there)
+
+```shell
+$ mvn -Descher.swingset2=true \
+    -Dswingset2.seconds=0 \
+    -pl cacio-escher test
+```
+
+### test escher's robot, clipboard, cursors and drag and drop
+
+these drive the pointer and the keyboard, so give them an X server of their own
+
+```shell
+$ Xvfb :77 -screen 0 1280x900x24 -nolisten tcp &
+$ DISPLAY=:77 mvn -Descher.x11=true -Dtest=EscherFeaturesTest -pl cacio-escher test
 ```
 
 ## References
@@ -234,3 +258,7 @@ TODO:
 
 It's pretty much everything for now, but stay tuned for other cool
 stuff :)
+
+---
+
+<sub>image designed by @umjammer, drawn by nano banana</sub>

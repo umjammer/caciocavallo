@@ -5,7 +5,7 @@
   <parent>
     <groupId>net.java.openjdk.cacio</groupId>
     <artifactId>cacio</artifactId>
-    <version>1.10.0</version>
+    <version>1.10.1</version>
   </parent>
 
   <artifactId>cacio-web</artifactId>
@@ -29,7 +29,9 @@
             <configuration>
               <target>
                 <get src="https://sourceforge.net/p/jskeylib/code/ci/default/tree/keylib.js?format=raw"
-                     dest="${project.build.directory}/classes/keylib.js"/>
+                     dest="${project.build.directory}/classes/keylib.js"
+                     usetimestamp="true"
+                     ignoreerrors="true"/>
               </target>
             </configuration>
             <goals>
@@ -52,7 +54,7 @@
           <plugin>
             <groupId>org.codehaus.mojo</groupId>
             <artifactId>exec-maven-plugin</artifactId>
-            <version>3.6.4</version>
+            <version>3.7.0</version>
             <executions>
               <execution>
                 <phase>compile</phase>
@@ -103,7 +105,7 @@
       <dependency>
         <groupId>org.eclipse.jetty</groupId>
         <artifactId>jetty-bom</artifactId>
-        <version>9.4.58.v20250814</version>
+        <version>12.1.15</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
@@ -117,25 +119,23 @@
       <version>${cacio.version}</version>
     </dependency>
     <dependency>
-      <groupId>javax.servlet</groupId>
-      <artifactId>javax.servlet-api</artifactId>
-      <version>4.0.1</version>
+      <groupId>jakarta.servlet</groupId>
+      <artifactId>jakarta.servlet-api</artifactId>
+      <version>6.1.0</version>
     </dependency>
     <dependency>
       <groupId>org.eclipse.jetty</groupId>
       <artifactId>jetty-server</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.eclipse.jetty</groupId>
-      <artifactId>jetty-servlet</artifactId>
+      <groupId>org.eclipse.jetty.ee10</groupId>
+      <artifactId>jetty-ee10-servlet</artifactId>
+      <version>12.1.15</version>
     </dependency>
     <dependency>
-      <groupId>org.eclipse.jetty.websocket</groupId>
-      <artifactId>websocket-api</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.eclipse.jetty.websocket</groupId>
-      <artifactId>websocket-servlet</artifactId>
+      <groupId>org.eclipse.jetty.ee10.websocket</groupId>
+      <artifactId>jetty-ee10-websocket-jakarta-server</artifactId>
+      <version>12.1.15</version>
     </dependency>
 
     <dependency>

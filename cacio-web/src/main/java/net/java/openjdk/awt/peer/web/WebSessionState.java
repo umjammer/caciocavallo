@@ -27,6 +27,7 @@ package net.java.openjdk.awt.peer.web;
 
 import java.awt.Dimension;
 import java.awt.EventQueue;
+import java.awt.Toolkit;
 import java.awt.Window;
 import java.awt.event.InvocationEvent;
 import java.lang.reflect.Method;
@@ -36,8 +37,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.java.openjdk.cacio.servlet.transport.Transport;
-import sun.awt.AppContext;
-import sun.awt.SunToolkit;
 
 
 /**
@@ -65,7 +64,7 @@ public class WebSessionState {
     Transport backend;
     int compressLevel;
 
-    AppContext appContext;
+    Object appContext;
     final HashMap<Integer, WebSessionState> subSessionMap;
 
     volatile boolean contextInitialized = false;
@@ -108,11 +107,11 @@ public class WebSessionState {
         return subSessionID;
     }
 
-    public AppContext getAppContext() {
+    public Object getAppContext() {
         return appContext;
     }
 
-    public void setAppContext(AppContext appContext) {
+    public void setAppContext(Object appContext) {
         this.appContext = appContext;
     }
 
@@ -120,14 +119,14 @@ public class WebSessionState {
         if (appContext != null) {
             logSessionDispose();
 
-            SunToolkit.postEvent(appContext, new InvocationEvent(this, () -> {
+            Toolkit.getDefaultToolkit().getSystemEventQueue().postEvent(new InvocationEvent(this, () -> {
                 Window[] windowArray = Window.getWindows();
                 for (Window w : windowArray) {
                     w.dispose();
                 }
             }));
 
-            appContext.dispose();
+            appContext = null;
         }
         screen = null;
         windowFactory = null;
@@ -135,7 +134,7 @@ public class WebSessionState {
     }
 
     private void logSessionDispose() {
-        EventQueue queue = (EventQueue) appContext.get(AppContext.EVENT_QUEUE_KEY);
+        EventQueue queue = Toolkit.getDefaultToolkit().getSystemEventQueue();
         if (queue != null) {
             try {
                 Method getDispatchThreadMethod = queue.getClass().getDeclaredMethod("getDispatchThread");

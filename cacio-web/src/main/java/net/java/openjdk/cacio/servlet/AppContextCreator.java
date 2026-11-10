@@ -33,8 +33,6 @@ import java.util.Random;
 
 import net.java.openjdk.awt.peer.web.WebKeyboardFocusManager;
 import net.java.openjdk.awt.peer.web.WebSessionState;
-import sun.awt.AppContext;
-import sun.awt.SunToolkit;
 
 
 /**
@@ -54,15 +52,13 @@ public class AppContextCreator {
         Thread t = new Thread(appGroup, "AppInitThread") {
             @Override
             public void run() {
-                AppContext appContext = SunToolkit.createNewAppContext();
-
 //		RepaintManager mgr = new RepaintManager();
 //		mgr.setDoubleBufferingEnabled(false);
 //		RepaintManager.setCurrentManager(mgr);
 
                 try {
                     sessionState.lockSession();
-                    WebSessionManager.getInstance().registerAppContext(appContext, sessionState);
+                    WebSessionManager.getInstance().registerAppContext(appGroup, sessionState);
 
                     KeyboardFocusManager.setCurrentKeyboardFocusManager(new WebKeyboardFocusManager());
 

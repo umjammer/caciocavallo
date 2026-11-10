@@ -83,18 +83,21 @@ class EscherBlitLoops
                      int dx, int dy,
                      int w, int h) {
         SunToolkit.awtLock();
-        if (src instanceof BufImgSurfaceData)
-            blitBufImg((BufImgSurfaceData) src, dst, comp, clip, sx, sy, dx, dy, w, h);
-        else {
-            XDrawableSurfaceData sxdsd = (XDrawableSurfaceData) src;
-            XDrawableSurfaceData dxdsd = (XDrawableSurfaceData) dst;
-            GC gc = dxdsd.getBlitGC(clip);
-            Drawable d = dxdsd.getDrawable();
-            Drawable s = sxdsd.getDrawable();
-            d.copyArea(s, gc, sx, sy, w, h, dx, dy);
-            d.getDisplay().flush();
+        try {
+            if (src instanceof BufImgSurfaceData)
+                blitBufImg((BufImgSurfaceData) src, dst, comp, clip, sx, sy, dx, dy, w, h);
+            else {
+                XDrawableSurfaceData sxdsd = (XDrawableSurfaceData) src;
+                XDrawableSurfaceData dxdsd = (XDrawableSurfaceData) dst;
+                GC gc = dxdsd.getBlitGC(clip);
+                Drawable d = dxdsd.getDrawable();
+                Drawable s = sxdsd.getDrawable();
+                d.copyArea(s, gc, sx, sy, w, h, dx, dy);
+            }
+            ((XDrawableSurfaceData) dst).getDrawable().getDisplay().flush();
+        } finally {
+            SunToolkit.awtUnlock();
         }
-        SunToolkit.awtUnlock();
     }
 
     private static void blitBufImg(BufImgSurfaceData src, SurfaceData dst,
@@ -143,10 +146,11 @@ class EscherBlitLoops
                 awtErr.initCause(e);
                 throw awtErr;
             }
-            for (int y = sy; y < sy + h; y++) {
-                for (int x = sx; x < sx + w; x++) {
-                    int rgb = bufImg.getRGB(x, y);
-                    pm.putPixel(x - sx, y - sy, rgb);
+            int[] row = new int[w];
+            for (int y = 0; y < h; y++) {
+                bufImg.getRGB(sx, sy + y, w, 1, row, 0, w);
+                for (int x = 0; x < w; x++) {
+                    pm.putPixel(x, y, row[x]);
                 }
             }
             d.putImage(gc, pm, dx, dy);
@@ -158,6 +162,10 @@ class EscherBlitLoops
                 AWTError awtErr = new AWTError("Cannot create a ZPixmpas");
                 awtErr.initCause(e);
                 throw awtErr;
+            } catch (gnu.x11.Error e) {
+                // A window that is partly off the screen or not mapped (yet) has
+                // no pixels to read, it will be exposed and painted again.
+                return;
             }
 
             for (int yy = 0; yy < h; yy++) {
@@ -170,7 +178,7 @@ class EscherBlitLoops
                     int green = rgb.getGreen();
                     int blue = rgb.getBlue();
 
-                    int rgbPix = bufImg.getRGB(xx, yy);
+                    int rgbPix = bufImg.getRGB(sx + xx, sy + yy);
 
                     int alpha = 0xff & (rgbPix >> 24);
                     if (alpha == 0) {

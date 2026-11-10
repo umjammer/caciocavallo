@@ -27,13 +27,14 @@ package net.java.openjdk.cacio.servlet;
 
 import java.lang.ref.WeakReference;
 import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 
 import net.java.openjdk.awt.peer.web.WebSessionState;
-import sun.awt.AppContext;
 
 
 /**
@@ -74,6 +75,8 @@ public abstract class WebSessionManager {
     }
 
     final ThreadLocal<WeakReference<WebSessionState>> threadStateHolder = new ThreadLocal<>();
+    private final Map<Object, WebSessionState> appContextMap = new ConcurrentHashMap<>();
+    private volatile WebSessionState currentAwtState;
 
     public static WebSessionManager getInstance() {
         return instance;
@@ -94,9 +97,12 @@ public abstract class WebSessionManager {
      * @param context
      * @param state
      */
-    public void registerAppContext(AppContext context, WebSessionState state) {
+    public void registerAppContext(Object context, WebSessionState state) {
         state.setAppContext(context);
-        AppContext.getAppContext().put(SESSION_KEY, state);
+        if (context != null) {
+            appContextMap.put(context, state);
+        }
+        currentAwtState = state;
         registerSessionAtCurrentThread(state);
     }
 
@@ -108,7 +114,15 @@ public abstract class WebSessionManager {
      * @return the WebSessionState
      */
     public WebSessionState getCurrentStateAWT() {
-        return (WebSessionState) AppContext.getAppContext().get(SESSION_KEY);
+        ThreadGroup tg = Thread.currentThread().getThreadGroup();
+        while (tg != null) {
+            WebSessionState state = appContextMap.get(tg);
+            if (state != null) {
+                return state;
+            }
+            tg = tg.getParent();
+        }
+        return currentAwtState;
     }
 
     /**
@@ -118,10 +132,11 @@ public abstract class WebSessionManager {
      * @return
      */
     public WebSessionState getCurrentState() {
-        WebSessionState state = getCurrentStateAWT();
+        WeakReference<WebSessionState> ref = threadStateHolder.get();
+        WebSessionState state = ref != null ? ref.get() : null;
 
         if (state == null) {
-            state = threadStateHolder.get().get();
+            state = getCurrentStateAWT();
         }
 
         return state;
@@ -159,6 +174,9 @@ public abstract class WebSessionManager {
     public synchronized void disposeSessionState(HttpSession session, WebSessionState state) {
         HashMap<Integer, WebSessionState> subSessionMap = state.getSubSessionMap();
         subSessionMap.remove(state.getSubSessionID());
+        if (state.getAppContext() != null) {
+            appContextMap.remove(state.getAppContext());
+        }
         state.dispose();
     }
 

@@ -39,6 +39,7 @@ package gnu.java.awt.peer.x;
 
 import gnu.x11.Drawable;
 import gnu.x11.GC;
+import sun.awt.SunToolkit;
 import sun.font.GlyphList;
 import sun.java2d.SunGraphics2D;
 import sun.java2d.pipe.GlyphListPipe;
@@ -46,35 +47,37 @@ import sun.java2d.pipe.GlyphListPipe;
 
 class EscherTextRenderer extends GlyphListPipe {
 
+    /** X has no alpha to draw with, so a pixel of a glyph is either there or not. */
+    private static final int ALPHA_THRESHOLD = 128;
+
     @Override
     protected void drawGlyphList(SunGraphics2D sg2d, GlyphList gl) {
-        XDrawableSurfaceData xdsd = (XDrawableSurfaceData) sg2d.surfaceData;
-        Drawable xd = xdsd.getDrawable();
-        GC gc = xdsd.getRenderGC(sg2d);
-        int numGlyphs = gl.getNumGlyphs();
-        int[] strBounds = gl.getBounds(numGlyphs);
-        for (int gi = 0; gi < numGlyphs; gi++) {
-            gl.setGlyphIndex(gi);
-            int[] metrics = gl.getMetrics();
-            byte[] bits = gl.getGrayBits();
-            int glyphX = metrics[0];
-            int glyphY = metrics[1];
-            int glyphW = metrics[2];
-            int glyphH = metrics[3];
-            int off = 0;
-            for (int j = 0; j < glyphH; j++) {
-                for (int i = 0; i < glyphW; i++) {
-                    int dx = glyphX + i;
-                    int dy = glyphY + j;
-                    int alpha = bits[off++];
-                    drawPixel(xd, gc, alpha, dx, dy);
+        SunToolkit.awtLock();
+        try {
+            XDrawableSurfaceData xdsd = (XDrawableSurfaceData) sg2d.surfaceData;
+            Drawable xd = xdsd.getDrawable();
+            GC gc = xdsd.getRenderGC(sg2d);
+            int numGlyphs = gl.getNumGlyphs();
+            gl.startGlyphIteration();
+            for (int gi = 0; gi < numGlyphs; gi++) {
+                gl.setGlyphIndex(gi);
+                int[] metrics = gl.getMetrics();
+                byte[] bits = gl.getGrayBits();
+                int glyphX = metrics[0];
+                int glyphY = metrics[1];
+                int glyphW = metrics[2];
+                int glyphH = metrics[3];
+                int rowBytes = metrics[4];
+                for (int j = 0; j < glyphH; j++) {
+                    for (int i = 0; i < glyphW; i++) {
+                        if ((bits[j * rowBytes + i] & 0xff) >= ALPHA_THRESHOLD) {
+                            xd.point(gc, glyphX + i, glyphY + j);
+                        }
+                    }
                 }
             }
+        } finally {
+            SunToolkit.awtUnlock();
         }
-    }
-
-    private static void drawPixel(Drawable xd, GC gc, int alpha, int dx, int dy) {
-        if (alpha == 0xffff_ffff)
-            xd.point(gc, dx, dy);
     }
 }

@@ -31,12 +31,14 @@ import net.java.openjdk.cacio.servlet.ImageStreamer;
 import net.java.openjdk.cacio.servlet.ResourceLoaderServlet;
 import net.java.openjdk.cacio.servlet.SessionInitializeServlet;
 import net.java.openjdk.cacio.servlet.WebSocketServlet;
+import net.java.openjdk.cacio.servlet.WebSocketStreamThread;
+import org.eclipse.jetty.ee10.servlet.ServletContextHandler;
+import org.eclipse.jetty.ee10.servlet.ServletHolder;
+import org.eclipse.jetty.ee10.websocket.jakarta.server.config.JakartaWebSocketServletContainerInitializer;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Server;
-import org.eclipse.jetty.server.handler.HandlerList;
+import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.server.handler.ResourceHandler;
-import org.eclipse.jetty.servlet.ServletContextHandler;
-import org.eclipse.jetty.servlet.ServletHolder;
 import org.eclipse.jetty.util.thread.QueuedThreadPool;
 
 
@@ -62,18 +64,20 @@ public class CacioServer {
     public CacioServer(int port, int maxThreads) throws Exception {
         applySystemProperties();
 
-        Server server = new Server(port);
+        Server server = new Server(new QueuedThreadPool(maxThreads));
         // https://stackoverflow.com/questions/16299981/jetty-thread-pool-and-sun-httpserver-session#comment27373331_16301885
-        server.setServer(new Server(new QueuedThreadPool(maxThreads)));
+        ServerConnector connector = new ServerConnector(server);
+        connector.setPort(port);
+        server.addConnector(connector);
 
         ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
         context.setContextPath("/");
-        context.setResourceBase("bin/");
+        context.setBaseResourceAsString("bin/");
         context.getSessionHandler().setMaxInactiveInterval(90);
         context.getSessionHandler().addEventListener(new CacioSessionListener());
 
         ResourceHandler handler = new ResourceHandler();
-        handler.setResourceBase("bin");
+        handler.setBaseResourceAsString("bin");
         handler.setServer(server);
 
         // context.addServlet(new ServletHolder(new ImgBenchServlet()),
@@ -86,8 +90,11 @@ public class CacioServer {
         context.addServlet(new ServletHolder(new WebSocketServlet()), "/WebSocket");
         context.addServlet(new ServletHolder(new ResourceLoaderServlet()), "/ResourceLoader");
 
-        HandlerList handlers = new HandlerList();
-        handlers.setHandlers(new Handler[] {handler, context});
+        JakartaWebSocketServletContainerInitializer.configure(context, (servletContext, wsContainer) -> {
+            wsContainer.addEndpoint(WebSocketStreamThread.class);
+        });
+
+        Handler.Sequence handlers = new Handler.Sequence(handler, context);
         server.setHandler(handlers);
 
         server.start();

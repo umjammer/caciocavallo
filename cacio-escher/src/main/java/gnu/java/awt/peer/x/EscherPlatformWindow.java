@@ -50,15 +50,17 @@ import java.awt.event.WindowEvent;
 import java.awt.image.ColorModel;
 import java.awt.peer.ComponentPeer;
 import java.awt.peer.ContainerPeer;
+import java.nio.charset.StandardCharsets;
 
 import com.github.caciocavallosilano.cacio.peer.CacioComponent;
 import com.github.caciocavallosilano.cacio.peer.PlatformToplevelWindow;
 import com.github.caciocavallosilano.cacio.peer.PlatformWindow;
 import gnu.x11.Atom;
-import gnu.x11.Drawable;
+import gnu.x11.Display;
 import gnu.x11.Window;
 import gnu.x11.WindowAttributes;
 import gnu.x11.event.Event;
+import sun.awt.SunToolkit;
 import sun.java2d.SunGraphics2D;
 import sun.java2d.SurfaceData;
 import sun.java2d.pipe.Region;
@@ -69,6 +71,7 @@ class EscherPlatformWindow implements PlatformToplevelWindow {
     private static final int standardSelect =
             Event.EventMask.BUTTON_PRESS_MASK.getMask()
                     | Event.EventMask.BUTTON_RELEASE_MASK.getMask() | Event.EventMask.POINTER_MOTION_MASK.getMask()
+                    | Event.EventMask.ENTER_WINDOW_MASK.getMask() | Event.EventMask.LEAVE_WINDOW_MASK.getMask()
                     // | Event.RESIZE_REDIRECT_MASK.getMask() //
                     | Event.EventMask.EXPOSURE_MASK.getMask() | Event.EventMask.PROPERTY_CHANGE_MASK.getMask()
                     | Event.EventMask.STRUCTURE_NOTIFY_MASK.getMask() //
@@ -112,6 +115,22 @@ class EscherPlatformWindow implements PlatformToplevelWindow {
      */
     private Font font;
 
+    /**
+     * Whether this window is on the screen as far as the X server is concerned.
+     * Set from the event pump.
+     */
+    private volatile boolean mapped;
+
+    /**
+     * Whether a modal dialog is keeping input away from this window.
+     */
+    private volatile boolean blocked;
+
+    /**
+     * The cursor that was set last.
+     */
+    private volatile java.awt.Cursor currentCursor;
+
     EscherPlatformWindow(CacioComponent cacioComp, PlatformWindow parent) {
 
         cacioComponent = cacioComp;
@@ -133,6 +152,9 @@ class EscherPlatformWindow implements PlatformToplevelWindow {
         if (parent == null) {
             parentWindow = dev.getDisplay().getDefaultRoot(); // TODO
             parentInsets = new Insets(0, 0, 0, 0);
+            // A plain toplevel window is a popup, a tooltip or the like, which
+            // has to show up where it was asked to and without a title bar.
+            atts.setOverrideRedirect(!isFocusableToplevel(awtComp));
         } else {
             parentWindow = ((EscherPlatformWindow) parent).xwindow;
             parentInsets = parent.getInsets();
@@ -142,7 +164,7 @@ class EscherPlatformWindow implements PlatformToplevelWindow {
                 y - parentInsets.top, w, h, 0, atts);
         xwindow.selectInput(standardSelect);
 
-        dev.getEventSource().registerWindow(xwindow, cacioComp);
+        dev.registerWindow(this);
 
         xwindow.setWMDeleteWindow();
 
@@ -151,8 +173,10 @@ class EscherPlatformWindow implements PlatformToplevelWindow {
         boolean undecorated;
         if (awtComp instanceof Frame f) {
             undecorated = f.isUndecorated();
+            setTitle(f.getTitle()); // it may have been set before there was a peer
         } else if (awtComp instanceof Dialog d) {
             undecorated = d.isUndecorated();
+            setTitle(d.getTitle());
         } else {
             // Everything else is undecorated by default.
             undecorated = true;
@@ -171,8 +195,8 @@ class EscherPlatformWindow implements PlatformToplevelWindow {
                         1 << 1, 0, 0, 0, 0}, 0, 5);
             }
         }
-        // TODO: Get an estimate of the insets here by used the
-        // _NET_FRAME_EXTENTS mechanism.
+        // A window manager's frame goes around the X window, it is not part of
+        // the AWT component: an AWT location is that of the X window itself.
         insets = new Insets(0, 0, 0, 0);
 
         // Setup the surface data.
@@ -182,7 +206,7 @@ class EscherPlatformWindow implements PlatformToplevelWindow {
         surfaceData =
                 new XDrawableSurfaceData((XGraphicsConfiguration) gc, xwindow,
                         XDrawableSurfaceData.EscherIntRgb,
-                        getColorModel());
+                        gc.getColorModel());
 
         if (awtComp.isVisible())
             show();
@@ -195,31 +219,39 @@ class EscherPlatformWindow implements PlatformToplevelWindow {
     @Override
     public void dispose() {
         XGraphicsDevice dev = EscherToolkit.getDefaultDevice();
-        dev.getEventSource().unregisterWindow(xwindow);
+        dev.unregisterWindow(this);
+        SunToolkit.awtLock();
+        try {
+            ((XDrawableSurfaceData) surfaceData).dispose();
+            xwindow.destroyWindow();
+            dev.getDisplay().flush();
+        } finally {
+            SunToolkit.awtUnlock();
+        }
     }
 
     @Override
     public Rectangle getBounds() {
-        return null;
+        Point p = getLocationOnScreen();
+        return new Rectangle(p.x, p.y, xwindow.width, xwindow.height);
     }
 
     @Override
     public void setBounds(int x, int y, int width, int height, int op) {
         Insets i = insets;
         Insets parentInsets = getParentToplevelInsets();
-        if (op == ComponentPeer.SET_BOUNDS) {
-            xwindow.moveResize(x - i.left - parentInsets.left,
-                    y - i.top - parentInsets.top,
-                    width - i.left - i.right,
-                    height - i.top - i.bottom);
-        } else if (op == ComponentPeer.SET_LOCATION)
-            xwindow.move(x - i.left - parentInsets.left,
-                    y - i.top - parentInsets.top);
-        else if (op == ComponentPeer.SET_SIZE)
-            xwindow.resize(width - i.left - i.right,
-                    height - i.top - i.bottom);
-        else if (op == ComponentPeer.SET_CLIENT_SIZE)
-            xwindow.resize(width, height);
+        // X rejects an empty window
+        int w = Math.max(width - i.left - i.right, 1);
+        int h = Math.max(height - i.top - i.bottom, 1);
+        int px = x - i.left - parentInsets.left;
+        int py = y - i.top - parentInsets.top;
+        switch (op & ~ComponentPeer.NO_EMBEDDED_CHECK) {
+            case ComponentPeer.SET_BOUNDS -> xwindow.moveResize(px, py, w, h);
+            case ComponentPeer.SET_LOCATION -> xwindow.move(px, py);
+            case ComponentPeer.SET_SIZE -> xwindow.resize(w, h);
+            case ComponentPeer.SET_CLIENT_SIZE -> xwindow.resize(Math.max(width, 1), Math.max(height, 1));
+            default -> { }
+        }
     }
 
     private static final Insets EMPTY_INSETS = new Insets(0, 0, 0, 0);
@@ -238,7 +270,7 @@ class EscherPlatformWindow implements PlatformToplevelWindow {
 
     @Override
     public ColorModel getColorModel() {
-        return ColorModel.getRGBdefault();
+        return getGraphicsConfiguration().getColorModel();
     }
 
     @Override
@@ -257,7 +289,9 @@ class EscherPlatformWindow implements PlatformToplevelWindow {
 
     @Override
     public GraphicsConfiguration getGraphicsConfiguration() {
-        return new XGraphicsConfiguration(EscherToolkit.getDefaultDevice());
+        // Has to be the same instance every time: swing keeps its back buffers
+        // per configuration.
+        return EscherToolkit.getDefaultDevice().getDefaultConfiguration();
     }
 
     @Override
@@ -267,9 +301,11 @@ class EscherPlatformWindow implements PlatformToplevelWindow {
 
     @Override
     public Point getLocationOnScreen() {
-        Drawable.GeometryInfo geoInfo = xwindow.getGeometry();
-        Point p = new Point(geoInfo.x - insets.left, geoInfo.y - insets.top);
-        return p;
+        // the window's own position is relative to its parent, which is the
+        // frame of a window manager as soon as there is one
+        Window root = EscherToolkit.getDefaultDevice().getDisplay().getDefaultRoot();
+        Window.Coordinates c = root.translateCoordinates(xwindow, 0, 0);
+        return new Point(c.x() - insets.left, c.y() - insets.top);
     }
 
     @Override
@@ -286,7 +322,6 @@ class EscherPlatformWindow implements PlatformToplevelWindow {
         //xwindow.select_input(Event.NO_EVENT_MASK);
         //xwindow.select_input(noResizeRedirectSelect);
 
-        XGraphicsDevice dev = EscherToolkit.getDefaultDevice();
         xwindow.map();
         EventQueue eq = Toolkit.getDefaultToolkit().getSystemEventQueue();
         Component awtComponent = cacioComponent.getAWTComponent();
@@ -301,17 +336,6 @@ class EscherPlatformWindow implements PlatformToplevelWindow {
 //      // Reset input selection.
 //      atts.set_override_redirect(false);
 //      xwindow.change_attributes(atts);
-
-        // Determine the frame insets.
-        Atom atom = Atom.intern(dev.getDisplay(), "_NET_FRAME_EXTENTS");
-        Window.Property p = xwindow.getProperty(false, atom, Atom.CARDINAL, 0, Window.MAX_WM_LENGTH);
-        if (p.format() != 0) {
-            insets = new Insets(p.value(2), p.value(0), p.value(3), p.value(1));
-            Window.Changes ch = new Window.Changes();
-            ch.setWidth(awtComponent.getWidth() - insets.left - insets.top);
-            ch.setHeight(awtComponent.getHeight() - insets.top - insets.bottom);
-            xwindow.configure(ch);
-        }
     }
 
     /**
@@ -371,14 +395,20 @@ class EscherPlatformWindow implements PlatformToplevelWindow {
 
     @Override
     public void setTitle(String title) {
-        xwindow.setWMName(title);
+        String name = title != null ? title : "";
+        xwindow.setWMName(name);
+        // WM_NAME is latin1, anything else needs the EWMH one to survive
+        Display display = xwindow.getDisplay();
+        xwindow.changeProperty(Window.PropertyMode.REPLACE,
+                Atom.intern(display, "_NET_WM_NAME"), Atom.intern(display, "UTF8_STRING"),
+                8, name.getBytes(StandardCharsets.UTF_8), 0, 8);
     }
 
     public boolean requestFocus(Component lightweightChild, boolean temporary,
                                 boolean focusedWindowChangeAllowed, long time,
                                 Cause cause) {
 
-        xwindow.setInputFocus();
+        takeFocus();
 
         return true;
     }
@@ -405,11 +435,84 @@ class EscherPlatformWindow implements PlatformToplevelWindow {
     }
 
     @Override
+    public void setCursor(java.awt.Cursor cursor) {
+        if (cursor != currentCursor) {
+            currentCursor = cursor;
+            gnu.x11.Cursor xcursor = EscherToolkit.getDefaultDevice().getXCursor(cursor);
+            if (xcursor != null) {
+                WindowAttributes attributes = new WindowAttributes();
+                attributes.setCursor(xcursor);
+                xwindow.changeAttributes(attributes);
+                xwindow.getDisplay().flush();
+            }
+        }
+    }
+
+    @Override
     public void requestFocus() {
+        takeFocus();
     }
 
     @Override
     public void setBlocked(boolean blocked) {
+        this.blocked = blocked;
+    }
+
+    boolean isBlocked() {
+        return blocked;
+    }
+
+    /**
+     * @return whether the component is a window that takes the keyboard, unlike
+     *         a popup that just shows up over the one that has it
+     */
+    private static boolean isFocusableToplevel(Component c) {
+        return c instanceof Frame || c instanceof Dialog;
+    }
+
+    /**
+     * Moves the X input focus here, if this is a window for that. Without a
+     * window manager nobody else does, and X rejects it for an unmapped window.
+     */
+    void takeFocus() {
+        if (mapped && !blocked && isFocusableToplevel(cacioComponent.getAWTComponent())) {
+            xwindow.setInputFocus();
+            xwindow.getDisplay().flush();
+        }
+    }
+
+    /**
+     * Called from the event pump when the X server has mapped or unmapped this
+     * window.
+     */
+    void mapped(boolean mapped) {
+        this.mapped = mapped;
+        if (mapped) {
+            takeFocus();
+        }
+    }
+
+    /**
+     * Enters where the window really is. {@link Window#move(int, int)} skips what
+     * it takes for no change, so a position a window manager came up with has to
+     * be known to it, or going back to the requested one would do nothing.
+     */
+    void locationChanged(Point p) {
+        xwindow.setGeometryCache(new gnu.x11.Rectangle(p.x, p.y, xwindow.width, xwindow.height));
+    }
+
+    /**
+     * Enters a size the X server reports.
+     *
+     * @return whether it differs from the one that was known so far
+     */
+    boolean sizeChanged(int width, int height) {
+        if (xwindow.width == width && xwindow.height == height) {
+            return false;
+        }
+        xwindow.width = width;
+        xwindow.height = height;
+        return true;
     }
 
     /**

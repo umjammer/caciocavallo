@@ -45,19 +45,21 @@ import java.awt.image.DataBuffer;
 import java.awt.image.Raster;
 import java.awt.image.SampleModel;
 import java.awt.image.WritableRaster;
+import java.util.ArrayList;
+import java.util.List;
 
 import gnu.x11.Drawable;
 import gnu.x11.GC;
 import gnu.x11.GC.Values.RectangleOrder;
 import gnu.x11.color.ColorMapper;
 import sun.awt.SunHints;
-import sun.awt.SunToolkit;
 import sun.java2d.SunGraphics2D;
 import sun.java2d.SurfaceData;
 import sun.java2d.loops.RenderLoops;
 import sun.java2d.loops.SurfaceType;
 import sun.java2d.pipe.PixelToShapeConverter;
 import sun.java2d.pipe.Region;
+import sun.java2d.pipe.SpanIterator;
 import sun.java2d.pipe.ValidatePipe;
 
 
@@ -100,6 +102,9 @@ class XDrawableSurfaceData extends SurfaceData {
     private GC xgc;
     private final Drawable xDrawable;
 
+    /** The clip the GC is set to, null if it is not known. */
+    private Region clip;
+
     /**
      * The graphics configuration for that surface.
      */
@@ -132,9 +137,9 @@ class XDrawableSurfaceData extends SurfaceData {
 
     @Override
     public Raster getRaster(int x, int y, int w, int h) {
-        if (raster == null) {
-            int width = xDrawable.width;
-            int height = xDrawable.height;
+        int width = xDrawable.width;
+        int height = xDrawable.height;
+        if (raster == null || raster.getWidth() != width || raster.getHeight() != height) {
             DataBuffer b = new XDrawableDataBuffer(xDrawable);
             ColorModel cm = ColorModel.getRGBdefault();
             SampleModel sm = cm.createCompatibleSampleModel(width, height);
@@ -251,22 +256,37 @@ class XDrawableSurfaceData extends SurfaceData {
 
     public synchronized void makePipes() {
         if (primitivePipe == null) {
-            SunToolkit.awtLock();
-            try {
-                xgc = new GC(xDrawable);
-            } finally {
-                SunToolkit.awtUnlock();
-            }
             primitivePipe = EscherRenderer.getInstance();
             complexPipe = new PixelToShapeConverter(primitivePipe);
             textPipe = new EscherTextRenderer();
         }
     }
 
+    /**
+     * @return the GC of this surface, not to be used without the AWT lock
+     */
+    private GC gc() {
+        if (xgc == null) {
+            xgc = new GC(xDrawable);
+            clip = null;
+        }
+        return xgc;
+    }
+
+    /**
+     * Releases the X resources along with the drawable they belong to.
+     */
+    void dispose() {
+        if (xgc != null) {
+            xgc.free();
+            xgc = null;
+        }
+    }
+
     @Override
     public void invalidate() {
         super.invalidate();
-        xgc.free();
+        dispose();
     }
 
     /**
@@ -279,33 +299,35 @@ class XDrawableSurfaceData extends SurfaceData {
                 convertToNativePixel(sg2d.pixel,
                         xDrawable.getDisplay().getDefaultVisual());
 
-        xgc.setForeground(pixel);
-        Region c = sg2d.clipRegion;
-        if (c.isRectangular()) {
-            gnu.x11.Rectangle clip = new gnu.x11.Rectangle(c.getLoX(), c.getLoY(),
-                    c.getWidth(),
-                    c.getHeight());
-            xgc.setClipRectangles(0, 0,
-                    new gnu.x11.Rectangle[] {clip}, RectangleOrder.UN_SORTED);
-        } else {
-            throw new UnsupportedOperationException();
-        }
-        return xgc;
+        GC gc = gc();
+        gc.setForeground(pixel);
+        setClip(sg2d.getCompClip());
+        return gc;
     }
 
     GC getBlitGC(Region c) {
-        if (c != null) {
-            if (c.isRectangular()) {
-                gnu.x11.Rectangle clip = new gnu.x11.Rectangle(c.getLoX(), c.getLoY(),
-                        c.getWidth(),
-                        c.getHeight());
-                xgc.setClipRectangles(0, 0,
-                        new gnu.x11.Rectangle[] {clip}, RectangleOrder.UN_SORTED);
-            } else {
-                throw new UnsupportedOperationException();
-            }
+        GC gc = gc();
+        setClip(c != null ? c : Region.getInstanceXYWH(0, 0, xDrawable.width, xDrawable.height));
+        return gc;
+    }
+
+    /**
+     * Enters a region as the clip of the GC, one rectangle per span for the
+     * ones that are not a plain rectangle. Swing sets the same clip over and
+     * over, so the request is saved when that is what happens.
+     */
+    private void setClip(Region c) {
+        if (c.equals(clip)) {
+            return;
         }
-        return xgc;
+        clip = c;
+        List<gnu.x11.Rectangle> rectangles = new ArrayList<>();
+        SpanIterator spans = c.getSpanIterator();
+        int[] box = new int[4];
+        while (spans.nextSpan(box)) {
+            rectangles.add(new gnu.x11.Rectangle(box[0], box[1], box[2] - box[0], box[3] - box[1]));
+        }
+        gc().setClipRectangles(0, 0, rectangles.toArray(gnu.x11.Rectangle[]::new), RectangleOrder.UN_SORTED);
     }
 
     Drawable getDrawable() {

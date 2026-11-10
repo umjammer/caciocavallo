@@ -38,15 +38,20 @@ exception statement from your version. */
 package gnu.java.awt.peer.x;
 
 import java.awt.AWTError;
+import java.awt.Component;
 import java.awt.GraphicsConfiguration;
 import java.awt.GraphicsDevice;
+import java.io.IOException;
 import java.lang.System.Logger;
 import java.lang.System.Logger.Level;
-import java.lang.reflect.Constructor;
 import java.net.Socket;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
+import gnu.x11.Cursor;
 import gnu.x11.Display;
 import gnu.x11.EscherServerConnectionException;
+import gnu.x11.UnixDomainSocket;
 
 
 /**
@@ -77,11 +82,16 @@ public class XGraphicsDevice extends GraphicsDevice {
             String[] pair = dn.split(":");
             this.hostname = pair[0];
             this.displayNumber = pair[1].indexOf('.') != -1 ? Integer.valueOf(pair[1].substring(0, pair[1].indexOf('.'))) : Integer.valueOf(pair[1]);
-            this.screenNumber = pair[1].indexOf('.') != -1 ? Integer.parseInt(pair[1].substring(pair[1].lastIndexOf('.'))) : -1;
+            this.screenNumber = pair[1].indexOf('.') != -1 ? Integer.parseInt(pair[1].substring(pair[1].lastIndexOf('.') + 1)) : -1;
         }
 
         public String getIDString() {
             return ":" + displayNumber + (screenNumber != -1 ? "." + screenNumber : "");
+        }
+
+        @Override
+        public String toString() {
+            return hostname + getIDString();
         }
     }
 
@@ -91,9 +101,18 @@ public class XGraphicsDevice extends GraphicsDevice {
     private final DisplayName displayName;
 
     /**
-     * The event pump for this X Display.
+     * The windows on this X Display by their X window id, for the event pump
+     * to find the target of an event. It runs on its own thread.
      */
-    private XEventSource eventSource;
+    private final Map<Integer, EscherPlatformWindow> windows = new ConcurrentHashMap<>();
+
+    /** The X cursors by AWT cursor type, they are created when first used. */
+    private final Map<Integer, Cursor> cursors = new ConcurrentHashMap<>();
+
+    private EscherClipboard clipboard;
+    private EscherClipboard primarySelection;
+
+    private volatile boolean buttonDown;
 
     /**
      * Creates a new XGraphicsDevice.
@@ -114,8 +133,7 @@ public class XGraphicsDevice extends GraphicsDevice {
 
     @Override
     public GraphicsConfiguration[] getConfigurations() {
-        // TODO: Implement this.
-        throw new UnsupportedOperationException("Not yet implemented.");
+        return new GraphicsConfiguration[] {getDefaultConfiguration()};
     }
 
     @Override
@@ -167,41 +185,120 @@ public class XGraphicsDevice extends GraphicsDevice {
                 awtErr.initCause(ex);
                 throw awtErr;
             }
-
-            eventSource = new XEventSource(display);
         }
         return display;
     }
 
-    XEventSource getEventSource() {
-        return eventSource;
+    void registerWindow(EscherPlatformWindow window) {
+        windows.put(window.xwindow.id(), window);
+    }
+
+    void unregisterWindow(EscherPlatformWindow window) {
+        windows.remove(window.xwindow.id());
     }
 
     /**
-     * Tries to load the LocalSocket class and initiate a connection to the
-     * local X server.
+     * @return the X window a component is on, null if it is not showing
+     */
+    EscherPlatformWindow getWindowOf(Component component) {
+        for (Component c = component; c != null; c = c.getParent()) {
+            if (c instanceof java.awt.Window) {
+                for (EscherPlatformWindow window : windows.values()) {
+                    if (window.getCacioComponent().getAWTComponent() == c) {
+                        return window;
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
+    /**
+     * @return the X cursor for an AWT one
+     */
+    Cursor getXCursor(java.awt.Cursor cursor) {
+        if (cursor instanceof EscherCustomCursor custom) {
+            return custom.xcursor();
+        }
+        return cursors.computeIfAbsent(cursor.getType(), type -> new Cursor(getDisplay(), switch (type) {
+            case java.awt.Cursor.CROSSHAIR_CURSOR -> Cursor.Shape.CROSSHAIR;
+            case java.awt.Cursor.TEXT_CURSOR -> Cursor.Shape.XTERM;
+            case java.awt.Cursor.WAIT_CURSOR -> Cursor.Shape.WATCH;
+            case java.awt.Cursor.SW_RESIZE_CURSOR -> Cursor.Shape.BOTTOM_LEFT_CORNER;
+            case java.awt.Cursor.SE_RESIZE_CURSOR -> Cursor.Shape.BOTTOM_RIGHT_CORNER;
+            case java.awt.Cursor.NW_RESIZE_CURSOR -> Cursor.Shape.TOP_LEFT_CORNER;
+            case java.awt.Cursor.NE_RESIZE_CURSOR -> Cursor.Shape.TOP_RIGHT_CORNER;
+            case java.awt.Cursor.N_RESIZE_CURSOR -> Cursor.Shape.TOP_SIDE;
+            case java.awt.Cursor.S_RESIZE_CURSOR -> Cursor.Shape.BOTTOM_SIDE;
+            case java.awt.Cursor.W_RESIZE_CURSOR -> Cursor.Shape.LEFT_SIDE;
+            case java.awt.Cursor.E_RESIZE_CURSOR -> Cursor.Shape.RIGHT_SIDE;
+            case java.awt.Cursor.HAND_CURSOR -> Cursor.Shape.HAND2;
+            case java.awt.Cursor.MOVE_CURSOR -> Cursor.Shape.FLEUR;
+            default -> Cursor.Shape.LEFT_PTR;
+        }));
+    }
+
+    /**
+     * @return the CLIPBOARD selection as a clipboard
+     */
+    synchronized EscherClipboard getClipboard() {
+        if (clipboard == null) {
+            clipboard = new EscherClipboard(getDisplay(), "CLIPBOARD");
+        }
+        return clipboard;
+    }
+
+    /**
+     * @return the PRIMARY selection as a clipboard
+     */
+    synchronized EscherClipboard getPrimarySelection() {
+        if (primarySelection == null) {
+            primarySelection = new EscherClipboard(getDisplay(), "PRIMARY");
+        }
+        return primarySelection;
+    }
+
+    /**
+     * @return the clipboard for a selection, null if it is not one in use
+     */
+    synchronized EscherClipboard getClipboard(int selection) {
+        for (EscherClipboard c : new EscherClipboard[] {clipboard, primarySelection}) {
+            if (c != null && c.selectionID() == selection) {
+                return c;
+            }
+        }
+        return null;
+    }
+
+    void setButtonDown(boolean down) {
+        buttonDown = down;
+    }
+
+    /**
+     * @return whether a mouse button is being held down, according to the events so far
+     */
+    boolean isButtonDown() {
+        return buttonDown;
+    }
+
+    /**
+     * @return the window for that id, null for a window that is gone already
+     */
+    EscherPlatformWindow getWindow(int id) {
+        return windows.get(id);
+    }
+
+    /**
+     * Tries to connect to the local X server through its unix domain socket.
+     *
+     * @return the connected socket, null when there is none to connect to
      */
     private Socket createLocalSocket() {
-        Socket socket = null;
         try {
-            // TODO: Is this 100% ok?
-            String sockPath = "/tmp/.X11-unix/X" + displayName.displayNumber;
-            Class<?> localSocketAddressClass =
-                    Class.forName("gnu.java.net.local.LocalSocketAddress");
-            Constructor<?> localSocketAddressConstr =
-                    localSocketAddressClass.getConstructor(String.class);
-            Object addr =
-                    localSocketAddressConstr.newInstance(sockPath);
-            Class<?> localSocketClass =
-                    Class.forName("gnu.java.net.local.LocalSocket");
-            Constructor<?> localSocketConstructor =
-                    localSocketClass.getConstructor(localSocketAddressClass);
-            Object localSocket =
-                    localSocketConstructor.newInstance(addr);
-            socket = (Socket) localSocket;
-        } catch (Exception ex) {
-            // Whatever goes wrong here, we return null.
+            return new UnixDomainSocket("/tmp/.X11-unix/X" + displayName.displayNumber);
+        } catch (IOException ex) {
+            logger.log(Level.DEBUG, "no local socket for " + displayName.getIDString() + ": " + ex);
+            return null;
         }
-        return socket;
     }
 }
