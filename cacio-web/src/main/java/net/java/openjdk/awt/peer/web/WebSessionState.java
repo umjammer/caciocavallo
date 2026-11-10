@@ -37,7 +37,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.java.openjdk.cacio.servlet.transport.Transport;
-import sun.awt.SunToolkit;
 
 
 /**
@@ -120,7 +119,7 @@ public class WebSessionState {
         if (appContext != null) {
             logSessionDispose();
 
-            SunToolkit.postEvent(new InvocationEvent(this, () -> {
+            Toolkit.getDefaultToolkit().getSystemEventQueue().postEvent(new InvocationEvent(this, () -> {
                 Window[] windowArray = Window.getWindows();
                 for (Window w : windowArray) {
                     w.dispose();
