@@ -1,7 +1,7 @@
 [![Release](https://jitpack.io/v/umjammer/caciocavallo.svg)](https://jitpack.io/#umjammer/caciocavallo)
 [![Java CI](https://github.com/umjammer/caciocavallo/actions/workflows/maven.yml/badge.svg)](https://github.com/umjammer/caciocavallo/actions/workflows/maven.yml)
 [![CodeQL](https://github.com/umjammer/caciocavallo/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/umjammer/caciocavallo/actions/workflows/codeql-analysis.yml)
-![Java](https://img.shields.io/badge/Java-17-b07219)
+![Java](https://img.shields.io/badge/Java-27-b07219)
 
 # Caciocavallo
 
